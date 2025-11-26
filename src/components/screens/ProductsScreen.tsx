@@ -1,10 +1,14 @@
-import { MagnifyingGlass, Plus, Funnel } from "@phosphor-icons/react"
+import { MagnifyingGlass, Plus, Funnel, Sparkle } from "@phosphor-icons/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { GlowCard } from "@/components/ui/spotlight-card"
+import { useState } from "react"
 
 export function ProductsScreen() {
+  const [showGlowDemo, setShowGlowDemo] = useState(false)
+
   const products = [
     {
       id: 1,
@@ -62,9 +66,17 @@ export function ProductsScreen() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-        <button className="glass-panel w-10 h-10 rounded-full flex items-center justify-center skeuo-raised active:skeuo-pressed transition-all duration-150 active:scale-95">
-          <Funnel weight="bold" className="w-4 h-4" />
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowGlowDemo(!showGlowDemo)}
+            className="glass-panel w-10 h-10 rounded-full flex items-center justify-center skeuo-raised active:skeuo-pressed transition-all duration-150 active:scale-95"
+          >
+            <Sparkle weight="bold" className={`w-4 h-4 ${showGlowDemo ? 'text-accent' : ''}`} />
+          </button>
+          <button className="glass-panel w-10 h-10 rounded-full flex items-center justify-center skeuo-raised active:skeuo-pressed transition-all duration-150 active:scale-95">
+            <Funnel weight="bold" className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <div className="relative">
@@ -77,6 +89,31 @@ export function ProductsScreen() {
           className="pl-11 h-12 glass-panel skeuo-inset border-input/50 bg-secondary/30 placeholder:text-muted-foreground/50"
         />
       </div>
+
+      {showGlowDemo && (
+        <div className="w-full overflow-x-auto pb-4">
+          <div className="flex gap-4 min-w-max px-2">
+            <GlowCard glowColor="blue" size="sm" className="!aspect-[4/3]">
+              <div className="flex flex-col justify-end">
+                <h3 className="text-sm font-semibold text-white">Blue Glow</h3>
+                <p className="text-xs text-white/70">Hover effect demo</p>
+              </div>
+            </GlowCard>
+            <GlowCard glowColor="purple" size="sm" className="!aspect-[4/3]">
+              <div className="flex flex-col justify-end">
+                <h3 className="text-sm font-semibold text-white">Purple Glow</h3>
+                <p className="text-xs text-white/70">Interactive card</p>
+              </div>
+            </GlowCard>
+            <GlowCard glowColor="green" size="sm" className="!aspect-[4/3]">
+              <div className="flex flex-col justify-end">
+                <h3 className="text-sm font-semibold text-white">Green Glow</h3>
+                <p className="text-xs text-white/70">Spotlight effect</p>
+              </div>
+            </GlowCard>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         {products.map((product) => (

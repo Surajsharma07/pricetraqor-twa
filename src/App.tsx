@@ -6,6 +6,7 @@ import { AlertsScreen } from "@/components/screens/AlertsScreen"
 import { ProfileScreen } from "@/components/screens/ProfileScreen"
 import { LoginScreen } from "@/components/screens/LoginScreen"
 import { SignupScreen } from "@/components/screens/SignupScreen"
+import { ComponentDemoScreen } from "@/components/screens/ComponentDemoScreen"
 import { Toaster } from "@/components/ui/sonner"
 import { useKV } from "@github/spark/hooks"
 
@@ -13,6 +14,7 @@ function App() {
   const [activeScreen, setActiveScreen] = useState("home")
   const [authScreen, setAuthScreen] = useState<"login" | "signup" | null>("login")
   const [isAuthenticated, setIsAuthenticated] = useKV<boolean>("is-authenticated", false)
+  const [showDemo, setShowDemo] = useState(false)
 
   const handleLogin = () => {
     setIsAuthenticated(true)
@@ -50,6 +52,15 @@ function App() {
     }
   }
 
+  if (showDemo) {
+    return (
+      <>
+        <ComponentDemoScreen onBack={() => setShowDemo(false)} />
+        <Toaster />
+      </>
+    )
+  }
+
   const renderScreen = () => {
     switch (activeScreen) {
       case "home":
@@ -59,7 +70,7 @@ function App() {
       case "alerts":
         return <AlertsScreen />
       case "profile":
-        return <ProfileScreen />
+        return <ProfileScreen onShowDemo={() => setShowDemo(true)} />
       default:
         return <HomeScreen />
     }

@@ -47,6 +47,11 @@
   --glass-border: oklch(0.30 0.04 250 / 0.3);
   --glass-bg: oklch(0.12 0.02 250 / 0.6);
   --shadow-color: oklch(0.05 0.01 250);
+
+  --press-desktop: 0.3s ease;
+  --press-mobile: 0.2s ease;
+  --gap: 4px;
+  --light: #00FF88;
 }
 
 @theme {
@@ -150,4 +155,151 @@
 .text-numeric {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+
+.skeuo-nav-container {
+  --background: #1e1e1e;
+  --background-card: #2a2a2a;
+  --card: #222;
+  --shadow-light: 0px -1px 2px 0px rgba(255, 255, 255, 0.09) inset;
+  --shadow-dark: 0px 2px 4px 0px rgba(0, 0, 0, 0.6) inset;
+  --icon-color: #fff;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+}
+
+.skeuo-nav-container .nav {
+  position: relative;
+  display: flex;
+  border-radius: 26px;
+  background-color: var(--background-card);
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+.skeuo-nav-container .button {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 22px;
+  background-color: var(--card);
+  box-shadow: var(--shadow-dark), var(--shadow-light);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow var(--press-desktop);
+}
+
+.skeuo-nav-container .button-bg {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform-origin: center center;
+  will-change: transform;
+  transition: opacity var(--press-desktop);
+}
+
+.skeuo-nav-container .button.hover .button-bg {
+  opacity: 0.15;
+}
+
+.skeuo-nav-container .button.press {
+  box-shadow: 
+    0px 1px 2px 0px rgba(255, 255, 255, 0.09) inset,
+    0px -1px 4px 0px rgba(0, 0, 0, 0.6) inset;
+  transition: box-shadow var(--press-mobile);
+}
+
+.skeuo-nav-container .button .frame {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeuo-nav-container .button svg {
+  width: 28px;
+  height: 28px;
+  color: var(--icon-color);
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.skeuo-nav-container .light {
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--light) 0%, transparent 60%);
+  filter: blur(80px);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.skeuo-nav-container .button-light {
+  position: absolute;
+  display: flex;
+  gap: var(--gap);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 0.3s ease;
+}
+
+.skeuo-nav-container .button-light > div {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.skeuo-nav-container .button-light svg {
+  width: 28px;
+  height: 28px;
+  color: var(--light);
+}
+
+.skeuo-nav-container .button-light.glare {
+  mix-blend-mode: color-dodge;
+}
+
+@media (max-width: 768px) {
+  .skeuo-nav-container .button {
+    width: 64px;
+    height: 64px;
+  }
+
+  .skeuo-nav-container .button svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .skeuo-nav-container .button-light > div {
+    width: 64px;
+    height: 64px;
+  }
+
+  .skeuo-nav-container .button-light svg {
+    width: 24px;
+    height: 24px;
+  }
 }

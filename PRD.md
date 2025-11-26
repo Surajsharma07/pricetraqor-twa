@@ -8,7 +8,7 @@ A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experien
 3. **Effortless** - Despite the rich visual treatment, navigation and actions should be immediate and obvious, with no learning curve between the user's intent and the interface's response.
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - Six distinct screens (Login, Signup, Home, Products, Alerts, Profile) with independent purposes but unified visual language, authentication flow with Telegram integration, basic state management for toggling alerts and switches, subscription tier management.
+  - Six distinct screens (Login, Signup, Home, Products, Alerts, Profile) with independent purposes but unified visual language, authentication flow with Telegram integration, basic state management for toggling alerts and switches, subscription tier management. Includes two integrated premium UI components: GlowCard (spotlight cards) and InteractiveNav (skeuomorphic navigation with dynamic lighting).
 
 ## Essential Features
 
@@ -48,11 +48,18 @@ A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experien
 - **Success criteria**: Toggle switches look like physical sliders with real shadows, ON state appears raised with inner highlight, OFF state looks sunken
 
 ### Profile & Preferences
-- **Functionality**: Displays user identity card, subscription details with tier-based features, preference controls for theme/currency/notifications, account actions
-- **Purpose**: Gives users control over app behavior, personal settings, and visibility into subscription benefits
+- **Functionality**: Displays user identity card, subscription details with tier-based features, preference controls for theme/currency/notifications, account actions, access to component showcase demo
+- **Purpose**: Gives users control over app behavior, personal settings, and visibility into subscription benefits, plus a showcase of premium UI components
 - **Trigger**: Tap "Profile" in bottom nav
-- **Progression**: Navigate to Profile → glass identity card at top → subscription card shows current tier (Free/Pro/Premium) with feature list → renewal date and pricing for paid tiers → preference rows with segmented controls → action buttons at bottom
-- **Success criteria**: Identity card has clear glass effect with blur, subscription card shows Crown icon with gradient, feature list displays with checkmarks, upgrade button has accent gradient, preference controls feel like physical switches, sign out button has destructive color treatment
+- **Progression**: Navigate to Profile → glass identity card at top → subscription card shows current tier (Free/Pro/Premium) with feature list → renewal date and pricing for paid tiers → preference rows with segmented controls → action buttons at bottom including "Component Showcase" → tap showcase button to view demo screen
+- **Success criteria**: Identity card has clear glass effect with blur, subscription card shows Crown icon with gradient, feature list displays with checkmarks, upgrade button has accent gradient, preference controls feel like physical switches, sign out button has destructive color treatment, showcase button displays with sparkle icon
+
+### Component Showcase Demo
+- **Functionality**: Interactive demo screen showcasing GlowCard (spotlight cards with cursor-following glow effects) and InteractiveNav (skeuomorphic navigation buttons with dynamic lighting)
+- **Purpose**: Demonstrates premium UI components integrated into the app, serves as a visual highlight of advanced design capabilities
+- **Trigger**: Tap "Component Showcase" button in Profile screen
+- **Progression**: Tap showcase → full-screen demo loads → back button at top → skeuomorphic nav demo with interactive buttons → multiple glow card variations with different colors → custom-sized responsive examples → tap back to return to profile
+- **Success criteria**: GlowCard follows cursor with smooth radial gradient spotlight, multiple color variations (blue, purple, green, orange, red), InteractiveNav shows dynamic shadow calculations based on cursor position, lighting effects respond in real-time, smooth transitions between demo and app
 
 ## Edge Case Handling
 
@@ -122,8 +129,11 @@ Animations should reinforce the physical nature of the interface—switches slid
   - Shadcn `Badge` for status chips and notification counts
   - Shadcn `Tabs` as base for segmented controls in preferences
   - Shadcn `Checkbox` for terms agreement with accent color when checked
+  - Custom `GlowCard` component for spotlight cards with cursor-following radial gradient effects (supports multiple colors: blue, purple, green, orange, red)
+  - Custom `InteractiveNav` component for skeuomorphic navigation buttons with dynamic lighting and shadow calculations
   - Custom bottom navigation component (not in Shadcn) with raised pill indicator
   - Custom login/signup screens with form layouts
+  - Custom ComponentDemoScreen for showcasing premium UI components
   
 - **Customizations**: 
   - All cards need `backdrop-filter: blur()` and semi-transparent backgrounds
@@ -132,6 +142,8 @@ Animations should reinforce the physical nature of the interface—switches slid
   - Switches need custom track with gradient and glossy highlight, circular thumb with shadow that moves with state
   - Input fields need carved-in appearance with inner shadow and subtle border, icon placement on left side
   - Telegram button uses official brand gradient `from-[#229ED9] to-[#1B7DB8]`
+  - GlowCard uses CSS custom properties for dynamic cursor tracking with radial gradients, supports customizable colors via glowColor prop
+  - InteractiveNav implements complex shadow calculations based on cursor position, uses easing functions for smooth transitions, includes light radius effects and gradient backgrounds
   
 - **States**: 
   - Buttons: idle (raised, outer shadow + top highlight + pseudo-element overlay), hover (shadow grows, subtle scale, gradient intensifies), active (sunken, inner shadow, scale 0.98, dark overlay), disabled (opacity 0.5, no shadow)
@@ -142,11 +154,12 @@ Animations should reinforce the physical nature of the interface—switches slid
 - **Icon Selection**: 
   - @phosphor-icons/react for all UI icons
   - Bottom nav: `House`, `Package`, `BellRinging`, `User` 
-  - Actions: `MagnifyingGlass`, `Plus`, `PencilSimple`, `Trash`, `Bell`, `Gear`
+  - Actions: `MagnifyingGlass`, `Plus`, `PencilSimple`, `Trash`, `Bell`, `Gear`, `ArrowLeft`, `Sparkle`, `Funnel`
   - Auth screens: `TelegramLogo`, `EnvelopeSimple`, `LockKey`, `Eye`, `EyeSlash`
   - Profile: `Crown`, `CalendarBlank`, `Infinity`, `CheckCircle`, `SignOut`
   - Indicators: `TrendUp`, `TrendDown`, `Minus`
-  - Use `weight="duotone"` for nav icons, `weight="bold"` for actions, `weight="fill"` for special icons like Crown and Telegram
+  - Custom SVG icons in InteractiveNav: `ListIcon`, `GridIcon` (inline SVG definitions)
+  - Use `weight="duotone"` for nav icons, `weight="bold"` for actions, `weight="fill"` for special icons like Crown, Telegram, and Sparkle
   
 - **Spacing**: 
   - Screen padding: 16px horizontal

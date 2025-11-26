@@ -1,11 +1,15 @@
-import { User, SignOut, Gear, Crown, CalendarBlank, Infinity, CheckCircle } from "@phosphor-icons/react"
+import { User, SignOut, Gear, Crown, CalendarBlank, Infinity, CheckCircle, Sparkle } from "@phosphor-icons/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useKV } from "@github/spark/hooks"
 
-export function ProfileScreen() {
+interface ProfileScreenProps {
+  onShowDemo?: () => void
+}
+
+export function ProfileScreen({ onShowDemo }: ProfileScreenProps) {
   const [selectedTheme, setSelectedTheme] = useKV<string>("theme-preference", "Auto")
   const [selectedCurrency, setSelectedCurrency] = useKV<string>("currency-preference", "INR")
   const [notificationPrefs, setNotificationPrefs] = useKV<string[]>("notification-prefs", ["In-app", "Email"])
@@ -216,6 +220,15 @@ export function ProfileScreen() {
       </div>
 
       <div className="space-y-3 pt-4">
+        {onShowDemo && (
+          <Button 
+            onClick={onShowDemo}
+            className="w-full h-12 glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-[0.98] bg-gradient-to-br from-accent/40 to-violet-accent/30 hover:from-accent/50 hover:to-violet-accent/40 border-accent/30"
+          >
+            <Sparkle weight="fill" className="w-4 h-4 mr-2" />
+            Component Showcase
+          </Button>
+        )}
         <Button className="w-full h-12 glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-[0.98] bg-gradient-to-br from-primary/30 to-accent/20 hover:from-primary/40 hover:to-accent/30 border-primary/30">
           <Gear weight="bold" className="w-4 h-4 mr-2" />
           Manage account
