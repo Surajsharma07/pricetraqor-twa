@@ -66,7 +66,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.2),0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25),0_3px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)] active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.3),inset_0_-1px_2px_rgba(255,255,255,0.05)] active:scale-95 bg-gradient-to-b from-secondary/60 to-secondary/40">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full neumorphic-button hover:glow-accent active:scale-95 bg-gradient-to-b from-secondary/60 to-secondary/40">
           <ArrowLeft className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
         </Button>
         <div>
@@ -75,7 +75,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
         </div>
       </div>
 
-      <Card className="p-6 shadow-[0_8px_24px_rgba(0,0,0,0.25),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)] bg-gradient-to-br from-card/98 via-card to-card/95 backdrop-blur-xl relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
+      <Card className="p-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
         <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
           <div className="space-y-2">
             <Label htmlFor="product-url" className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
@@ -89,7 +89,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
                 placeholder="https://www.amazon.com/product/..."
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                className={`pl-10 shadow-[inset_0_3px_8px_rgba(0,0,0,0.15),inset_0_-1px_3px_rgba(255,255,255,0.05),0_1px_3px_rgba(0,0,0,0.1)] bg-gradient-to-b from-background/60 to-background/40 border-border/40 ${urlError ? 'border-destructive' : ''}`}
+                className={`pl-10 neumorphic-inset ${urlError ? 'border-destructive' : ''}`}
               />
             </div>
             {urlError && (
@@ -114,7 +114,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
                 placeholder="0.00"
                 value={targetPrice}
                 onChange={(e) => setTargetPrice(e.target.value)}
-                className="pl-10 shadow-[inset_0_3px_8px_rgba(0,0,0,0.15),inset_0_-1px_3px_rgba(255,255,255,0.05),0_1px_3px_rgba(0,0,0,0.1)] bg-gradient-to-b from-background/60 to-background/40 border-border/40"
+                className="pl-10 neumorphic-inset"
               />
             </div>
             <p className="text-xs text-muted-foreground">
@@ -122,7 +122,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
             </p>
           </div>
 
-          <Button type="submit" className="w-full shadow-[0_6px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.2)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-1px_0_rgba(0,0,0,0.25)] active:shadow-[inset_0_4px_16px_rgba(0,0,0,0.35),inset_0_-1px_3px_rgba(255,255,255,0.08)] active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200" disabled={isValidating}>
+          <Button type="submit" className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200" disabled={isValidating}>
             {isValidating ? (
               <>
                 <span className="animate-pulse drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Validating...</span>
@@ -137,9 +137,9 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
         </form>
       </Card>
 
-      <Card className="p-5 bg-gradient-to-br from-muted/90 via-muted/70 to-muted/50 shadow-[0_6px_20px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)] backdrop-blur-sm">
+      <Card className="p-5 frosted-glass">
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
-          <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(var(--accent),0.6)]"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-accent glow-accent"></div>
           How it works
         </h3>
         <ul className="text-xs text-muted-foreground space-y-2">
