@@ -1,178 +1,154 @@
 # Planning Guide
 
-A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experience that makes digital price tracking feel like interacting with premium physical hardware.
+A Telegram Web App (TWA) interface for price tracking that monitors ecommerce products and alerts users when prices drop, providing a mobile-optimized experience for managing watchlists and receiving timely notifications.
 
 **Experience Qualities**: 
-1. **Tactile** - Every interaction should feel physically responsive, with buttons that appear to press, switches that slide, and surfaces that catch light like real materials.
-2. **Luxurious** - The app should evoke premium hardware through meticulous attention to light, shadow, and material quality—like holding an expensive watch or hi-fi equipment.
-3. **Effortless** - Despite the rich visual treatment, navigation and actions should be immediate and obvious, with no learning curve between the user's intent and the interface's response.
+1. **Instant** - Fast navigation, immediate feedback, and real-time price updates that feel snappy and responsive
+2. **Trustworthy** - Clear data presentation with reliable notifications that users can depend on for important purchase decisions
+3. **Focused** - Streamlined interface that prioritizes the watchlist and alerts without unnecessary complexity or distractions
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - Six distinct screens (Login, Signup, Home, Products, Alerts, Profile) with independent purposes but unified visual language, authentication flow with Telegram integration, basic state management for toggling alerts and switches, subscription tier management. Includes two integrated premium UI components: GlowCard (spotlight cards) and InteractiveNav (skeuomorphic navigation with dynamic lighting).
+- Multiple interconnected screens (watchlist, product detail, add product, settings) with navigation and state management, but maintaining simplicity in each individual view to serve the core price-tracking purpose efficiently.
 
 ## Essential Features
 
-### Authentication Flow
-- **Functionality**: Provides login and signup screens with email/password or Telegram authentication options
-- **Purpose**: Secure user access and enable personalized price tracking across devices
-- **Trigger**: App loads and user is not authenticated
-- **Progression**: App loads → Login screen appears → user can choose Telegram auth (instant) or email/password → enter credentials → validate → navigate to home screen
-- **Success criteria**: Telegram button has distinctive blue gradient, form inputs have proper inset appearance, password visibility toggle works, authentication state persists using useKV
+### Watchlist Management
+- **Functionality**: Display all tracked products with current prices, change indicators, and quick actions
+- **Purpose**: Central hub for monitoring all price-tracked items at a glance
+- **Trigger**: App launch or bottom nav "Home" tap
+- **Progression**: Launch app → View watchlist grid → See price changes → Tap product for details OR tap + to add new
+- **Success criteria**: User can immediately identify which products have price drops and access product details in one tap
 
-### Bottom Navigation Bar
-- **Functionality**: Provides persistent access to four primary screens (Home, Products, Alerts, Profile)
-- **Purpose**: Ensures users can jump between any major section with one tap, matching Telegram Mini App expectations
-- **Trigger**: Always visible at bottom of viewport
-- **Progression**: Tap icon → immediate screen transition with subtle slide animation → selected state highlights active icon with raised pill effect
-- **Success criteria**: Navigation responds within 100ms, active state is visually obvious, transitions feel smooth
+### Add Product Tracking
+- **Functionality**: Accept ecommerce URLs, validate, and add products to watchlist
+- **Purpose**: Allow users to expand their watchlist with any supported ecommerce product
+- **Trigger**: Tap "+ Add Product" button OR deep-link with pre-filled URL parameter
+- **Progression**: Tap add → Input URL → Optional: set target price → Submit → Validation → Confirmation → Redirect to watchlist
+- **Success criteria**: User successfully adds product and sees it appear in watchlist with current price data
 
-### Home Dashboard
-- **Functionality**: Displays at-a-glance KPIs, today's watchlist (3-5 products), and quick action shortcuts
-- **Purpose**: Gives users immediate context on their tracking activity without requiring navigation
-- **Trigger**: Default landing screen when app opens
-- **Progression**: App loads → KPI cards animate in with staggered timing → watchlist populates → quick action pills appear ready to tap
-- **Success criteria**: All data visible without scrolling on 360px viewport, cards feel raised and glass-like, notification badge draws attention if present
+### Product Detail View
+- **Functionality**: Show comprehensive product info, price history, and tracking controls
+- **Purpose**: Provide detailed insights and management options for individual tracked products
+- **Trigger**: Tap any product card in watchlist
+- **Progression**: Tap product → View full details → See price trend → Adjust target price OR pause tracking OR delete
+- **Success criteria**: User understands price history and can modify tracking settings without confusion
 
-### Product List & Management
-- **Functionality**: Shows all tracked products with search/filter, displays price history indicators, allows adding new products
-- **Purpose**: Central inventory of what user is monitoring, with enough detail to understand current status
-- **Trigger**: Tap "Products" in bottom nav or "Add product" quick action
-- **Progression**: Navigate to Products → search input appears inset at top → product cards load in vertical grid → tap card to see status → tap "Add new product" button → (MVP: shows feedback only)
-- **Success criteria**: Search input looks carved into surface, product cards have frosted glass effect, hover states show gradient border accent, add button looks pressable
+### Price Alert System
+- **Functionality**: Display price change notifications with inline actions
+- **Purpose**: Immediately inform users of price drops and allow quick responses
+- **Trigger**: Price monitoring detects change (simulated in UI with badge/banner)
+- **Progression**: Price drops → Alert appears → User reviews → Tap "View" to see details OR "Mute" to pause OR "Remove" to delete
+- **Success criteria**: User can act on price alerts within seconds of seeing them
 
-### Alert Rules Management
-- **Functionality**: Lists configured alert rules with visual toggle switches, shows alert type chips, master alert control
-- **Purpose**: Lets users see and control when they get notified about price changes
-- **Trigger**: Tap "Alerts" in bottom nav or "Edit alerts" quick action
-- **Progression**: Navigate to Alerts → summary chips show alert types → rule cards display with product name and threshold → toggle switch to enable/disable → master switch at bottom controls all alerts
-- **Success criteria**: Toggle switches look like physical sliders with real shadows, ON state appears raised with inner highlight, OFF state looks sunken
-
-### Profile & Preferences
-- **Functionality**: Displays user identity card, subscription details with tier-based features, preference controls for theme/currency/notifications, account actions, access to component showcase demo
-- **Purpose**: Gives users control over app behavior, personal settings, and visibility into subscription benefits, plus a showcase of premium UI components
-- **Trigger**: Tap "Profile" in bottom nav
-- **Progression**: Navigate to Profile → glass identity card at top → subscription card shows current tier (Free/Pro/Premium) with feature list → renewal date and pricing for paid tiers → preference rows with segmented controls → action buttons at bottom including "Component Showcase" → tap showcase button to view demo screen
-- **Success criteria**: Identity card has clear glass effect with blur, subscription card shows Crown icon with gradient, feature list displays with checkmarks, upgrade button has accent gradient, preference controls feel like physical switches, sign out button has destructive color treatment, showcase button displays with sparkle icon
-
-### Component Showcase Demo
-- **Functionality**: Interactive demo screen showcasing GlowCard (spotlight cards with cursor-following glow effects) and InteractiveNav (skeuomorphic navigation buttons with dynamic lighting)
-- **Purpose**: Demonstrates premium UI components integrated into the app, serves as a visual highlight of advanced design capabilities
-- **Trigger**: Tap "Component Showcase" button in Profile screen
-- **Progression**: Tap showcase → full-screen demo loads → back button at top → skeuomorphic nav demo with interactive buttons → multiple glow card variations with different colors → custom-sized responsive examples → tap back to return to profile
-- **Success criteria**: GlowCard follows cursor with smooth radial gradient spotlight, multiple color variations (blue, purple, green, orange, red), InteractiveNav shows dynamic shadow calculations based on cursor position, lighting effects respond in real-time, smooth transitions between demo and app
+### Settings & Preferences
+- **Functionality**: Configure notification behavior and tracking preferences
+- **Purpose**: Give users control over alert frequency and types
+- **Trigger**: Tap settings icon in bottom nav
+- **Progression**: Open settings → Toggle notifications → Select alert type → Set default target percentage → Save automatically
+- **Success criteria**: User preferences persist and affect alert behavior appropriately
 
 ## Edge Case Handling
 
-- **Empty States**: When no products tracked, show large glass card with icon and "Add your first product" CTA that maintains skeuomorphic treatment
-- **Long Product Names**: Truncate to 2 lines with ellipsis, show full name on hover/long-press tooltip
-- **Large Numbers**: Format with thousand separators and currency symbols, abbreviate very large numbers (1.2K, 5.6M)
-- **Touch Target Sizes**: All interactive elements minimum 44px tap target even if visual appearance is smaller
-- **No Alerts Configured**: Show helpful glass panel explaining how alerts work with example scenarios
-- **Notification Badge Overflow**: Cap displayed count at 99, show "99+" for larger numbers
-- **Unauthenticated Access**: Show login/signup screens with Telegram and email options before allowing app access
-- **Password Visibility**: Toggle between masked and visible password with eye icon in input fields
-- **Subscription Tiers**: Display appropriate feature lists based on user's current plan (Free/Pro/Premium)
+- **Invalid URLs** - Clear inline error message with example of valid format (e.g., "Enter a valid Amazon, Flipkart, or supported store URL")
+- **Duplicate Products** - Prevent adding same URL twice, show "Already tracking" toast with option to view existing
+- **Empty Watchlist** - Welcoming empty state with large "+ Add Product" CTA and example use case
+- **Network Errors** - Graceful loading states and retry options with friendly error messages
+- **Out of Stock** - Visual badge indicator with timestamp when product became unavailable
+- **Stale Prices** - Show "Last updated X time ago" to indicate data freshness
 
 ## Design Direction
 
-The design should feel like premium audio equipment or a luxury watch face—tactile, precise, and crafted from glass and metal rather than flat pixels. Skeuomorphic depth cues (bevels, inner shadows, specular highlights) should make every button feel pressable and every surface feel material. The interface should be dense but breathable, with just enough glassmorphism to see layers without losing clarity. Dark base with blue-violet accent glows creates a nighttime cockpit feeling.
+The design should evoke trust and efficiency with a modern, data-focused aesthetic - clean cards with clear typography for prices and changes, subtle color coding for price movements (green drops, red increases), and professional polish that feels like a serious tool rather than a playful consumer app. A rich interface better serves the purpose since users need to quickly scan multiple data points (prices, changes, timestamps, status) across many products.
 
 ## Color Selection
 
-Custom palette using dark backgrounds with luminous blue-violet accents to create depth and premium feel, with additional accent gradients for important actions.
+Triadic color scheme with blue (trust/stability), green (positive/drops), and red/orange (alerts/increases) to create clear semantic meaning for price movements while maintaining professional appearance.
 
-- **Primary Color**: Deep electric blue `oklch(0.55 0.22 250)` - represents active states, primary actions, and selected navigation items; communicates precision and technology
+- **Primary Color**: Deep blue `oklch(0.45 0.15 250)` - Communicates reliability and data-focused professionalism, used for navigation and primary actions
 - **Secondary Colors**: 
-  - Dark base `oklch(0.08 0.015 250)` for main background (near-black with blue tint)
-  - Panel overlay `oklch(0.12 0.02 250)` for raised glass surfaces
-  - Accent violet `oklch(0.60 0.20 290)` for gradients and glows
-  - Telegram blue `#229ED9` to `#1B7DB8` gradient for OAuth buttons
-- **Accent Color**: Bright cyan-blue `oklch(0.70 0.18 230)` for highlights, notification badges, active states, and specular reflections on glass surfaces
-- **Action Gradients**: 
-  - Primary actions: `from-accent/40 to-violet-accent/30` with hover state `from-accent/50 to-violet-accent/40`
-  - Secondary actions: `from-primary/30 to-accent/20` with hover state `from-primary/40 to-accent/30`
-  - Destructive actions: `bg-destructive/20` with `text-destructive` and `border-destructive/30`
+  - Muted slate `oklch(0.25 0.02 250)` for cards and containers
+  - Dark navy `oklch(0.10 0.02 250)` for backgrounds
+- **Accent Color**: Vibrant cyan `oklch(0.70 0.18 230)` - Attention-grabbing highlight for CTAs, active states, and new alerts
 - **Foreground/Background Pairings**:
-  - Background (Dark base #020309): White text `oklch(0.98 0 0)` - Ratio 18.5:1 ✓
-  - Card (Panel overlay #0B1020): White text `oklch(0.98 0 0)` - Ratio 14.2:1 ✓
-  - Primary (Electric blue): White text `oklch(0.98 0 0)` - Ratio 4.9:1 ✓
-  - Accent (Bright cyan-blue): Dark text `oklch(0.15 0 0)` - Ratio 7.8:1 ✓
-  - Muted (Subdued gray): Light gray text `oklch(0.75 0.01 250)` - Ratio 4.6:1 ✓
-  - Telegram Blue (#229ED9): White text - Ratio 5.2:1 ✓
+  - Background (Dark Navy `oklch(0.10 0.02 250)`): White text `oklch(0.98 0 0)` - Ratio 15.2:1 ✓
+  - Card (Muted Slate `oklch(0.25 0.02 250)`): White text `oklch(0.98 0 0)` - Ratio 11.8:1 ✓
+  - Primary (Deep Blue `oklch(0.45 0.15 250)`): White text `oklch(0.98 0 0)` - Ratio 6.2:1 ✓
+  - Secondary (Dark Slate `oklch(0.20 0.03 250)`): White text `oklch(0.98 0 0)` - Ratio 13.5:1 ✓
+  - Accent (Vibrant Cyan `oklch(0.70 0.18 230)`): Dark text `oklch(0.15 0 0)` - Ratio 8.9:1 ✓
+  - Muted (Darker Slate `oklch(0.25 0.02 250)`): Muted text `oklch(0.75 0.01 250)` - Ratio 4.7:1 ✓
+  - Success (Green `oklch(0.65 0.20 145)`): Dark text `oklch(0.15 0 0)` - Ratio 7.8:1 ✓
+  - Destructive (Red `oklch(0.55 0.22 15)`): White text `oklch(0.98 0 0)` - Ratio 5.1:1 ✓
 
 ## Font Selection
 
-Typography should feel technical and precise yet readable at small sizes—suggesting instrument displays and premium electronics without sacrificing legibility.
+Inter with tabular numerics for prices ensures professional readability and consistent digit spacing crucial for scanning price changes quickly - medium weight for body text, semibold for prices, and bold for headings to establish clear hierarchy.
 
-- **Typographic Hierarchy**:
-  - H1 (Screen Titles): Inter Bold / 24px / -0.02em letter-spacing / line-height 1.2
-  - H2 (Section Headers): Inter Semibold / 18px / -0.01em letter-spacing / line-height 1.3
-  - H3 (Card Titles): Inter Medium / 16px / normal letter-spacing / line-height 1.4
-  - Body (Primary): Inter Regular / 14px / normal letter-spacing / line-height 1.5
-  - Small (Labels/Meta): Inter Medium / 12px / 0.01em letter-spacing / line-height 1.4
-  - Numeric (Prices/KPIs): Inter Semibold / 16-20px / tabular-nums / -0.01em letter-spacing
+- **Typographic Hierarchy**: 
+  - H1 (Screen Titles): Inter Semibold/24px/tight letter spacing/-0.02em
+  - H2 (Product Names): Inter Medium/16px/normal/1.4 line height
+  - Price (Large): Inter Semibold/20px/tabular-nums/-0.01em
+  - Price (Small): Inter Medium/14px/tabular-nums/-0.01em
+  - Body: Inter Regular/14px/normal/1.5 line height
+  - Labels: Inter Medium/12px/uppercase/0.05em tracking
+  - Timestamps: Inter Regular/11px/normal/muted color
 
 ## Animations
 
-Animations should reinforce the physical nature of the interface—switches slide with momentum, buttons depress with satisfying weight, and screen transitions maintain spatial continuity like panels sliding in a device.
+Animations should be purposeful and fast, primarily serving to confirm user actions and guide attention to price changes - subtle rather than showy, with quick transitions (200-300ms) that maintain the efficient, professional tone while providing satisfying feedback.
 
-- **Purposeful Meaning**: Motion communicates material weight and mechanical precision; toggles slide smoothly like real switches, buttons compress and release like physical keys, navigation transitions slide panels horizontally to maintain spatial model
-- **Hierarchy of Movement**: Navigation transitions (300ms) > toggle switches (200ms) > button press feedback (150ms) > hover effects (100ms); only one major animation should occur at a time to maintain focus
+- **Purposeful Meaning**: Quick scale feedback on taps (0.95 scale), smooth slide-in for screens (translate), gentle pulse on new price alerts to draw eye without being alarming
+- **Hierarchy of Movement**: Price change badges deserve animation focus (gentle pulse, color shift), followed by screen transitions, with minimal motion on static content to keep focus on data
 
 ## Component Selection
 
 - **Components**: 
-  - Shadcn `Button` for all CTAs with heavy customization (inner/outer shadows, gradient overlays, pressed states, accent color gradients)
-  - Shadcn `Card` as base for glass panels with blur backdrop and border-gradient treatment
-  - Shadcn `Switch` for toggles with complete visual override to create sliding thumb with shadow
-  - Shadcn `Input` for search field and form inputs with inset shadow treatment
-  - Shadcn `Badge` for status chips and notification counts
-  - Shadcn `Tabs` as base for segmented controls in preferences
-  - Shadcn `Checkbox` for terms agreement with accent color when checked
-  - Custom `GlowCard` component for spotlight cards with cursor-following radial gradient effects (supports multiple colors: blue, purple, green, orange, red)
-  - Custom `InteractiveNav` component for skeuomorphic navigation buttons with dynamic lighting and shadow calculations
-  - Custom bottom navigation component (not in Shadcn) with raised pill indicator
-  - Custom login/signup screens with form layouts
-  - Custom ComponentDemoScreen for showcasing premium UI components
+  - Cards for product items with hover states
+  - Badges for price change indicators and status
+  - Input with validation states for URL entry
+  - Buttons (primary for add, ghost for secondary actions)
+  - Tabs for filtering watchlist (All, Dropped, Increased)
+  - Switch for settings toggles
+  - Dialog for delete confirmations
+  - Sheet for bottom drawer product details on mobile
+  - Avatar for potential user profile
+  - Separator for visual grouping
+  - ScrollArea for long lists
   
 - **Customizations**: 
-  - All cards need `backdrop-filter: blur()` and semi-transparent backgrounds
-  - Buttons require dual shadow system: outer drop shadow for raised state, inner shadow for pressed, with enhanced depth using pseudo-elements
-  - Gradient buttons use accent color combinations: `from-accent/40 to-violet-accent/30` for primary actions
-  - Switches need custom track with gradient and glossy highlight, circular thumb with shadow that moves with state
-  - Input fields need carved-in appearance with inner shadow and subtle border, icon placement on left side
-  - Telegram button uses official brand gradient `from-[#229ED9] to-[#1B7DB8]`
-  - GlowCard uses CSS custom properties for dynamic cursor tracking with radial gradients, supports customizable colors via glowColor prop
-  - InteractiveNav implements complex shadow calculations based on cursor position, uses easing functions for smooth transitions, includes light radius effects and gradient backgrounds
+  - Custom price display component with automatic formatting and change indicators
+  - Custom product card with integrated image, title, price, and quick actions
+  - Custom alert banner component with inline action buttons
+  - Custom empty state illustrations
   
 - **States**: 
-  - Buttons: idle (raised, outer shadow + top highlight + pseudo-element overlay), hover (shadow grows, subtle scale, gradient intensifies), active (sunken, inner shadow, scale 0.98, dark overlay), disabled (opacity 0.5, no shadow)
-  - Toggles: OFF (sunken track, thumb left, inner shadow), ON (raised track, thumb right, outer shadow, accent glow)
-  - Nav items: inactive (flat, muted color), active (raised pill background, accent color, soft glow ring)
-  - Form inputs: default (inset shadow, border), focus (accent border, subtle glow), error (destructive border)
+  - Buttons: default with subtle border, hover with background shift, active with scale down, disabled with reduced opacity
+  - Inputs: default with border, focus with accent ring and border color shift, error with destructive color and icon, success with green checkmark
+  - Cards: default flat, hover with subtle elevation increase, active/selected with accent border
   
 - **Icon Selection**: 
-  - @phosphor-icons/react for all UI icons
-  - Bottom nav: `House`, `Package`, `BellRinging`, `User` 
-  - Actions: `MagnifyingGlass`, `Plus`, `PencilSimple`, `Trash`, `Bell`, `Gear`, `ArrowLeft`, `Sparkle`, `Funnel`
-  - Auth screens: `TelegramLogo`, `EnvelopeSimple`, `LockKey`, `Eye`, `EyeSlash`
-  - Profile: `Crown`, `CalendarBlank`, `Infinity`, `CheckCircle`, `SignOut`
-  - Indicators: `TrendUp`, `TrendDown`, `Minus`
-  - Custom SVG icons in InteractiveNav: `ListIcon`, `GridIcon` (inline SVG definitions)
-  - Use `weight="duotone"` for nav icons, `weight="bold"` for actions, `weight="fill"` for special icons like Crown, Telegram, and Sparkle
+  - Plus (add product)
+  - TrendDown/TrendUp (price changes)
+  - Bell/BellSlash (notifications)
+  - Trash (delete)
+  - PauseCircle/PlayCircle (pause/resume tracking)
+  - MagnifyingGlass (search/filter)
+  - Gear (settings)
+  - Check (success states)
+  - X (close/remove)
+  - Link (external product link)
   
 - **Spacing**: 
-  - Screen padding: 16px horizontal
-  - Card padding: 20px
-  - Section gaps: 24px vertical
-  - Card grid gaps: 12px
-  - Tight groups (KPI segments): 8px
-  - Mobile-optimized max-width: 430px centered
+  - Container padding: p-4 (16px)
+  - Card internal padding: p-4
+  - Stack spacing: gap-4 for major sections, gap-2 for related items
+  - Grid gaps: gap-3 for product grid
+  - Section margins: mb-6 between major sections
   
 - **Mobile**: 
-  - Fixed bottom navigation (60px height) with safe-area padding
-  - All screens scroll vertically with bottom nav always visible
-  - Touch targets minimum 44px
-  - Product cards stack single-column
-  - Horizontal pill button groups scroll horizontally if needed
-  - Reduce card padding to 16px on screens < 360px
+  - Single column layout for watchlist (grid on tablet+)
+  - Bottom navigation for primary screens
+  - Sheet drawer for product details (replaces full page)
+  - Larger touch targets (min 44px)
+  - Simplified header with back button
+  - Sticky bottom action bar for primary CTAs
+  - Reduced padding in tight spaces (p-3 instead of p-4)

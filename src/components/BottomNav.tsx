@@ -1,60 +1,40 @@
-import { House, Package, BellRinging, User } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
-
-type NavItem = {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string; weight?: string }>
-}
-
-const navItems: NavItem[] = [
-  { id: "home", label: "Home", icon: House },
-  { id: "products", label: "Products", icon: Package },
-  { id: "alerts", label: "Alerts", icon: BellRinging },
-  { id: "profile", label: "Profile", icon: User },
-]
+import { House, Gear } from '@phosphor-icons/react'
 
 interface BottomNavProps {
-  active: string
-  onNavigate: (id: string) => void
+  active: 'watchlist' | 'settings'
+  onNavigate: (screen: 'watchlist' | 'settings') => void
 }
 
 export function BottomNav({ active, onNavigate }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-panel border-t pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border safe-area-bottom">
       <div className="mx-auto max-w-[430px] px-4">
-        <div className="flex items-center justify-around h-[60px]">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = active === item.id
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => onNavigate(item.id)}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-full transition-all duration-200",
-                  isActive && "skeuo-raised bg-primary/20"
-                )}
-              >
-                <Icon 
-                  className={cn(
-                    "transition-colors duration-200 w-6 h-6",
-                    isActive ? "text-accent" : "text-muted-foreground"
-                  )}
-                  weight={isActive ? "duotone" : "regular"}
-                />
-                <span className={cn(
-                  "text-[10px] font-medium transition-colors duration-200",
-                  isActive ? "text-accent" : "text-muted-foreground"
-                )}>
-                  {item.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <nav className="flex items-center justify-around h-16">
+          <button
+            onClick={() => onNavigate('watchlist')}
+            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-colors ${
+              active === 'watchlist'
+                ? 'text-accent'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <House className="w-6 h-6" weight={active === 'watchlist' ? 'fill' : 'regular'} />
+            <span className="text-xs font-medium">Watchlist</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('settings')}
+            className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-colors ${
+              active === 'settings'
+                ? 'text-accent'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Gear className="w-6 h-6" weight={active === 'settings' ? 'fill' : 'regular'} />
+            <span className="text-xs font-medium">Settings</span>
+          </button>
+        </nav>
       </div>
-    </nav>
+    </div>
   )
 }
