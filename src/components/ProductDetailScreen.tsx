@@ -77,14 +77,14 @@ export function ProductDetailScreen({
     <>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.08)]">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-semibold tracking-tight">Product Details</h1>
+          <h1 className="text-xl font-bold tracking-tight">Product Details</h1>
         </div>
 
-        <Card className="overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
-          <div className="aspect-square w-full bg-secondary flex items-center justify-center">
+        <Card className="overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] bg-gradient-to-b from-card to-card/95">
+          <div className="aspect-square w-full bg-gradient-to-br from-secondary/80 to-secondary/60 flex items-center justify-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.15)]">
             <img 
               src={product.imageUrl} 
               alt={product.title}
@@ -92,53 +92,53 @@ export function ProductDetailScreen({
             />
           </div>
           
-          <div className="p-4 space-y-4">
+          <div className="p-5 space-y-5">
             <div>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h2 className="font-medium leading-tight">{product.title}</h2>
+                <h2 className="font-semibold leading-tight text-base">{product.title}</h2>
                 <Button 
                   variant="ghost" 
                   size="icon"
                   onClick={() => window.open(product.productUrl, '_blank')}
-                  className="flex-shrink-0 rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
+                  className="flex-shrink-0 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.08)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.2)] bg-gradient-to-b from-secondary/60 to-secondary/40"
                 >
                   <ArrowSquareOut className="w-5 h-5" />
                 </Button>
               </div>
               
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline">{getSiteName(product.siteDomain)}</Badge>
+                <Badge variant="outline" className="shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{getSiteName(product.siteDomain)}</Badge>
                 {!product.isActive && (
-                  <Badge variant="outline" className="bg-muted">
+                  <Badge variant="outline" className="bg-muted shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
                     Paused
                   </Badge>
                 )}
                 {!product.inStock && (
-                  <Badge variant="destructive">Out of Stock</Badge>
+                  <Badge variant="destructive" className="shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Out of Stock</Badge>
                 )}
               </div>
             </div>
 
-            <Separator />
+            <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
             <div>
-              <div className="flex items-baseline gap-3 mb-1">
-                <span className="text-3xl font-bold text-numeric">
+              <div className="flex items-baseline gap-3 mb-2">
+                <span className="text-4xl font-bold text-numeric bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text">
                   {formatPrice(product.currentPrice, product.currency)}
                 </span>
                 {priceChangeData && priceChangeData.direction !== 'same' && (
-                  <div className={`flex items-center gap-1.5 ${
-                    priceChangeData.direction === 'down' ? 'text-success' : 'text-destructive'
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg shadow-[inset_0_2px_6px_rgba(0,0,0,0.15)] ${
+                    priceChangeData.direction === 'down' ? 'text-success bg-success/15' : 'text-destructive bg-destructive/15'
                   }`}>
                     {priceChangeData.direction === 'down' ? (
                       <TrendDown className="w-5 h-5" weight="bold" />
                     ) : (
                       <TrendUp className="w-5 h-5" weight="bold" />
                     )}
-                    <span className="text-sm font-semibold">
+                    <span className="text-sm font-bold">
                       {formatPrice(Math.abs(priceChangeData.amount), product.currency)}
                     </span>
-                    <span className="text-sm">
+                    <span className="text-sm font-semibold">
                       ({Math.abs(priceChangeData.percent).toFixed(1)}%)
                     </span>
                   </div>
@@ -149,26 +149,27 @@ export function ProductDetailScreen({
                   Previous: {formatPrice(product.previousPrice, product.currency)}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1.5">
                 Last updated {getRelativeTime(product.lastCheckedAt)}
               </p>
             </div>
 
-            <Separator />
+            <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
             <div>
-              <Label className="text-sm font-medium mb-2 block">Target Price Alert</Label>
+              <Label className="text-sm font-semibold mb-3 block">Target Price Alert</Label>
               {!isEditingTarget ? (
                 <div className="flex items-center gap-2">
                   {product.targetPrice ? (
                     <>
-                      <div className="flex-1 px-3 py-2 bg-muted rounded-md text-sm">
+                      <div className="flex-1 px-4 py-2.5 bg-gradient-to-br from-muted/80 to-muted/60 rounded-lg text-sm font-medium shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]">
                         Notify me when price ≤ {formatPrice(product.targetPrice, product.currency)}
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setIsEditingTarget(true)}
+                        className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
                       >
                         Edit
                       </Button>
@@ -176,7 +177,7 @@ export function ProductDetailScreen({
                   ) : (
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                       onClick={() => setIsEditingTarget(true)}
                     >
                       Set Target Price
@@ -193,13 +194,13 @@ export function ProductDetailScreen({
                       placeholder="Enter target price"
                       value={targetPriceInput}
                       onChange={(e) => setTargetPriceInput(e.target.value)}
-                      className="flex-1"
+                      className="flex-1 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]"
                     />
                     <Button
                       variant="default"
                       size="icon"
                       onClick={handleSaveTargetPrice}
-                      className="rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.15)] hover:shadow-[0_3px_8px_rgba(0,0,0,0.2)]"
+                      className="rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
                     >
                       <Check className="w-5 h-5" />
                     </Button>
@@ -207,7 +208,7 @@ export function ProductDetailScreen({
                       variant="outline"
                       size="icon"
                       onClick={handleCancelEdit}
-                      className="rounded-full"
+                      className="rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
                     >
                       <X className="w-5 h-5" />
                     </Button>
@@ -219,21 +220,21 @@ export function ProductDetailScreen({
               )}
             </div>
 
-            <Separator />
+            <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
             <div>
-              <h3 className="text-sm font-medium mb-3">Price History</h3>
+              <h3 className="text-sm font-semibold mb-3">Price History</h3>
               {product.priceHistory.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {product.priceHistory.slice(0, 10).map((entry, index) => (
                     <div 
                       key={index}
-                      className="flex items-center justify-between py-2 px-3 bg-muted rounded-md"
+                      className="flex items-center justify-between py-2.5 px-4 bg-gradient-to-br from-muted/80 to-muted/60 rounded-lg shadow-[inset_0_2px_6px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
                     >
-                      <span className="text-sm font-medium text-numeric">
+                      <span className="text-sm font-semibold text-numeric">
                         {formatPrice(entry.price, entry.currency)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground font-medium">
                         {new Date(entry.checkedAt).toLocaleDateString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -253,7 +254,7 @@ export function ProductDetailScreen({
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)]"
             onClick={() => onToggleActive(product.id)}
           >
             {product.isActive ? (
@@ -270,7 +271,7 @@ export function ProductDetailScreen({
           </Button>
           <Button
             variant="destructive"
-            className="flex-1"
+            className="flex-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)]"
             onClick={() => setDeleteDialogOpen(true)}
           >
             <Trash className="w-5 h-5 mr-2" />
@@ -280,7 +281,7 @@ export function ProductDetailScreen({
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="shadow-[0_16px_64px_rgba(0,0,0,0.35)]">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove product?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -288,13 +289,13 @@ export function ProductDetailScreen({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => {
                 onDelete(product.id)
                 setDeleteDialogOpen(false)
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-[0_4px_16px_rgba(0,0,0,0.2)]"
             >
               Remove
             </AlertDialogAction>

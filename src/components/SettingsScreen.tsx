@@ -32,24 +32,24 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Gear className="w-6 h-6" weight="bold" />
+        <Gear className="w-7 h-7" weight="bold" />
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">Manage your preferences</p>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your preferences</p>
         </div>
       </div>
 
-      <Card className="p-6 space-y-6 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <Card className="p-6 space-y-6 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] bg-gradient-to-b from-card to-card/95">
         <div>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-5">
             <Bell className="w-5 h-5 text-muted-foreground" weight="bold" />
-            <h2 className="text-lg font-semibold">Notifications</h2>
+            <h2 className="text-lg font-bold">Notifications</h2>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="notifications-enabled" className="text-sm font-medium">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-br from-muted/80 to-muted/60 rounded-xl shadow-[inset_0_2px_6px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.05)]">
+              <div className="space-y-1">
+                <Label htmlFor="notifications-enabled" className="text-sm font-semibold cursor-pointer">
                   Enable Notifications
                 </Label>
                 <p className="text-xs text-muted-foreground">
@@ -60,37 +60,39 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
                 id="notifications-enabled"
                 checked={settings.notificationsEnabled}
                 onCheckedChange={handleToggleNotifications}
+                className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
               />
             </div>
 
             {settings.notificationsEnabled && (
               <>
-                <Separator />
+                <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium">Alert Type</Label>
+                  <Label className="text-sm font-semibold">Alert Type</Label>
                   <RadioGroup
                     value={settings.alertType}
                     onValueChange={handleAlertTypeChange}
+                    className="space-y-3"
                   >
-                    <div className="flex items-center space-x-3 rounded-md border border-border p-3">
+                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_2px_rgba(255,255,255,0.03)] bg-gradient-to-br from-card/80 to-card/60 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow">
                       <RadioGroupItem value="drops" id="alert-drops" />
                       <div className="flex-1">
-                        <Label htmlFor="alert-drops" className="text-sm font-medium cursor-pointer">
+                        <Label htmlFor="alert-drops" className="text-sm font-semibold cursor-pointer">
                           Price drops only
                         </Label>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Only notify when prices decrease
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 rounded-md border border-border p-3">
+                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_2px_rgba(255,255,255,0.03)] bg-gradient-to-br from-card/80 to-card/60 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow">
                       <RadioGroupItem value="all" id="alert-all" />
                       <div className="flex-1">
-                        <Label htmlFor="alert-all" className="text-sm font-medium cursor-pointer">
+                        <Label htmlFor="alert-all" className="text-sm font-semibold cursor-pointer">
                           All price changes
                         </Label>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Notify for any price change (up or down)
                         </p>
                       </div>
@@ -98,10 +100,10 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
                   </RadioGroup>
                 </div>
 
-                <Separator />
+                <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
                 <div className="space-y-2">
-                  <Label htmlFor="default-target" className="text-sm font-medium">
+                  <Label htmlFor="default-target" className="text-sm font-semibold">
                     Auto-alert Threshold (%)
                   </Label>
                   <Input
@@ -113,6 +115,7 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
                     placeholder="e.g., 10"
                     value={settings.defaultTargetPercent || ''}
                     onChange={(e) => handleDefaultTargetChange(e.target.value)}
+                    className="shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]"
                   />
                   <p className="text-xs text-muted-foreground">
                     Automatically notify when price drops by at least this percentage
@@ -124,23 +127,26 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
         </div>
       </Card>
 
-      <Card className="p-4 bg-muted/50 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <h3 className="text-sm font-medium mb-2">About Notifications</h3>
-        <ul className="text-xs text-muted-foreground space-y-1.5">
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+      <Card className="p-5 bg-gradient-to-br from-muted/60 to-muted/40 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)]">
+        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
+          About Notifications
+        </h3>
+        <ul className="text-xs text-muted-foreground space-y-2">
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>Notifications are delivered via Telegram bot messages</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>You can set custom target prices for individual products</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>Price checks happen automatically in the background</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>Pause tracking on specific products to stop alerts temporarily</span>
           </li>
         </ul>

@@ -66,19 +66,19 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.08)]">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Add Product</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Add Product</h1>
           <p className="text-sm text-muted-foreground">Track prices from any supported store</p>
         </div>
       </div>
 
-      <Card className="p-6 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <Card className="p-6 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] bg-gradient-to-b from-card to-card/95">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="product-url" className="text-sm font-medium">
+            <Label htmlFor="product-url" className="text-sm font-semibold">
               Product URL
             </Label>
             <div className="relative">
@@ -89,11 +89,11 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
                 placeholder="https://www.amazon.com/product/..."
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                className={`pl-10 ${urlError ? 'border-destructive' : ''}`}
+                className={`pl-10 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)] ${urlError ? 'border-destructive' : ''}`}
               />
             </div>
             {urlError && (
-              <p className="text-xs text-destructive">{urlError}</p>
+              <p className="text-xs text-destructive font-medium">{urlError}</p>
             )}
             <p className="text-xs text-muted-foreground">
               Supported: Amazon, Flipkart, eBay, Walmart, Target, Best Buy
@@ -101,7 +101,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="target-price" className="text-sm font-medium">
+            <Label htmlFor="target-price" className="text-sm font-semibold">
               Target Price (Optional)
             </Label>
             <div className="relative">
@@ -114,7 +114,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
                 placeholder="0.00"
                 value={targetPrice}
                 onChange={(e) => setTargetPrice(e.target.value)}
-                className="pl-10"
+                className="pl-10 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]"
               />
             </div>
             <p className="text-xs text-muted-foreground">
@@ -122,7 +122,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
             </p>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isValidating}>
+          <Button type="submit" className="w-full shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] active:shadow-[inset_0_3px_10px_rgba(0,0,0,0.25)]" disabled={isValidating}>
             {isValidating ? (
               <>
                 <span className="animate-pulse">Validating...</span>
@@ -137,23 +137,26 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
         </form>
       </Card>
 
-      <Card className="p-4 bg-muted/50 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <h3 className="text-sm font-medium mb-2">How it works</h3>
-        <ul className="text-xs text-muted-foreground space-y-1.5">
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+      <Card className="p-5 bg-gradient-to-br from-muted/60 to-muted/40 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)]">
+        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
+          How it works
+        </h3>
+        <ul className="text-xs text-muted-foreground space-y-2">
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>Paste any product URL from supported stores</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>We'll track the price and notify you of changes</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>Set a target price for automatic alerts</span>
           </li>
-          <li className="flex gap-2">
-            <span className="text-accent">•</span>
+          <li className="flex gap-2.5">
+            <span className="text-accent font-bold">•</span>
             <span>View price history and trends over time</span>
           </li>
         </ul>

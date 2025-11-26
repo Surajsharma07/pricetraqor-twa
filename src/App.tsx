@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
 import { TrackedProduct, UserSettings } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
-import { ProductsScreen } from "@/components/ProductsScreen"
 import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
 import { ProductDetailScreen } from "@/components/ProductDetailScreen"
@@ -11,7 +10,7 @@ import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
-type Screen = 'watchlist' | 'products' | 'profile' | 'add-product' | 'product-detail' | 'settings'
+type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
@@ -128,7 +127,7 @@ function App() {
     toast.success('Settings saved')
   }
 
-  const handleBottomNavClick = (screen: 'watchlist' | 'products' | 'profile' | 'settings') => {
+  const handleBottomNavClick = (screen: 'watchlist' | 'profile' | 'settings') => {
     setActiveScreen(screen)
   }
 
@@ -142,15 +141,6 @@ function App() {
             onAddProduct={() => setActiveScreen('add-product')}
             onToggleActive={handleToggleActive}
             onDelete={handleDeleteProduct}
-          />
-        )
-      
-      case 'products':
-        return (
-          <ProductsScreen
-            products={products || []}
-            onProductClick={handleProductClick}
-            onAddProduct={() => setActiveScreen('add-product')}
           />
         )
       
@@ -197,7 +187,7 @@ function App() {
         {renderScreen()}
       </div>
       
-      {(activeScreen === 'watchlist' || activeScreen === 'products' || activeScreen === 'profile' || activeScreen === 'settings') && (
+      {(activeScreen === 'watchlist' || activeScreen === 'profile' || activeScreen === 'settings') && (
         <BottomNav 
           active={activeScreen} 
           onNavigate={handleBottomNavClick} 
