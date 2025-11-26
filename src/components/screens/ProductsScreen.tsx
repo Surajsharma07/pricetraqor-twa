@@ -117,7 +117,7 @@ export function ProductsScreen() {
         ))}
       </div>
 
-      <Button className="w-full h-14 glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-[0.98] bg-gradient-to-r from-primary/30 to-violet-accent/30 hover:from-primary/40 hover:to-violet-accent/40 border-primary/30 text-base font-semibold">
+      <Button className="w-full h-14 glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-[0.98] bg-gradient-to-br from-accent/40 to-violet-accent/30 hover:from-accent/50 hover:to-violet-accent/40 border-accent/30 text-base font-semibold">
         <Plus weight="bold" className="w-5 h-5 mr-2" />
         Add new product
       </Button>

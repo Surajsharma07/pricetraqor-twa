@@ -116,11 +116,11 @@ export function AlertsScreen() {
             </div>
 
             <div className="flex items-center gap-2 pt-2 border-t border-border/30">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass-panel skeuo-raised hover:skeuo-pressed active:scale-95 transition-all duration-150 text-xs">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass-panel skeuo-raised hover:skeuo-pressed active:scale-95 transition-all duration-150 text-xs bg-primary/20 hover:bg-primary/30 border-primary/30">
                 <PencilSimple weight="bold" className="w-3.5 h-3.5" />
                 Edit
               </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass-panel skeuo-raised hover:skeuo-pressed active:scale-95 transition-all duration-150 text-xs text-destructive">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass-panel skeuo-raised hover:skeuo-pressed active:scale-95 transition-all duration-150 text-xs text-destructive bg-destructive/10 hover:bg-destructive/20 border-destructive/30">
                 <Trash weight="bold" className="w-3.5 h-3.5" />
                 Delete
               </button>

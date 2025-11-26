@@ -89,21 +89,62 @@
 
 .skeuo-raised {
   box-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.1) inset,
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    0 2px 4px rgba(0, 0, 0, 0.3);
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 6px 16px rgba(0, 0, 0, 0.6),
+    0 3px 6px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  position: relative;
+}
+
+.skeuo-raised::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .skeuo-pressed {
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.6) inset,
-    0 1px 2px rgba(0, 0, 0, 0.4);
+    0 3px 10px rgba(0, 0, 0, 0.7) inset,
+    0 1px 3px rgba(0, 0, 0, 0.5) inset,
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+.skeuo-pressed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, transparent 100%);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .skeuo-inset {
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.5) inset,
+    0 2px 6px rgba(0, 0, 0, 0.6) inset,
+    0 1px 2px rgba(0, 0, 0, 0.4) inset,
     0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.skeuo-inset::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
 }
 
 .text-numeric {

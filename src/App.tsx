@@ -4,10 +4,51 @@ import { HomeScreen } from "@/components/screens/HomeScreen"
 import { ProductsScreen } from "@/components/screens/ProductsScreen"
 import { AlertsScreen } from "@/components/screens/AlertsScreen"
 import { ProfileScreen } from "@/components/screens/ProfileScreen"
+import { LoginScreen } from "@/components/screens/LoginScreen"
+import { SignupScreen } from "@/components/screens/SignupScreen"
 import { Toaster } from "@/components/ui/sonner"
+import { useKV } from "@github/spark/hooks"
 
 function App() {
   const [activeScreen, setActiveScreen] = useState("home")
+  const [authScreen, setAuthScreen] = useState<"login" | "signup" | null>("login")
+  const [isAuthenticated, setIsAuthenticated] = useKV<boolean>("is-authenticated", false)
+
+  const handleLogin = () => {
+    setIsAuthenticated(true)
+    setAuthScreen(null)
+  }
+
+  const handleSignup = () => {
+    setIsAuthenticated(true)
+    setAuthScreen(null)
+  }
+
+  const handleAuthNavigation = (screen: string) => {
+    if (screen === "login" || screen === "signup") {
+      setAuthScreen(screen)
+    }
+  }
+
+  if (!isAuthenticated) {
+    if (authScreen === "login") {
+      return (
+        <>
+          <LoginScreen onNavigate={handleAuthNavigation} onLogin={handleLogin} />
+          <Toaster />
+        </>
+      )
+    }
+    
+    if (authScreen === "signup") {
+      return (
+        <>
+          <SignupScreen onNavigate={handleAuthNavigation} onSignup={handleSignup} />
+          <Toaster />
+        </>
+      )
+    }
+  }
 
   const renderScreen = () => {
     switch (activeScreen) {

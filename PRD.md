@@ -8,9 +8,16 @@ A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experien
 3. **Effortless** - Despite the rich visual treatment, navigation and actions should be immediate and obvious, with no learning curve between the user's intent and the interface's response.
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - Four distinct screens with independent purposes but unified visual language, basic state management for toggling alerts and switches, no authentication or complex data flows needed for MVP.
+  - Six distinct screens (Login, Signup, Home, Products, Alerts, Profile) with independent purposes but unified visual language, authentication flow with Telegram integration, basic state management for toggling alerts and switches, subscription tier management.
 
 ## Essential Features
+
+### Authentication Flow
+- **Functionality**: Provides login and signup screens with email/password or Telegram authentication options
+- **Purpose**: Secure user access and enable personalized price tracking across devices
+- **Trigger**: App loads and user is not authenticated
+- **Progression**: App loads → Login screen appears → user can choose Telegram auth (instant) or email/password → enter credentials → validate → navigate to home screen
+- **Success criteria**: Telegram button has distinctive blue gradient, form inputs have proper inset appearance, password visibility toggle works, authentication state persists using useKV
 
 ### Bottom Navigation Bar
 - **Functionality**: Provides persistent access to four primary screens (Home, Products, Alerts, Profile)
@@ -41,11 +48,11 @@ A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experien
 - **Success criteria**: Toggle switches look like physical sliders with real shadows, ON state appears raised with inner highlight, OFF state looks sunken
 
 ### Profile & Preferences
-- **Functionality**: Displays user identity card, preference controls for theme/currency/notifications, account actions
-- **Purpose**: Gives users control over app behavior and personal settings
+- **Functionality**: Displays user identity card, subscription details with tier-based features, preference controls for theme/currency/notifications, account actions
+- **Purpose**: Gives users control over app behavior, personal settings, and visibility into subscription benefits
 - **Trigger**: Tap "Profile" in bottom nav
-- **Progression**: Navigate to Profile → glass identity card at top → preference rows with segmented controls → action buttons at bottom → tap preference to change → (MVP: visual state change only)
-- **Success criteria**: Identity card has clear glass effect with blur, segmented controls feel like physical switches, buttons respond to press with depth change
+- **Progression**: Navigate to Profile → glass identity card at top → subscription card shows current tier (Free/Pro/Premium) with feature list → renewal date and pricing for paid tiers → preference rows with segmented controls → action buttons at bottom
+- **Success criteria**: Identity card has clear glass effect with blur, subscription card shows Crown icon with gradient, feature list displays with checkmarks, upgrade button has accent gradient, preference controls feel like physical switches, sign out button has destructive color treatment
 
 ## Edge Case Handling
 
@@ -55,6 +62,9 @@ A compact mobile price-watch cockpit delivering a tactile, skeuomorphic experien
 - **Touch Target Sizes**: All interactive elements minimum 44px tap target even if visual appearance is smaller
 - **No Alerts Configured**: Show helpful glass panel explaining how alerts work with example scenarios
 - **Notification Badge Overflow**: Cap displayed count at 99, show "99+" for larger numbers
+- **Unauthenticated Access**: Show login/signup screens with Telegram and email options before allowing app access
+- **Password Visibility**: Toggle between masked and visible password with eye icon in input fields
+- **Subscription Tiers**: Display appropriate feature lists based on user's current plan (Free/Pro/Premium)
 
 ## Design Direction
 
@@ -62,20 +72,26 @@ The design should feel like premium audio equipment or a luxury watch face—tac
 
 ## Color Selection
 
-Custom palette using dark backgrounds with luminous blue-violet accents to create depth and premium feel.
+Custom palette using dark backgrounds with luminous blue-violet accents to create depth and premium feel, with additional accent gradients for important actions.
 
 - **Primary Color**: Deep electric blue `oklch(0.55 0.22 250)` - represents active states, primary actions, and selected navigation items; communicates precision and technology
 - **Secondary Colors**: 
   - Dark base `oklch(0.08 0.015 250)` for main background (near-black with blue tint)
   - Panel overlay `oklch(0.12 0.02 250)` for raised glass surfaces
   - Accent violet `oklch(0.60 0.20 290)` for gradients and glows
-- **Accent Color**: Bright cyan-blue `oklch(0.70 0.18 230)` for highlights, notification badges, and specular reflections on glass surfaces
+  - Telegram blue `#229ED9` to `#1B7DB8` gradient for OAuth buttons
+- **Accent Color**: Bright cyan-blue `oklch(0.70 0.18 230)` for highlights, notification badges, active states, and specular reflections on glass surfaces
+- **Action Gradients**: 
+  - Primary actions: `from-accent/40 to-violet-accent/30` with hover state `from-accent/50 to-violet-accent/40`
+  - Secondary actions: `from-primary/30 to-accent/20` with hover state `from-primary/40 to-accent/30`
+  - Destructive actions: `bg-destructive/20` with `text-destructive` and `border-destructive/30`
 - **Foreground/Background Pairings**:
   - Background (Dark base #020309): White text `oklch(0.98 0 0)` - Ratio 18.5:1 ✓
   - Card (Panel overlay #0B1020): White text `oklch(0.98 0 0)` - Ratio 14.2:1 ✓
   - Primary (Electric blue): White text `oklch(0.98 0 0)` - Ratio 4.9:1 ✓
   - Accent (Bright cyan-blue): Dark text `oklch(0.15 0 0)` - Ratio 7.8:1 ✓
   - Muted (Subdued gray): Light gray text `oklch(0.75 0.01 250)` - Ratio 4.6:1 ✓
+  - Telegram Blue (#229ED9): White text - Ratio 5.2:1 ✓
 
 ## Font Selection
 
@@ -99,31 +115,38 @@ Animations should reinforce the physical nature of the interface—switches slid
 ## Component Selection
 
 - **Components**: 
-  - Shadcn `Button` for all CTAs with heavy customization (inner/outer shadows, gradient overlays, pressed states)
+  - Shadcn `Button` for all CTAs with heavy customization (inner/outer shadows, gradient overlays, pressed states, accent color gradients)
   - Shadcn `Card` as base for glass panels with blur backdrop and border-gradient treatment
   - Shadcn `Switch` for toggles with complete visual override to create sliding thumb with shadow
-  - Shadcn `Input` for search field with inset shadow treatment
+  - Shadcn `Input` for search field and form inputs with inset shadow treatment
   - Shadcn `Badge` for status chips and notification counts
   - Shadcn `Tabs` as base for segmented controls in preferences
+  - Shadcn `Checkbox` for terms agreement with accent color when checked
   - Custom bottom navigation component (not in Shadcn) with raised pill indicator
+  - Custom login/signup screens with form layouts
   
 - **Customizations**: 
   - All cards need `backdrop-filter: blur()` and semi-transparent backgrounds
-  - Buttons require dual shadow system: outer drop shadow for raised state, inner shadow for pressed
+  - Buttons require dual shadow system: outer drop shadow for raised state, inner shadow for pressed, with enhanced depth using pseudo-elements
+  - Gradient buttons use accent color combinations: `from-accent/40 to-violet-accent/30` for primary actions
   - Switches need custom track with gradient and glossy highlight, circular thumb with shadow that moves with state
-  - Input fields need carved-in appearance with inner shadow and subtle border
+  - Input fields need carved-in appearance with inner shadow and subtle border, icon placement on left side
+  - Telegram button uses official brand gradient `from-[#229ED9] to-[#1B7DB8]`
   
 - **States**: 
-  - Buttons: idle (raised, outer shadow + top highlight), hover (shadow grows, subtle scale), active (sunken, inner shadow, scale 0.98), disabled (opacity 0.5, no shadow)
+  - Buttons: idle (raised, outer shadow + top highlight + pseudo-element overlay), hover (shadow grows, subtle scale, gradient intensifies), active (sunken, inner shadow, scale 0.98, dark overlay), disabled (opacity 0.5, no shadow)
   - Toggles: OFF (sunken track, thumb left, inner shadow), ON (raised track, thumb right, outer shadow, accent glow)
   - Nav items: inactive (flat, muted color), active (raised pill background, accent color, soft glow ring)
+  - Form inputs: default (inset shadow, border), focus (accent border, subtle glow), error (destructive border)
   
 - **Icon Selection**: 
   - @phosphor-icons/react for all UI icons
   - Bottom nav: `House`, `Package`, `BellRinging`, `User` 
-  - Actions: `MagnifyingGlass`, `Plus`, `PencilSimple`, `Trash`, `Bell`
+  - Actions: `MagnifyingGlass`, `Plus`, `PencilSimple`, `Trash`, `Bell`, `Gear`
+  - Auth screens: `TelegramLogo`, `EnvelopeSimple`, `LockKey`, `Eye`, `EyeSlash`
+  - Profile: `Crown`, `CalendarBlank`, `Infinity`, `CheckCircle`, `SignOut`
   - Indicators: `TrendUp`, `TrendDown`, `Minus`
-  - Use `weight="duotone"` for nav icons, `weight="bold"` for actions
+  - Use `weight="duotone"` for nav icons, `weight="bold"` for actions, `weight="fill"` for special icons like Crown and Telegram
   
 - **Spacing**: 
   - Screen padding: 16px horizontal

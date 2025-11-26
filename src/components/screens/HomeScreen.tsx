@@ -145,15 +145,15 @@ export function HomeScreen() {
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2">
-        <Button className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 bg-primary/20 hover:bg-primary/30 border-primary/30 flex-1 min-w-fit">
+        <Button className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 bg-gradient-to-br from-accent/40 to-violet-accent/30 hover:from-accent/50 hover:to-violet-accent/40 border-accent/30 flex-1 min-w-fit font-semibold">
           <Plus weight="bold" className="w-4 h-4 mr-2" />
           Add product
         </Button>
-        <Button variant="secondary" className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 flex-1 min-w-fit">
+        <Button variant="secondary" className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 bg-primary/20 hover:bg-primary/30 border-primary/30 flex-1 min-w-fit">
           <PencilSimple weight="bold" className="w-4 h-4 mr-2" />
           Edit alerts
         </Button>
-        <Button variant="secondary" className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 flex-1 min-w-fit">
+        <Button variant="secondary" className="glass-panel skeuo-raised hover:skeuo-pressed active:skeuo-pressed active:scale-95 bg-secondary/60 hover:bg-secondary/80 border-border flex-1 min-w-fit">
           <Gear weight="bold" className="w-4 h-4 mr-2" />
           Settings
         </Button>
