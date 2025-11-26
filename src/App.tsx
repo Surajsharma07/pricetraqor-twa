@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
 import { TrackedProduct, UserSettings } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
+import { ProductsScreen } from "@/components/ProductsScreen"
+import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
 import { ProductDetailScreen } from "@/components/ProductDetailScreen"
 import { SettingsScreen } from "@/components/SettingsScreen"
@@ -9,7 +11,7 @@ import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
-type Screen = 'watchlist' | 'add-product' | 'product-detail' | 'settings'
+type Screen = 'watchlist' | 'products' | 'profile' | 'add-product' | 'product-detail' | 'settings'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
@@ -126,7 +128,7 @@ function App() {
     toast.success('Settings saved')
   }
 
-  const handleBottomNavClick = (screen: 'watchlist' | 'settings') => {
+  const handleBottomNavClick = (screen: 'watchlist' | 'products' | 'profile' | 'settings') => {
     setActiveScreen(screen)
   }
 
@@ -140,6 +142,22 @@ function App() {
             onAddProduct={() => setActiveScreen('add-product')}
             onToggleActive={handleToggleActive}
             onDelete={handleDeleteProduct}
+          />
+        )
+      
+      case 'products':
+        return (
+          <ProductsScreen
+            products={products || []}
+            onProductClick={handleProductClick}
+            onAddProduct={() => setActiveScreen('add-product')}
+          />
+        )
+      
+      case 'profile':
+        return (
+          <ProfileScreen
+            products={products || []}
           />
         )
       
@@ -179,7 +197,7 @@ function App() {
         {renderScreen()}
       </div>
       
-      {(activeScreen === 'watchlist' || activeScreen === 'settings') && (
+      {(activeScreen === 'watchlist' || activeScreen === 'products' || activeScreen === 'profile' || activeScreen === 'settings') && (
         <BottomNav 
           active={activeScreen} 
           onNavigate={handleBottomNavClick} 
