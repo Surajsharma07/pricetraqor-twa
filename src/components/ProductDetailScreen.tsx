@@ -83,7 +83,7 @@ export function ProductDetailScreen({
           <h1 className="text-xl font-semibold tracking-tight">Product Details</h1>
         </div>
 
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
           <div className="aspect-square w-full bg-secondary flex items-center justify-center">
             <img 
               src={product.imageUrl} 
@@ -100,7 +100,7 @@ export function ProductDetailScreen({
                   variant="ghost" 
                   size="icon"
                   onClick={() => window.open(product.productUrl, '_blank')}
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
                 >
                   <ArrowSquareOut className="w-5 h-5" />
                 </Button>
@@ -199,6 +199,7 @@ export function ProductDetailScreen({
                       variant="default"
                       size="icon"
                       onClick={handleSaveTargetPrice}
+                      className="rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.15)] hover:shadow-[0_3px_8px_rgba(0,0,0,0.2)]"
                     >
                       <Check className="w-5 h-5" />
                     </Button>
@@ -206,6 +207,7 @@ export function ProductDetailScreen({
                       variant="outline"
                       size="icon"
                       onClick={handleCancelEdit}
+                      className="rounded-full"
                     >
                       <X className="w-5 h-5" />
                     </Button>

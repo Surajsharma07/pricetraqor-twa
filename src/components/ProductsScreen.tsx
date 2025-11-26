@@ -23,7 +23,11 @@ export function ProductsScreen({ products, onProductClick, onAddProduct }: Produ
             {activeProducts.length} active {activeProducts.length === 1 ? 'product' : 'products'}
           </p>
         </div>
-        <Button onClick={onAddProduct} size="icon" className="rounded-full h-12 w-12">
+        <Button 
+          onClick={onAddProduct} 
+          size="icon" 
+          className="rounded-full h-12 w-12 shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] active:shadow-[inset_0_3px_10px_rgba(0,0,0,0.3)]"
+        >
           <Plus className="w-6 h-6" weight="bold" />
         </Button>
       </div>
@@ -47,7 +51,7 @@ export function ProductsScreen({ products, onProductClick, onAddProduct }: Produ
           {products.map((product) => (
             <Card
               key={product.id}
-              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              className="overflow-hidden cursor-pointer hover:shadow-lg transition-all shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.03)] active:scale-[0.98]"
               onClick={() => onProductClick(product)}
             >
               <div className="aspect-square bg-muted relative">

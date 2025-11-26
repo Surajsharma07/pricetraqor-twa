@@ -71,7 +71,11 @@ export function WatchlistScreen({
               {products.length} {products.length === 1 ? 'product' : 'products'} tracked
             </p>
           </div>
-          <Button onClick={onAddProduct} size="icon" className="rounded-full h-12 w-12">
+          <Button 
+            onClick={onAddProduct} 
+            size="icon" 
+            className="rounded-full h-12 w-12 shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] active:shadow-[inset_0_3px_10px_rgba(0,0,0,0.3)]"
+          >
             <Plus className="w-6 h-6" weight="bold" />
           </Button>
         </div>

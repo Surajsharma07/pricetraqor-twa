@@ -71,9 +71,9 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
         </div>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
         <div className="flex items-center gap-4">
-          <Avatar className="w-16 h-16">
+          <Avatar className="w-16 h-16 shadow-[0_2px_6px_rgba(0,0,0,0.15)]">
             <AvatarImage src={user?.avatarUrl} alt={user?.login || 'User'} />
             <AvatarFallback className="text-lg">
               {user ? getInitials(user.login) : 'U'}
@@ -96,9 +96,9 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
       <div>
         <h3 className="text-sm font-medium text-muted-foreground mb-3">Statistics</h3>
         <div className="grid grid-cols-2 gap-3">
-          <Card className="p-4">
+          <Card className="p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
                 <Package className="w-5 h-5 text-accent" weight="bold" />
               </div>
               <div>
@@ -108,9 +108,9 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
                 <ChartLine className="w-5 h-5 text-success" weight="bold" />
               </div>
               <div>
@@ -120,9 +120,9 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
                 <TrendDown className="w-5 h-5 text-success" weight="bold" />
               </div>
               <div>
@@ -132,9 +132,9 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
                 <Bell className="w-5 h-5 text-accent" weight="bold" />
               </div>
               <div>
@@ -147,7 +147,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
       </div>
 
       {products.length > 0 && (
-        <Card className="p-6">
+        <Card className="p-6 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
           <h3 className="text-sm font-medium mb-4 flex items-center gap-2">
             <ChartLine className="w-4 h-4" weight="bold" />
             Insights
@@ -190,7 +190,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
       )}
 
       {products.length === 0 && (
-        <Card className="p-8 text-center">
+        <Card className="p-8 text-center shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
             <Clock className="w-8 h-8 text-muted-foreground" />
           </div>

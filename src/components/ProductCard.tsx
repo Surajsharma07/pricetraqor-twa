@@ -40,11 +40,11 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
 
   return (
     <Card 
-      className="overflow-hidden hover:border-accent/50 transition-all cursor-pointer group"
+      className="overflow-hidden hover:border-accent/50 transition-all cursor-pointer group shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.03)] active:scale-[0.98]"
       onClick={onClick}
     >
       <div className="flex gap-3 p-3">
-        <div className="w-20 h-20 flex-shrink-0 bg-secondary rounded-md overflow-hidden">
+        <div className="w-20 h-20 flex-shrink-0 bg-secondary rounded-md overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]">
           <img 
             src={product.imageUrl} 
             alt={product.title}
@@ -60,7 +60,7 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.15)]">
                   <DotsThree className="w-5 h-5" weight="bold" />
                 </Button>
               </DropdownMenuTrigger>

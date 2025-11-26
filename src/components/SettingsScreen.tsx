@@ -39,7 +39,7 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
         </div>
       </div>
 
-      <Card className="p-6 space-y-6">
+      <Card className="p-6 space-y-6 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <Bell className="w-5 h-5 text-muted-foreground" weight="bold" />
@@ -124,7 +124,7 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
         </div>
       </Card>
 
-      <Card className="p-4 bg-muted/50">
+      <Card className="p-4 bg-muted/50 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.03)]">
         <h3 className="text-sm font-medium mb-2">About Notifications</h3>
         <ul className="text-xs text-muted-foreground space-y-1.5">
           <li className="flex gap-2">
