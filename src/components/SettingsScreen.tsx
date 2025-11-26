@@ -32,27 +32,27 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Gear className="w-7 h-7" weight="bold" />
+        <Gear className="w-7 h-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">Settings</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your preferences</p>
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Manage your preferences</p>
         </div>
       </div>
 
-      <Card className="p-6 space-y-6 shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] bg-gradient-to-b from-card to-card/95">
-        <div>
+      <Card className="p-6 space-y-6 shadow-[0_8px_24px_rgba(0,0,0,0.25),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)] bg-gradient-to-br from-card/98 via-card to-card/95 backdrop-blur-xl relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
+        <div className="relative z-10">
           <div className="flex items-center gap-3 mb-5">
-            <Bell className="w-5 h-5 text-muted-foreground" weight="bold" />
-            <h2 className="text-lg font-bold">Notifications</h2>
+            <Bell className="w-5 h-5 text-muted-foreground drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" weight="bold" />
+            <h2 className="text-lg font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">Notifications</h2>
           </div>
 
           <div className="space-y-5">
-            <div className="flex items-center justify-between p-4 bg-gradient-to-br from-muted/80 to-muted/60 rounded-xl shadow-[inset_0_2px_6px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-br from-muted/90 via-muted/70 to-muted/60 rounded-xl shadow-[inset_0_3px_8px_rgba(0,0,0,0.15),inset_0_-1px_3px_rgba(255,255,255,0.05),0_2px_6px_rgba(0,0,0,0.1)] border border-border/30">
               <div className="space-y-1">
-                <Label htmlFor="notifications-enabled" className="text-sm font-semibold cursor-pointer">
+                <Label htmlFor="notifications-enabled" className="text-sm font-semibold cursor-pointer drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">
                   Enable Notifications
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">
                   Receive alerts when prices change
                 </p>
               </div>
@@ -60,22 +60,22 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
                 id="notifications-enabled"
                 checked={settings.notificationsEnabled}
                 onCheckedChange={handleToggleNotifications}
-                className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
+                className="shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] data-[state=checked]:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1),0_0_12px_rgba(var(--accent),0.4)]"
               />
             </div>
 
             {settings.notificationsEnabled && (
               <>
-                <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
+                <Separator className="shadow-[0_1px_3px_rgba(0,0,0,0.15)]" />
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold">Alert Type</Label>
+                  <Label className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Alert Type</Label>
                   <RadioGroup
                     value={settings.alertType}
                     onValueChange={handleAlertTypeChange}
                     className="space-y-3"
                   >
-                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_2px_rgba(255,255,255,0.03)] bg-gradient-to-br from-card/80 to-card/60 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-shadow">
+                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15),0_2px_6px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.05)] bg-gradient-to-br from-card/90 to-card/70 hover:shadow-[0_6px_16px_rgba(0,0,0,0.2),0_3px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200">
                       <RadioGroupItem value="drops" id="alert-drops" />
                       <div className="flex-1">
                         <Label htmlFor="alert-drops" className="text-sm font-semibold cursor-pointer">

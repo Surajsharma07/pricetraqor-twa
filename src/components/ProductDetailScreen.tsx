@@ -77,44 +77,44 @@ export function ProductDetailScreen({
     <>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.08)]">
-            <ArrowLeft className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.2),0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25),0_3px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)] active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.3),inset_0_-1px_2px_rgba(255,255,255,0.05)] active:scale-95 bg-gradient-to-b from-secondary/60 to-secondary/40">
+            <ArrowLeft className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
           </Button>
-          <h1 className="text-xl font-bold tracking-tight">Product Details</h1>
+          <h1 className="text-xl font-bold tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Product Details</h1>
         </div>
 
-        <Card className="overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] bg-gradient-to-b from-card to-card/95">
-          <div className="aspect-square w-full bg-gradient-to-br from-secondary/80 to-secondary/60 flex items-center justify-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.15)]">
+        <Card className="overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.25),0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(0,0,0,0.2)] bg-gradient-to-br from-card/98 via-card to-card/95 backdrop-blur-xl">
+          <div className="aspect-square w-full bg-gradient-to-br from-secondary/90 via-secondary/70 to-secondary/60 flex items-center justify-center shadow-[inset_0_4px_12px_rgba(0,0,0,0.2),inset_0_-2px_6px_rgba(255,255,255,0.05)] relative before:absolute before:inset-0 before:bg-gradient-to-tr before:from-white/5 before:via-transparent before:to-white/10 before:opacity-60">
             <img 
               src={product.imageUrl} 
               alt={product.title}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain relative z-10"
             />
           </div>
           
           <div className="p-5 space-y-5">
             <div>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h2 className="font-semibold leading-tight text-base">{product.title}</h2>
+                <h2 className="font-semibold leading-tight text-base drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{product.title}</h2>
                 <Button 
                   variant="ghost" 
                   size="icon"
                   onClick={() => window.open(product.productUrl, '_blank')}
-                  className="flex-shrink-0 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(255,255,255,0.08)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.2)] bg-gradient-to-b from-secondary/60 to-secondary/40"
+                  className="flex-shrink-0 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.2),0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25),0_3px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.25)] active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.3),inset_0_-1px_2px_rgba(255,255,255,0.05)] active:scale-95 bg-gradient-to-b from-secondary/70 to-secondary/50"
                 >
-                  <ArrowSquareOut className="w-5 h-5" />
+                  <ArrowSquareOut className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
                 </Button>
               </div>
               
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{getSiteName(product.siteDomain)}</Badge>
+                <Badge variant="outline" className="shadow-[0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] border-border/40">{getSiteName(product.siteDomain)}</Badge>
                 {!product.isActive && (
-                  <Badge variant="outline" className="bg-muted shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                  <Badge variant="outline" className="bg-muted shadow-[0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.05)] border-border/40">
                     Paused
                   </Badge>
                 )}
                 {!product.inStock && (
-                  <Badge variant="destructive" className="shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Out of Stock</Badge>
+                  <Badge variant="destructive" className="shadow-[0_2px_6px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]">Out of Stock</Badge>
                 )}
               </div>
             </div>
