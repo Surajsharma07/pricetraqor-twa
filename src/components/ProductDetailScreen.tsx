@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from 'sonner'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface ProductDetailScreenProps {
   product: TrackedProduct
@@ -224,26 +225,109 @@ export function ProductDetailScreen({
 
             <div>
               <h3 className="text-sm font-semibold mb-3">Price History</h3>
-              {product.priceHistory.length > 0 ? (
-                <div className="space-y-2.5">
-                  {product.priceHistory.slice(0, 10).map((entry, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between py-2.5 px-4 bg-gradient-to-br from-muted/80 to-muted/60 rounded-lg shadow-[inset_0_2px_6px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
-                    >
-                      <span className="text-sm font-semibold text-numeric">
-                        {formatPrice(entry.price, entry.currency)}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-medium">
-                        {new Date(entry.checkedAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </span>
-                    </div>
-                  ))}
+              {product.priceHistory.length > 1 ? (
+                <div className="space-y-4">
+                  <div className="neumorphic-inset p-4 rounded-xl">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart 
+                        data={product.priceHistory.map(entry => ({
+                          date: new Date(entry.checkedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          price: entry.price,
+                          fullDate: entry.checkedAt
+                        }))}
+                        margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+                      >
+                        <defs>
+                          <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="oklch(0.65 0.20 230)" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="oklch(0.65 0.20 230)" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid 
+                          strokeDasharray="3 3" 
+                          stroke="oklch(0.25 0.04 250 / 0.3)" 
+                          vertical={false}
+                        />
+                        <XAxis 
+                          dataKey="date" 
+                          stroke="oklch(0.70 0.02 250)"
+                          style={{ fontSize: '11px', fontWeight: 500 }}
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          stroke="oklch(0.70 0.02 250)"
+                          style={{ fontSize: '11px', fontWeight: 500 }}
+                          tickLine={false}
+                          tickFormatter={(value) => `$${value}`}
+                        />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'oklch(0.15 0.03 250 / 0.95)',
+                            border: '1px solid oklch(0.35 0.05 250 / 0.2)',
+                            borderRadius: '12px',
+                            padding: '8px 12px',
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                            backdropFilter: 'blur(16px)'
+                          }}
+                          labelStyle={{ 
+                            color: 'oklch(0.98 0 0)', 
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            marginBottom: '4px'
+                          }}
+                          itemStyle={{ 
+                            color: 'oklch(0.65 0.20 230)',
+                            fontSize: '13px',
+                            fontWeight: 700
+                          }}
+                          formatter={(value: number) => [`$${value.toFixed(2)}`, 'Price']}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="price" 
+                          stroke="oklch(0.65 0.20 230)" 
+                          strokeWidth={3}
+                          dot={{ 
+                            fill: 'oklch(0.65 0.20 230)', 
+                            r: 4,
+                            strokeWidth: 2,
+                            stroke: 'oklch(0.15 0.03 250)'
+                          }}
+                          activeDot={{ 
+                            r: 6,
+                            fill: 'oklch(0.65 0.20 230)',
+                            stroke: 'oklch(0.15 0.03 250)',
+                            strokeWidth: 2,
+                            filter: 'drop-shadow(0 0 8px oklch(0.65 0.20 230 / 0.6))'
+                          }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <div className="space-y-2.5">
+                    <h4 className="text-xs font-semibold text-muted-foreground">Recent Prices</h4>
+                    {product.priceHistory.slice(0, 5).map((entry, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-center justify-between py-2.5 px-4 bg-gradient-to-br from-muted/80 to-muted/60 rounded-lg shadow-[inset_0_2px_6px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+                      >
+                        <span className="text-sm font-semibold text-numeric">
+                          {formatPrice(entry.price, entry.currency)}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {new Date(entry.checkedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              ) : product.priceHistory.length === 1 ? (
+                <p className="text-sm text-muted-foreground">Add more price checks to see the graph</p>
               ) : (
                 <p className="text-sm text-muted-foreground">No price history yet</p>
               )}

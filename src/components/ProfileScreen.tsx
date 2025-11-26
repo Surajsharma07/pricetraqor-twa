@@ -10,7 +10,10 @@ import {
   TrendDown, 
   Bell, 
   Package,
-  Clock
+  Clock,
+  Crown,
+  Sparkle,
+  Check
 } from '@phosphor-icons/react'
 
 interface ProfileScreenProps {
@@ -61,6 +64,12 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
       .slice(0, 2)
   }
 
+  const subscriptionPlan = 'Free'
+  const maxProducts = 10
+  const maxPriceChecks = 100
+  const usedProducts = products.length
+  const usedPriceChecks = products.reduce((sum, p) => sum + p.priceHistory.length, 0)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -90,6 +99,83 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
               </Badge>
             )}
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 glass-card relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 via-accent/10 to-transparent blur-3xl"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full neumorphic-raised flex items-center justify-center">
+                <Crown className="w-5 h-5 text-accent drop-shadow-[0_2px_6px_rgba(var(--accent),0.6)]" weight="fill" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">Subscription</h3>
+                <p className="text-xs text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{subscriptionPlan} Plan</p>
+              </div>
+            </div>
+            <Badge variant="secondary" className="glass-morphism px-3 py-1">
+              <Sparkle className="w-3 h-3 mr-1" weight="fill" />
+              Active
+            </Badge>
+          </div>
+
+          <div className="space-y-4 mb-5">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Products Tracked</span>
+                <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{usedProducts} / {maxProducts}</span>
+              </div>
+              <div className="h-2.5 neumorphic-inset rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-accent via-accent/90 to-accent/80 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(var(--accent),0.5)]"
+                  style={{ width: `${Math.min((usedProducts / maxProducts) * 100, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Price Checks Used</span>
+                <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{usedPriceChecks} / {maxPriceChecks}</span>
+              </div>
+              <div className="h-2.5 neumorphic-inset rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-success via-success/90 to-success/80 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(var(--success),0.4)]"
+                  style={{ width: `${Math.min((usedPriceChecks / maxPriceChecks) * 100, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 frosted-glass rounded-xl border border-border/30 mb-4">
+            <p className="text-xs font-semibold text-muted-foreground mb-3 drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Free Plan Includes:</p>
+            <div className="space-y-2">
+              {[
+                `Track up to ${maxProducts} products`,
+                `${maxPriceChecks} price checks per month`,
+                'Daily price updates',
+                'Email notifications',
+                'Price history charts'
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full neumorphic-inset flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-success" weight="bold" />
+                  </div>
+                  <span className="text-xs font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button 
+            className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary/90 to-primary/80 shadow-[0_4px_16px_rgba(var(--primary),0.3)]"
+            size="lg"
+          >
+            <Crown className="w-5 h-5 mr-2" weight="fill" />
+            Upgrade to Pro
+          </Button>
         </div>
       </Card>
 
