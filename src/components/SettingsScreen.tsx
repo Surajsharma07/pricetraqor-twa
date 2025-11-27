@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { Bell, Gear, Palette, Sun, Moon } from '@phosphor-icons/react'
+import { Bell, Gear, Palette } from '@phosphor-icons/react'
 import { NeumorphicRadioGroup } from '@/components/NeumorphicRadioGroup'
 import { LampSwitch } from '@/components/ui/lamp-switch'
 
@@ -37,7 +37,7 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex items-center gap-3">
         <Gear className="w-7 h-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
         <div>
@@ -46,25 +46,12 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
         </div>
       </div>
 
-      <Card className="p-6 space-y-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-5">
-            {settings.theme === 'light' ? (
-              <Sun className="w-5 h-5 text-muted-foreground drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" weight="bold" />
-            ) : (
-              <Moon className="w-5 h-5 text-muted-foreground drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" weight="bold" />
-            )}
-            <h2 className="text-lg font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">Appearance</h2>
-          </div>
-
-          <div className="flex justify-center py-8">
-            <LampSwitch 
-              checked={settings.theme === 'light'}
-              onCheckedChange={handleThemeChange}
-            />
-          </div>
-        </div>
-      </Card>
+      <div className="absolute -top-2 right-0 z-20">
+        <LampSwitch 
+          checked={settings.theme === 'light'}
+          onCheckedChange={handleThemeChange}
+        />
+      </div>
 
       <Card className="p-6 space-y-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
         <div className="relative z-10">
