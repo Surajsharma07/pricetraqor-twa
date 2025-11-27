@@ -636,3 +636,115 @@
     inset 0 1px 0 0 oklch(0.82 0.01 250 / 0.15),
     inset 0 -1px 0 0 oklch(1 0 0 / 0.4);
 }
+
+@keyframes sway {
+  0%   { transform: rotate(1deg); }
+  50%  { transform: rotate(-1deg); }
+  100% { transform: rotate(1deg); }
+}
+
+.lamp-switch {
+  position: fixed;
+  top: -80px;
+  right: 80px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  transform-origin: top center;
+  animation: sway 2.4s ease-in-out infinite;
+  transition: top 0.22s ease, transform 0.22s ease;
+  z-index: 50;
+}
+
+.lamp-switch:hover {
+  cursor: pointer;
+}
+
+.lamp-switch:focus-visible {
+  outline: 2px solid oklch(0.65 0.20 230);
+  outline-offset: 4px;
+}
+
+.lamp-switch.is-pulled {
+  top: -40px;
+  animation-play-state: paused;
+}
+
+.lamp-rope {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lamp-bead {
+  height: 12px;
+  width: 12px;
+  background-color: oklch(0.35 0.04 250);
+  border-radius: 999px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.light-theme .lamp-bead {
+  background-color: oklch(0.65 0.01 250);
+}
+
+.lamp-bulb {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: oklch(0.08 0.02 250);
+  border: 3px solid oklch(0.35 0.04 250);
+  box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+  position: relative;
+  margin-top: 10px;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.lamp-bulb::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 10px;
+  border-radius: 6px;
+  background-color: oklch(0.12 0.02 250);
+  border: 2px solid oklch(0.35 0.04 250);
+}
+
+.lamp-bulb::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(252, 211, 77, 0.85) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.light-theme .lamp-bulb {
+  background-color: oklch(0.85 0.12 85);
+  border-color: oklch(0.75 0.18 85);
+  box-shadow: 0 0 26px 8px rgba(251, 191, 36, 0.75);
+}
+
+.light-theme .lamp-bulb::before {
+  background-color: oklch(0.90 0.005 250);
+  border-color: oklch(0.65 0.01 250);
+}
+
+.light-theme .lamp-bulb::after {
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .lamp-switch {
+    right: 32px;
+  }
+}

@@ -38,19 +38,17 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
 
   return (
     <div className="space-y-6 relative">
+      <LampSwitch 
+        isLight={settings.theme === 'light'}
+        onToggle={() => handleThemeChange(settings.theme !== 'light')}
+      />
+      
       <div className="flex items-center gap-3">
         <Gear className="w-7 h-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">Settings</h1>
           <p className="text-sm text-muted-foreground mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Manage your preferences</p>
         </div>
-      </div>
-
-      <div className="fixed top-0 right-4 z-50" style={{ marginTop: '-20px' }}>
-        <LampSwitch 
-          checked={settings.theme === 'light'}
-          onCheckedChange={handleThemeChange}
-        />
       </div>
 
       <Card className="p-6 space-y-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
