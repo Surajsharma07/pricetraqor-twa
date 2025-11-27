@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { TrackedProduct } from '@/lib/types'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +21,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick, onToggleActive, onDelete }: ProductCardProps) {
+  const [isHovered, setIsHovered] = useState(false)
+  
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
     : null
@@ -40,31 +43,70 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer group active:scale-[0.98] transition-all duration-200 relative neumorphic-raised hover:shadow-[8px_8px_20px_oklch(0.06_0.01_250_/_0.7),-4px_-4px_14px_oklch(0.22_0.04_250_/_0.4),inset_0_1px_0_oklch(0.95_0_0_/_0.1),0_0_40px_oklch(0.65_0.20_230_/_0.15)]"
+      className="overflow-hidden cursor-pointer group active:scale-[0.98] transition-all duration-300 relative neumorphic-raised"
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: isHovered 
+          ? '10px 10px 24px oklch(0.06 0.01 250 / 0.8), -5px -5px 16px oklch(0.24 0.05 250 / 0.5), inset 0 1px 0 oklch(0.95 0 0 / 0.15), 0 0 50px oklch(0.65 0.20 230 / 0.25), 0 0 80px oklch(0.50 0.18 250 / 0.15)'
+          : '8px 8px 16px oklch(0.06 0.01 250 / 0.5), -4px -4px 12px oklch(0.22 0.04 250 / 0.3), inset 0 1px 0 oklch(0.95 0 0 / 0.08)',
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+      <div 
+        className="absolute inset-0 bg-gradient-to-tr from-accent/8 via-primary/5 to-transparent opacity-0 transition-opacity duration-500 pointer-events-none rounded-2xl"
+        style={{ opacity: isHovered ? 1 : 0 }}
+      ></div>
+      
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-accent/5 opacity-0 transition-opacity duration-700 pointer-events-none rounded-2xl"
+        style={{ opacity: isHovered ? 1 : 0 }}
+      ></div>
+      
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-all duration-300"
+        style={{ 
+          backgroundImage: isHovered 
+            ? 'linear-gradient(90deg, transparent, oklch(0.65 0.20 230 / 0.4) 50%, transparent)' 
+            : 'linear-gradient(90deg, transparent, oklch(0.95 0 0 / 0.1) 50%, transparent)'
+        }}
+      ></div>
       
       <div className="flex gap-4 p-4 relative z-10">
-        <div className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden relative neumorphic-inset">
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-60 pointer-events-none z-10"></div>
+        <div 
+          className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden relative neumorphic-inset transition-all duration-500"
+          style={{
+            transform: isHovered ? 'scale(1.05) rotate(-1deg)' : 'scale(1)',
+            boxShadow: isHovered 
+              ? 'inset 8px 8px 16px oklch(0.06 0.01 250 / 0.9), inset -6px -6px 12px oklch(0.20 0.04 250 / 0.5), 0 0 20px oklch(0.65 0.20 230 / 0.2)'
+              : 'inset 6px 6px 12px oklch(0.06 0.01 250 / 0.6), inset -4px -4px 8px oklch(0.20 0.04 250 / 0.4)'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-60 pointer-events-none z-10 transition-opacity duration-300"
+            style={{ opacity: isHovered ? 0.8 : 0.6 }}
+          ></div>
           <div className="absolute inset-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)] rounded-2xl pointer-events-none z-10"></div>
           <img 
             src={product.imageUrl} 
             alt={product.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700"
+            style={{ transform: isHovered ? 'scale(1.1)' : 'scale(1)' }}
           />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="font-semibold text-sm line-clamp-2 leading-tight drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
+            <h3 className="font-semibold text-sm line-clamp-2 leading-tight drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)] transition-all duration-300"
+              style={{
+                transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
+                textShadow: isHovered 
+                  ? '0 2px 4px rgba(0,0,0,0.6), 0 0 12px rgba(101, 80, 230, 0.3)' 
+                  : '0 2px 3px rgba(0,0,0,0.5)'
+              }}
+            >
               {product.title}
             </h3>
             
@@ -73,9 +115,17 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-9 w-9 flex-shrink-0 rounded-full neumorphic-button hover:glow-accent active:scale-95 transition-all duration-200"
+                  className="h-9 w-9 flex-shrink-0 rounded-full neumorphic-button hover:glow-accent active:scale-95 transition-all duration-300"
                   style={{
                     background: 'linear-gradient(145deg, oklch(0.20 0.04 250), oklch(0.16 0.03 250))',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '10px 10px 20px oklch(0.06 0.01 250 / 0.7), -5px -5px 14px oklch(0.24 0.05 250 / 0.5), inset 0 1px 0 oklch(0.95 0 0 / 0.15), 0 0 20px oklch(0.65 0.20 230 / 0.4)'
+                    e.currentTarget.style.transform = 'scale(1.08) rotate(90deg)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '6px 6px 12px oklch(0.06 0.01 250 / 0.5), -3px -3px 8px oklch(0.22 0.04 250 / 0.3), inset 0 1px 0 oklch(0.95 0 0 / 0.08)'
+                    e.currentTarget.style.transform = 'scale(1) rotate(0deg)'
                   }}
                 >
                   <DotsThree className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]" weight="bold" />
@@ -121,20 +171,38 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
           </div>
 
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-medium text-muted-foreground px-2.5 py-1 rounded-lg border border-border/40 neumorphic-inset shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]">
+            <span 
+              className="text-xs font-medium text-muted-foreground px-2.5 py-1 rounded-lg border border-border/40 neumorphic-inset shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] transition-all duration-300"
+              style={{
+                transform: isHovered ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
+                boxShadow: isHovered 
+                  ? 'inset 0 3px 6px rgba(0,0,0,0.3), 0 0 12px oklch(0.65 0.20 230 / 0.15)'
+                  : 'inset 0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
               {getSiteName(product.siteDomain)}
             </span>
             {!product.isActive && (
-              <Badge variant="outline" className="text-xs py-0.5 h-5 glass-morphism border-border/50">
+              <Badge 
+                variant="outline" 
+                className="text-xs py-0.5 h-5 glass-morphism border-border/50 transition-all duration-300 animate-pulse"
+                style={{
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)'
+                }}
+              >
                 Paused
               </Badge>
             )}
             {!product.inStock && (
               <Badge 
                 variant="destructive" 
-                className="text-xs py-0.5 h-5 shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                className="text-xs py-0.5 h-5 shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-300 animate-pulse"
                 style={{
                   background: 'linear-gradient(145deg, oklch(0.60 0.22 15), oklch(0.50 0.20 15))',
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                  boxShadow: isHovered 
+                    ? '0 3px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2), 0 0 20px oklch(0.55 0.22 15 / 0.6)'
+                    : '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)'
                 }}
               >
                 Out of Stock
@@ -143,7 +211,15 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
           </div>
 
           <div className="flex items-baseline gap-2.5 mb-1">
-            <span className="text-xl font-bold text-numeric bg-gradient-to-br from-foreground via-foreground to-foreground/80 bg-clip-text drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">
+            <span 
+              className="text-xl font-bold text-numeric bg-gradient-to-br from-foreground via-foreground to-foreground/80 bg-clip-text drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)] transition-all duration-500"
+              style={{
+                transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                textShadow: isHovered 
+                  ? '0 4px 8px rgba(0,0,0,0.7), 0 0 20px rgba(101, 80, 230, 0.5)' 
+                  : '0 3px 6px rgba(0,0,0,0.6)'
+              }}
+            >
               {formatPrice(product.currentPrice, product.currency)}
             </span>
             
@@ -152,14 +228,22 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
                 priceChangeData.direction === 'down' 
                   ? 'border-success/40 glow-success neumorphic-inset' 
                   : 'border-destructive/40 neumorphic-inset'
-              }`}
+              } transition-all duration-500`}
                 style={{
                   background: priceChangeData.direction === 'down'
                     ? 'linear-gradient(145deg, oklch(0.12 0.02 250), oklch(0.16 0.03 250))'
                     : 'linear-gradient(145deg, oklch(0.12 0.02 250), oklch(0.16 0.03 250))',
+                  transform: isHovered ? 'scale(1.05) translateY(-2px)' : 'scale(1)',
+                  boxShadow: isHovered
+                    ? priceChangeData.direction === 'down'
+                      ? 'inset 4px 4px 8px oklch(0.06 0.01 250 / 0.8), inset -2px -2px 6px oklch(0.20 0.04 250 / 0.6), 0 0 20px oklch(0.65 0.20 145 / 0.5)'
+                      : 'inset 4px 4px 8px oklch(0.06 0.01 250 / 0.8), inset -2px -2px 6px oklch(0.20 0.04 250 / 0.6), 0 0 20px oklch(0.55 0.22 15 / 0.5)'
+                    : 'inset 3px 3px 6px oklch(0.06 0.01 250 / 0.6), inset -2px -2px 4px oklch(0.20 0.04 250 / 0.4)'
                 }}
               >
-                {getPriceChangeIcon()}
+                <span style={{ transform: isHovered ? 'scale(1.15)' : 'scale(1)', display: 'inline-block', transition: 'transform 0.3s ease' }}>
+                  {getPriceChangeIcon()}
+                </span>
                 <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                   {Math.abs(priceChangeData.percent).toFixed(1)}%
                 </span>
@@ -167,10 +251,29 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
             )}
           </div>
 
-          <div className="text-xs text-muted-foreground mt-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+          <div 
+            className="text-xs text-muted-foreground mt-1.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-all duration-300"
+            style={{
+              transform: isHovered ? 'translateX(2px)' : 'translateX(0)',
+              opacity: isHovered ? 1 : 0.8
+            }}
+          >
             Updated {getRelativeTime(product.lastCheckedAt)}
           </div>
         </div>
+      </div>
+      
+      <div 
+        className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden"
+        style={{ opacity: isHovered ? 1 : 0, transition: 'opacity 0.6s ease' }}
+      >
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+          style={{
+            transform: 'translateX(-100%)',
+            animation: isHovered ? 'shimmer 2s ease-in-out infinite' : 'none'
+          }}
+        />
       </div>
     </Card>
   )
