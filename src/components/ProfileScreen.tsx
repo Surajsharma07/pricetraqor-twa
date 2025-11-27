@@ -29,6 +29,7 @@ interface UserInfo {
 
 export function ProfileScreen({ products }: ProfileScreenProps) {
   const [user, setUser] = useState<UserInfo | null>(null)
+  const isLightTheme = document.documentElement.classList.contains('light-theme')
 
   useEffect(() => {
     const loadUser = async () => {

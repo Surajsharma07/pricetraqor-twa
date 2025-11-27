@@ -111,3 +111,28 @@ export function filterProducts(products: TrackedProduct[], filterType: string): 
       return products
   }
 }
+
+export function getThemeAwareCardBg(): string {
+  const isLight = document.documentElement.classList.contains('light-theme')
+  return isLight
+    ? 'linear-gradient(145deg, oklch(0.95 0.010 60 / 0.98), oklch(0.92 0.012 60 / 0.95))'
+    : 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))'
+}
+
+export function getThemeAwareButtonBg(): string {
+  const isLight = document.documentElement.classList.contains('light-theme')
+  return isLight
+    ? 'linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.89 0.015 60))'
+    : 'linear-gradient(145deg, oklch(0.20 0.04 250), oklch(0.16 0.03 250))'
+}
+
+export function getThemeAwareNeumorphicBg(): string {
+  const isLight = document.documentElement.classList.contains('light-theme')
+  return isLight
+    ? 'linear-gradient(145deg, oklch(0.94 0.010 60), oklch(0.90 0.012 60))'
+    : 'linear-gradient(145deg, oklch(0.16 0.03 250), oklch(0.12 0.025 250))'
+}
+
+export function isLightTheme(): boolean {
+  return document.documentElement.classList.contains('light-theme')
+}

@@ -8,10 +8,12 @@ interface BottomNavProps {
 
 export function BottomNav({ active, onNavigate }: BottomNavProps) {
   const navRef = useRef<HTMLDivElement>(null)
+  const isLightTheme = document.documentElement.classList.contains('light-theme')
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!navRef.current) return
+      const isLight = document.documentElement.classList.contains('light-theme')
       
       const rect = navRef.current.getBoundingClientRect()
       const centerX = rect.left + rect.width / 2
@@ -25,12 +27,19 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
       const offsetX = Math.cos(angle) * distance
       const offsetY = Math.sin(angle) * distance
       
-      navRef.current.style.boxShadow = `
-        ${-offsetX * 3}px ${-offsetY * 3}px 8px oklch(0.06 0.01 250 / 0.6),
-        ${offsetX * 2}px ${offsetY * 2}px 6px oklch(0.22 0.04 250 / 0.3),
-        inset 0 1px 0 oklch(0.95 0 0 / 0.06),
-        0 -4px 16px oklch(0 0 0 / 0.4)
-      `
+      navRef.current.style.boxShadow = isLight
+        ? `
+          ${-offsetX * 4}px ${-offsetY * 4}px 12px oklch(0.68 0.022 60 / 0.4),
+          ${offsetX * 3}px ${offsetY * 3}px 8px oklch(0.96 0.008 60 / 0.5),
+          inset 0 1px 0 oklch(1 0 0 / 0.7),
+          0 -4px 16px oklch(0 0 0 / 0.2)
+        `
+        : `
+          ${-offsetX * 3}px ${-offsetY * 3}px 8px oklch(0.06 0.01 250 / 0.6),
+          ${offsetX * 2}px ${offsetY * 2}px 6px oklch(0.22 0.04 250 / 0.3),
+          inset 0 1px 0 oklch(0.95 0 0 / 0.06),
+          0 -4px 16px oklch(0 0 0 / 0.4)
+        `
     }
 
     window.addEventListener('mousemove', handleMouseMove)
@@ -41,11 +50,14 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
     <div className="fixed bottom-0 left-0 right-0 safe-area-bottom backdrop-blur-3xl">
       <div 
         ref={navRef}
-        className="mx-auto max-w-[430px] px-4 pb-2 pt-1 neumorphic-raised border-t border-white/5 transition-shadow duration-300"
+        className="mx-auto max-w-[430px] px-4 pb-2 pt-1 neumorphic-raised border-t transition-shadow duration-300"
         style={{
-          background: 'linear-gradient(145deg, oklch(0.16 0.03 250 / 0.95), oklch(0.12 0.025 250 / 0.95))',
+          background: isLightTheme
+            ? 'linear-gradient(145deg, oklch(0.94 0.010 60 / 0.98), oklch(0.90 0.012 60 / 0.98))'
+            : 'linear-gradient(145deg, oklch(0.16 0.03 250 / 0.95), oklch(0.12 0.025 250 / 0.95))',
           backdropFilter: 'blur(40px)',
           WebkitBackdropFilter: 'blur(40px)',
+          borderTopColor: isLightTheme ? 'oklch(0.78 0.018 60 / 0.3)' : 'oklch(0.95 0 0 / 0.05)',
         }}
       >
         <nav className="flex items-center justify-around h-18">

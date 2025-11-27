@@ -656,11 +656,11 @@
 }
 
 .light-theme .neumorphic-card {
-  background: linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.89 0.015 60));
+  background: linear-gradient(145deg, oklch(0.94 0.010 60), oklch(0.90 0.012 60)) !important;
   box-shadow: 
     14px 14px 28px oklch(0.68 0.022 60),
     -10px -10px 20px oklch(0.96 0.008 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.6);
+    inset 0 1px 0 oklch(1 0 0 / 0.6) !important;
   border: 1px solid oklch(0.78 0.018 60 / 0.4);
 }
 
@@ -686,16 +686,16 @@
 .light-theme .glass-card {
   background: linear-gradient(
     135deg,
-    oklch(0.92 0.012 60 / 0.85) 0%,
-    oklch(0.89 0.015 60 / 0.75) 100%
-  );
+    oklch(0.95 0.010 60 / 0.92) 0%,
+    oklch(0.92 0.012 60 / 0.88) 100%
+  ) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid oklch(0.75 0.02 60 / 0.5);
+  border: 1px solid oklch(0.78 0.018 60 / 0.6) !important;
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.8),
-    inset 0 -1px 0 0 oklch(0.68 0.022 60 / 0.4);
+    0 8px 32px 0 rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.9),
+    inset 0 -1px 0 0 oklch(0.68 0.022 60 / 0.4) !important;
 }
 
 .light-theme .neumorphic-raised {
@@ -893,4 +893,211 @@
   .lamp-switch {
     right: 32px;
   }
+}
+
+.light-theme [style*="oklch(0.18 0.04 250"],
+.light-theme [style*="oklch(0.14 0.03 250"],
+.light-theme [style*="oklch(0.16 0.03 250"],
+.light-theme [style*="oklch(0.12 0.025 250"],
+.light-theme [style*="oklch(0.20 0.04 250"] {
+  background: linear-gradient(145deg, oklch(0.94 0.010 60 / 0.95), oklch(0.91 0.012 60 / 0.92)) !important;
+}
+
+.light-theme .frosted-glass {
+  background: linear-gradient(
+    135deg,
+    oklch(0.93 0.012 60 / 0.85) 0%,
+    oklch(0.89 0.015 60 / 0.75) 100%
+  ) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid oklch(0.78 0.018 60 / 0.6) !important;
+}
+
+.light-theme .text-muted-foreground {
+  color: oklch(0.40 0.02 250) !important;
+}
+
+.light-theme .text-foreground {
+  color: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme h1,
+.light-theme h2,
+.light-theme h3,
+.light-theme .font-bold {
+  color: oklch(0.15 0.02 250) !important;
+}
+
+.light-theme [class*="drop-shadow"] {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) !important;
+}
+
+.light-theme .border-border {
+  border-color: oklch(0.78 0.018 60 / 0.5) !important;
+}
+
+.light-theme .glass-morphism {
+  background: linear-gradient(
+    135deg,
+    oklch(0.94 0.012 60 / 0.7) 0%,
+    oklch(0.91 0.015 60 / 0.6) 100%
+  ) !important;
+  border-color: oklch(0.76 0.02 60 / 0.4) !important;
+}
+
+.light-theme .Badge[variant="outline"] {
+  background: oklch(0.90 0.012 60 / 0.8) !important;
+  border-color: oklch(0.76 0.02 60 / 0.6) !important;
+  color: oklch(0.25 0.03 250) !important;
+}
+
+.light-theme .Input,
+.light-theme input,
+.light-theme textarea {
+  background: oklch(0.93 0.012 60) !important;
+  color: oklch(0.18 0.02 250) !important;
+  border-color: oklch(0.78 0.018 60 / 0.5) !important;
+}
+
+.light-theme .Input::placeholder,
+.light-theme input::placeholder,
+.light-theme textarea::placeholder {
+  color: oklch(0.50 0.02 250) !important;
+}
+
+.light-theme [role="progressbar"] {
+  background: oklch(0.88 0.015 60) !important;
+}
+
+.light-theme .bg-accent\/5,
+.light-theme .bg-accent\/8,
+.light-theme .bg-accent\/10 {
+  background-color: oklch(0.85 0.015 60) !important;
+}
+
+.light-theme .bg-primary\/5 {
+  background-color: oklch(0.88 0.012 60) !important;
+}
+
+.light-theme [class*="Avatar"] [style*="oklch(0.55 0.18 250"],
+.light-theme [style*="oklch(0.55 0.18 250)"],
+.light-theme [style*="oklch(0.45 0.18 250)"] {
+  background: linear-gradient(145deg, oklch(0.50 0.18 250), oklch(0.45 0.18 250)) !important;
+}
+
+.light-theme [style*="oklch(0.12 0.02 250)"] {
+  background: linear-gradient(145deg, oklch(0.88 0.015 60), oklch(0.92 0.012 60)) !important;
+}
+
+.light-theme svg,
+.light-theme [class*="Phosphor"] {
+  filter: brightness(0.3) !important;
+}
+
+.light-theme [class*="glow-accent"] svg,
+.light-theme [class*="glow-primary"] svg,
+.light-theme [class*="glow-success"] svg,
+.light-theme .text-accent svg,
+.light-theme .text-primary svg,
+.light-theme .text-success svg,
+.light-theme .text-destructive svg {
+  filter: brightness(1) !important;
+}
+
+.light-theme .Toaster,
+.light-theme [data-sonner-toaster] {
+  --normal-bg: oklch(0.95 0.010 60) !important;
+  --normal-border: oklch(0.78 0.018 60) !important;
+  --normal-text: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme [data-sonner-toast] {
+  background: oklch(0.95 0.010 60) !important;
+  border-color: oklch(0.78 0.018 60) !important;
+  color: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme [data-description] {
+  color: oklch(0.40 0.02 250) !important;
+}
+
+.light-theme .relative.z-10,
+.light-theme [class*="relative"][class*="z-10"] {
+  color: oklch(0.18 0.02 250);
+}
+
+.light-theme .relative.z-10 .text-muted-foreground,
+.light-theme [class*="relative"][class*="z-10"] .text-muted-foreground {
+  color: oklch(0.45 0.02 250) !important;
+}
+
+.light-theme [class*="TabsList"] {
+  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.86 0.015 60)) !important;
+}
+
+.light-theme [class*="TabsTrigger"][data-state="active"] {
+  background: linear-gradient(145deg, oklch(0.96 0.008 60), oklch(0.93 0.010 60)) !important;
+  color: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme [data-state="active"] svg {
+  filter: brightness(0.2) !important;
+}
+
+.light-theme button:not([class*="text-destructive"]):not([class*="destructive"]) svg {
+  filter: brightness(0.25);
+}
+
+.light-theme button[class*="text-accent"] svg,
+.light-theme button[class*="glow"] svg {
+  filter: brightness(0.8) !important;
+}
+
+.light-theme [role="dialog"],
+.light-theme [data-radix-dropdown-menu-content],
+.light-theme [data-radix-popover-content],
+.light-theme [data-radix-dialog-content] {
+  background: oklch(0.95 0.010 60 / 0.98) !important;
+  border-color: oklch(0.78 0.018 60 / 0.5) !important;
+  color: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme [data-radix-dropdown-menu-item],
+.light-theme [role="menuitem"] {
+  color: oklch(0.18 0.02 250) !important;
+}
+
+.light-theme [data-radix-dropdown-menu-item]:hover,
+.light-theme [role="menuitem"]:hover {
+  background: oklch(0.90 0.012 60) !important;
+}
+
+.light-theme .card,
+.light-theme [class*="Card"] {
+  background: oklch(0.94 0.010 60 / 0.95) !important;
+  border-color: oklch(0.78 0.018 60 / 0.4) !important;
+}
+
+.light-theme .badge,
+.light-theme [class*="Badge"] {
+  background: oklch(0.88 0.015 60) !important;
+  color: oklch(0.25 0.03 250) !important;
+  border-color: oklch(0.76 0.02 60 / 0.6) !important;
+}
+
+.light-theme .badge[class*="destructive"],
+.light-theme [class*="Badge"][class*="destructive"] {
+  background: linear-gradient(145deg, oklch(0.60 0.22 15), oklch(0.50 0.20 15)) !important;
+  color: oklch(0.98 0 0) !important;
+}
+
+.light-theme label,
+.light-theme [class*="Label"] {
+  color: oklch(0.20 0.02 250) !important;
+}
+
+.light-theme p:not([class*="text-"]),
+.light-theme span:not([class*="text-"]) {
+  color: oklch(0.25 0.02 250);
 }
