@@ -59,12 +59,12 @@ export function NeumorphicRadioGroup({
             <div className="flex-1 ml-4">
               <span
                 className={cn(
-                  "block text-sm font-semibold transition-all duration-200 ease-out",
-                  focusedValue === option.value
+                  "block text-sm font-medium transition-all duration-200 ease-out",
+                  focusedValue === option.value || value === option.value
                     ? "opacity-100 translate-x-2"
-                    : "opacity-80",
+                    : "opacity-70",
                   "hover:opacity-100",
-                  "text-foreground"
+                  "text-[oklch(0.35_0.04_250)]"
                 )}
               >
                 {option.label}
@@ -73,11 +73,11 @@ export function NeumorphicRadioGroup({
                 <span
                   className={cn(
                     "block text-xs mt-1 transition-all duration-200 ease-out",
-                    focusedValue === option.value
-                      ? "opacity-100 translate-x-2"
+                    focusedValue === option.value || value === option.value
+                      ? "opacity-80 translate-x-2"
                       : "opacity-50",
-                    "hover:opacity-80",
-                    "text-muted-foreground"
+                    "hover:opacity-70",
+                    "text-[oklch(0.50_0.03_250)]"
                   )}
                 >
                   {option.description}
