@@ -20,9 +20,18 @@ function App() {
     notificationsEnabled: true,
     alertType: 'drops',
     defaultTargetPercent: 10,
+    theme: 'dark',
   })
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
   const [prefillUrl, setPrefillUrl] = useState<string>()
+
+  useEffect(() => {
+    if (settings?.theme === 'light') {
+      document.documentElement.classList.add('light-theme')
+    } else {
+      document.documentElement.classList.remove('light-theme')
+    }
+  }, [settings?.theme])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -175,7 +184,7 @@ function App() {
       case 'settings':
         return (
           <SettingsScreen
-            settings={settings || { notificationsEnabled: true, alertType: 'drops' }}
+            settings={settings || { notificationsEnabled: true, alertType: 'drops', theme: 'dark' }}
             onUpdateSettings={handleUpdateSettings}
             onShowNeumorphic={() => setActiveScreen('neumorphic')}
           />

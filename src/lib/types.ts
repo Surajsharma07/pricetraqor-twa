@@ -27,6 +27,7 @@ export interface UserSettings {
   notificationsEnabled: boolean
   alertType: 'drops' | 'all'
   defaultTargetPercent?: number
+  theme?: 'dark' | 'light'
 }
 
 export type FilterType = 'all' | 'dropped' | 'increased' | 'out-of-stock'
