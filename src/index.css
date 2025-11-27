@@ -28,9 +28,9 @@
     content: "";
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.96 0.01 60 / 0.4), transparent),
-                radial-gradient(ellipse 60% 80% at 80% 100%, oklch(0.94 0.015 50 / 0.3), transparent),
-                oklch(0.94 0.01 70);
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.92 0.015 60 / 0.5), transparent),
+                radial-gradient(ellipse 60% 80% at 80% 100%, oklch(0.90 0.018 50 / 0.4), transparent),
+                oklch(0.88 0.015 70);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,7 +45,7 @@
     content: "";
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, oklch(0.94 0.01 70 / 0.5), transparent 70%);
+    background: radial-gradient(circle at center, oklch(0.90 0.015 70 / 0.6), transparent 70%);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
@@ -120,43 +120,43 @@
 }
 
 .light-theme {
-  --background: oklch(0.94 0.01 70);
-  --foreground: oklch(0.20 0.02 250);
+  --background: oklch(0.88 0.015 60);
+  --foreground: oklch(0.18 0.02 250);
 
-  --card: oklch(0.96 0.008 60);
-  --card-foreground: oklch(0.22 0.02 250);
+  --card: oklch(0.92 0.012 60);
+  --card-foreground: oklch(0.18 0.02 250);
   
-  --popover: oklch(0.97 0.008 60);
-  --popover-foreground: oklch(0.22 0.02 250);
+  --popover: oklch(0.93 0.012 60);
+  --popover-foreground: oklch(0.18 0.02 250);
 
   --primary: oklch(0.50 0.18 250);
   --primary-foreground: oklch(0.98 0 0);
 
-  --secondary: oklch(0.88 0.01 60);
-  --secondary-foreground: oklch(0.22 0.02 250);
+  --secondary: oklch(0.82 0.015 60);
+  --secondary-foreground: oklch(0.18 0.02 250);
 
-  --muted: oklch(0.90 0.01 60);
-  --muted-foreground: oklch(0.45 0.02 250);
+  --muted: oklch(0.84 0.015 60);
+  --muted-foreground: oklch(0.40 0.02 250);
 
   --accent: oklch(0.65 0.20 230);
-  --accent-foreground: oklch(0.15 0.02 250);
+  --accent-foreground: oklch(0.12 0.02 250);
 
   --destructive: oklch(0.55 0.22 15);
   --destructive-foreground: oklch(0.98 0 0);
 
   --success: oklch(0.65 0.20 145);
-  --success-foreground: oklch(0.15 0.02 250);
+  --success-foreground: oklch(0.12 0.02 250);
 
-  --border: oklch(0.78 0.015 60);
-  --input: oklch(0.85 0.012 60);
+  --border: oklch(0.72 0.018 60);
+  --input: oklch(0.80 0.015 60);
   --ring: oklch(0.50 0.18 250);
   
-  --glass-bg: oklch(0.95 0.01 60 / 0.5);
-  --glass-border: oklch(0.78 0.015 60 / 0.4);
-  --glass-highlight: oklch(1 0 0 / 0.7);
+  --glass-bg: oklch(0.90 0.012 60 / 0.6);
+  --glass-border: oklch(0.72 0.018 60 / 0.5);
+  --glass-highlight: oklch(1 0 0 / 0.8);
   
-  --neomorph-shadow-dark: oklch(0.75 0.018 60);
-  --neomorph-shadow-light: oklch(0.99 0.005 60);
+  --neomorph-shadow-dark: oklch(0.68 0.022 60);
+  --neomorph-shadow-light: oklch(0.96 0.008 60);
 }
 
 @theme {
@@ -453,10 +453,10 @@
 }
 
 .light-theme .neumorphic-switch-track {
-  background: oklch(0.90 0.012 60);
+  background: oklch(0.86 0.015 60);
   box-shadow: 
-    inset 5px 5px 10px oklch(0.75 0.018 60),
-    inset -3px -3px 7px oklch(0.99 0.005 60);
+    inset 5px 5px 10px oklch(0.68 0.022 60),
+    inset -3px -3px 7px oklch(0.96 0.008 60);
 }
 
 .neumorphic-switch-thumb {
@@ -469,11 +469,11 @@
 }
 
 .light-theme .neumorphic-switch-thumb {
-  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.92 0.012 60));
+  background: linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.88 0.015 60));
   box-shadow: 
-    5px 5px 10px oklch(0.75 0.018 60),
-    -3px -3px 7px oklch(0.99 0.005 60),
-    inset 0 1px 2px oklch(1 0 0 / 0.6);
+    5px 5px 10px oklch(0.68 0.022 60),
+    -3px -3px 7px oklch(0.96 0.008 60),
+    inset 0 1px 2px oklch(1 0 0 / 0.7);
 }
 
 .neumorphic-checkbox {
@@ -486,11 +486,11 @@
 }
 
 .light-theme .neumorphic-checkbox {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.88 0.015 60));
   box-shadow: 
-    7px 7px 14px oklch(0.75 0.018 60),
-    -5px -5px 10px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.4);
+    7px 7px 14px oklch(0.68 0.022 60),
+    -5px -5px 10px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.5);
 }
 
 .neumorphic-checkbox:active {
@@ -501,8 +501,8 @@
 
 .light-theme .neumorphic-checkbox:active {
   box-shadow: 
-    inset 4px 4px 8px oklch(0.75 0.018 60),
-    inset -3px -3px 6px oklch(0.99 0.005 60);
+    inset 4px 4px 8px oklch(0.68 0.022 60),
+    inset -3px -3px 6px oklch(0.96 0.008 60);
 }
 
 .neumorphic-checkbox-inner {
@@ -521,7 +521,7 @@
 }
 
 .light-theme .neumorphic-checkbox-inner.checked {
-  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.96 0.01 60));
+  background: linear-gradient(145deg, oklch(0.88 0.015 60), oklch(0.92 0.012 60));
 }
 
 .neumorphic-btn {
@@ -535,11 +535,11 @@
 }
 
 .light-theme .neumorphic-btn {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.88 0.015 60));
   box-shadow: 
-    9px 9px 18px oklch(0.75 0.018 60),
-    -5px -5px 14px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.5);
+    9px 9px 18px oklch(0.68 0.022 60),
+    -5px -5px 14px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
 }
 
 .neumorphic-btn::before {
@@ -563,9 +563,9 @@
 
 .light-theme .neumorphic-btn:hover {
   box-shadow: 
-    11px 11px 22px oklch(0.75 0.018 60),
-    -6px -6px 16px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.6);
+    11px 11px 22px oklch(0.68 0.022 60),
+    -6px -6px 16px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 .neumorphic-btn:active {
@@ -577,10 +577,10 @@
 }
 
 .light-theme .neumorphic-btn:active {
-  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.96 0.01 60));
+  background: linear-gradient(145deg, oklch(0.88 0.015 60), oklch(0.92 0.012 60));
   box-shadow: 
-    inset 6px 6px 12px oklch(0.75 0.018 60),
-    inset -4px -4px 10px oklch(0.99 0.005 60);
+    inset 6px 6px 12px oklch(0.68 0.022 60),
+    inset -4px -4px 10px oklch(0.96 0.008 60);
   transform: scale(0.98);
 }
 
@@ -593,10 +593,10 @@
 }
 
 .light-theme .neumorphic-slider-track {
-  background: linear-gradient(145deg, oklch(0.88 0.012 60), oklch(0.94 0.01 60));
+  background: linear-gradient(145deg, oklch(0.84 0.015 60), oklch(0.88 0.012 60));
   box-shadow: 
-    inset 5px 5px 10px oklch(0.75 0.018 60),
-    inset -3px -3px 7px oklch(0.99 0.005 60);
+    inset 5px 5px 10px oklch(0.68 0.022 60),
+    inset -3px -3px 7px oklch(0.96 0.008 60);
 }
 
 .neumorphic-slider-fill {
@@ -609,7 +609,7 @@
 .light-theme .neumorphic-slider-fill {
   background: linear-gradient(90deg, oklch(0.50 0.18 250), oklch(0.65 0.20 230));
   box-shadow: 
-    0 2px 5px oklch(0.50 0.18 250 / 0.4);
+    0 2px 5px oklch(0.50 0.18 250 / 0.5);
 }
 
 .neumorphic-slider-thumb {
@@ -623,11 +623,11 @@
 }
 
 .light-theme .neumorphic-slider-thumb {
-  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.93 0.012 60));
+  background: linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.89 0.015 60));
   box-shadow: 
-    7px 7px 14px oklch(0.75 0.018 60),
-    -5px -5px 10px oklch(0.99 0.005 60),
-    inset 0 1px 2px oklch(1 0 0 / 0.7);
+    7px 7px 14px oklch(0.68 0.022 60),
+    -5px -5px 10px oklch(0.96 0.008 60),
+    inset 0 1px 2px oklch(1 0 0 / 0.8);
 }
 
 .neumorphic-slider-thumb:active {
@@ -640,9 +640,9 @@
 
 .light-theme .neumorphic-slider-thumb:active {
   box-shadow: 
-    5px 5px 10px oklch(0.75 0.018 60),
-    -3px -3px 7px oklch(0.99 0.005 60),
-    inset 2px 2px 5px oklch(0.75 0.018 60 / 0.4);
+    5px 5px 10px oklch(0.68 0.022 60),
+    -3px -3px 7px oklch(0.96 0.008 60),
+    inset 2px 2px 5px oklch(0.68 0.022 60 / 0.5);
   transform: translate(-50%, -50%) scale(0.95);
 }
 
@@ -656,11 +656,12 @@
 }
 
 .light-theme .neumorphic-card {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  background: linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.89 0.015 60));
   box-shadow: 
-    14px 14px 28px oklch(0.75 0.018 60),
-    -10px -10px 20px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.5);
+    14px 14px 28px oklch(0.68 0.022 60),
+    -10px -10px 20px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
+  border: 1px solid oklch(0.78 0.018 60 / 0.4);
 }
 
 .neumorphic-inset-card {
@@ -672,112 +673,103 @@
 }
 
 .light-theme .neumorphic-inset-card {
-  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.94 0.01 60));
+  background: linear-gradient(145deg, oklch(0.86 0.015 60), oklch(0.90 0.012 60));
   box-shadow: 
-    inset 9px 9px 18px oklch(0.75 0.018 60),
-    inset -7px -7px 14px oklch(0.99 0.005 60);
+    inset 9px 9px 18px oklch(0.68 0.022 60),
+    inset -7px -7px 14px oklch(0.96 0.008 60);
 }
 
 .light-theme .neumorphic-bg {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
-}
-
-.light-theme .neumorphic-card {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
-  box-shadow: 
-    14px 14px 28px oklch(0.75 0.018 60),
-    -10px -10px 20px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.5);
-  border: 1px solid oklch(0.85 0.015 60 / 0.4);
+  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.86 0.015 60));
 }
 
 .light-theme .glass-card {
   background: linear-gradient(
     135deg,
-    oklch(0.97 0.008 60 / 0.8) 0%,
-    oklch(0.95 0.01 60 / 0.7) 100%
+    oklch(0.92 0.012 60 / 0.85) 0%,
+    oklch(0.89 0.015 60 / 0.75) 100%
   );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid oklch(0.80 0.018 60 / 0.4);
+  border: 1px solid oklch(0.75 0.02 60 / 0.5);
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.7),
-    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.3);
+    0 8px 32px 0 rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.8),
+    inset 0 -1px 0 0 oklch(0.68 0.022 60 / 0.4);
 }
 
 .light-theme .neumorphic-raised {
-  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.93 0.012 60));
+  background: linear-gradient(145deg, oklch(0.93 0.012 60), oklch(0.88 0.015 60));
   box-shadow: 
-    10px 10px 20px oklch(0.75 0.018 60),
-    -6px -6px 14px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.6);
+    10px 10px 20px oklch(0.68 0.022 60),
+    -6px -6px 14px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 .light-theme .neumorphic-inset {
-  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.94 0.01 60));
+  background: linear-gradient(145deg, oklch(0.86 0.015 60), oklch(0.90 0.012 60));
   box-shadow: 
-    inset 7px 7px 14px oklch(0.75 0.018 60),
-    inset -5px -5px 10px oklch(0.99 0.005 60);
+    inset 7px 7px 14px oklch(0.68 0.022 60),
+    inset -5px -5px 10px oklch(0.96 0.008 60);
 }
 
 .light-theme .neumorphic-button {
-  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.88 0.015 60));
   box-shadow: 
-    7px 7px 14px oklch(0.75 0.018 60),
-    -4px -4px 10px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.6);
+    7px 7px 14px oklch(0.68 0.022 60),
+    -4px -4px 10px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 .light-theme .neumorphic-button:hover {
   box-shadow: 
-    9px 9px 18px oklch(0.75 0.018 60),
-    -5px -5px 12px oklch(0.99 0.005 60),
-    inset 0 1px 0 oklch(1 0 0 / 0.7);
+    9px 9px 18px oklch(0.68 0.022 60),
+    -5px -5px 12px oklch(0.96 0.008 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.8);
 }
 
 .light-theme .neumorphic-button:active {
   box-shadow: 
-    inset 5px 5px 10px oklch(0.75 0.018 60),
-    inset -3px -3px 8px oklch(0.99 0.005 60);
+    inset 5px 5px 10px oklch(0.68 0.022 60),
+    inset -3px -3px 8px oklch(0.96 0.008 60);
 }
 
 .light-theme .frosted-glass {
   background: linear-gradient(
     135deg,
-    oklch(0.97 0.008 60 / 0.65) 0%,
-    oklch(0.95 0.01 60 / 0.55) 100%
+    oklch(0.92 0.012 60 / 0.70) 0%,
+    oklch(0.88 0.015 60 / 0.60) 100%
   );
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid oklch(0.82 0.016 60 / 0.4);
+  border: 1px solid oklch(0.76 0.02 60 / 0.5);
 }
 
 .light-theme .glass-button {
   background: linear-gradient(
     135deg,
-    oklch(0.97 0.008 60 / 0.85) 0%,
-    oklch(0.94 0.01 60 / 0.75) 100%
+    oklch(0.93 0.012 60 / 0.90) 0%,
+    oklch(0.89 0.015 60 / 0.80) 100%
   );
-  border: 1px solid oklch(0.82 0.016 60 / 0.45);
+  border: 1px solid oklch(0.76 0.02 60 / 0.55);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.7),
-    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.25);
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.8),
+    inset 0 -1px 0 0 oklch(0.68 0.022 60 / 0.3);
 }
 
 .light-theme .glass-button:hover {
   box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.8),
-    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.3);
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.9),
+    inset 0 -1px 0 0 oklch(0.68 0.022 60 / 0.4);
 }
 
 .light-theme .glass-button:active {
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 0 oklch(0.75 0.018 60 / 0.2),
-    inset 0 -1px 0 0 oklch(1 0 0 / 0.5);
+    0 2px 8px rgba(0, 0, 0, 0.10),
+    inset 0 1px 0 0 oklch(0.68 0.022 60 / 0.3),
+    inset 0 -1px 0 0 oklch(1 0 0 / 0.6);
 }
 
 @keyframes sway {
