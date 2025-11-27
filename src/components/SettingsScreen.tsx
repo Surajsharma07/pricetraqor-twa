@@ -46,7 +46,7 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
         </div>
       </div>
 
-      <div className="absolute -top-2 right-0 z-20">
+      <div className="fixed top-0 right-4 z-50" style={{ marginTop: '-20px' }}>
         <LampSwitch 
           checked={settings.theme === 'light'}
           onCheckedChange={handleThemeChange}
