@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
-import { TrackedProduct, UserSettings } from "@/lib/types"
+import { TrackedProduct, UserSettings, PriceHistoryEntry } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
 import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
 import { ProductDetailScreen } from "@/components/ProductDetailScreen"
 import { SettingsScreen } from "@/components/SettingsScreen"
-import { NeumorphicShowcase } from "@/components/NeumorphicShowcase"
 import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
-type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings' | 'neumorphic'
+type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
@@ -74,6 +73,33 @@ function App() {
     const mockPrice = Math.random() * 500 + 50
     const siteDomain = new URL(url).hostname.replace('www.', '')
     
+    const generatePriceHistory = (currentPrice: number): PriceHistoryEntry[] => {
+      const history: PriceHistoryEntry[] = []
+      const daysAgo = Math.floor(Math.random() * 15) + 5
+      
+      for (let i = daysAgo; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        
+        const variance = (Math.random() - 0.5) * 50
+        const trendFactor = (daysAgo - i) / daysAgo
+        const price = i === 0 
+          ? currentPrice 
+          : currentPrice + variance + (Math.random() * 30 * trendFactor)
+        
+        history.push({
+          price: Math.max(10, price),
+          currency: 'USD',
+          checkedAt: date.toISOString(),
+        })
+      }
+      
+      return history
+    }
+    
+    const priceHistory = generatePriceHistory(mockPrice)
+    const previousPrice = priceHistory.length > 1 ? priceHistory[priceHistory.length - 2].price : undefined
+    
     const newProduct: TrackedProduct = {
       id: Date.now().toString(),
       productUrl: url,
@@ -86,18 +112,14 @@ function App() {
       isActive: true,
       lastCheckedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      priceHistory: [
-        {
-          price: mockPrice,
-          currency: 'USD',
-          checkedAt: new Date().toISOString(),
-        }
-      ],
+      priceHistory,
+      previousPrice,
       inStock: true,
     }
 
     setProducts([...products, newProduct])
     setActiveScreen('watchlist')
+    toast.success('Product added to watchlist')
   }
 
   const handleProductClick = (product: TrackedProduct) => {
@@ -198,14 +220,6 @@ function App() {
           <SettingsScreen
             settings={settings || { notificationsEnabled: true, alertType: 'drops', theme: 'dark' }}
             onUpdateSettings={handleUpdateSettings}
-            onShowNeumorphic={() => setActiveScreen('neumorphic')}
-          />
-        )
-      
-      case 'neumorphic':
-        return (
-          <NeumorphicShowcase
-            onBack={() => setActiveScreen('settings')}
           />
         )
     }

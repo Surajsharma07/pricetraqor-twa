@@ -245,32 +245,32 @@ export function ProductDetailScreen({
                         </defs>
                         <CartesianGrid 
                           strokeDasharray="3 3" 
-                          stroke="oklch(0.25 0.04 250 / 0.3)" 
+                          stroke="var(--color-border)" 
                           vertical={false}
                         />
                         <XAxis 
                           dataKey="date" 
-                          stroke="oklch(0.70 0.02 250)"
+                          stroke="var(--color-muted-foreground)"
                           style={{ fontSize: '11px', fontWeight: 500 }}
                           tickLine={false}
                         />
                         <YAxis 
-                          stroke="oklch(0.70 0.02 250)"
+                          stroke="var(--color-muted-foreground)"
                           style={{ fontSize: '11px', fontWeight: 500 }}
                           tickLine={false}
                           tickFormatter={(value) => `$${value}`}
                         />
                         <Tooltip 
                           contentStyle={{
-                            backgroundColor: 'oklch(0.15 0.03 250 / 0.95)',
-                            border: '1px solid oklch(0.35 0.05 250 / 0.2)',
+                            backgroundColor: 'var(--color-card)',
+                            border: '1px solid var(--color-border)',
                             borderRadius: '12px',
                             padding: '8px 12px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                             backdropFilter: 'blur(16px)'
                           }}
                           labelStyle={{ 
-                            color: 'oklch(0.98 0 0)', 
+                            color: 'var(--color-foreground)', 
                             fontSize: '12px',
                             fontWeight: 600,
                             marginBottom: '4px'
@@ -291,12 +291,12 @@ export function ProductDetailScreen({
                             fill: 'oklch(0.65 0.20 230)', 
                             r: 4,
                             strokeWidth: 2,
-                            stroke: 'oklch(0.15 0.03 250)'
+                            stroke: 'var(--color-card)'
                           }}
                           activeDot={{ 
                             r: 6,
                             fill: 'oklch(0.65 0.20 230)',
-                            stroke: 'oklch(0.15 0.03 250)',
+                            stroke: 'var(--color-card)',
                             strokeWidth: 2,
                             filter: 'drop-shadow(0 0 8px oklch(0.65 0.20 230 / 0.6))'
                           }}
@@ -327,9 +327,13 @@ export function ProductDetailScreen({
                   </div>
                 </div>
               ) : product.priceHistory.length === 1 ? (
-                <p className="text-sm text-muted-foreground">Add more price checks to see the graph</p>
+                <div className="p-6 text-center neumorphic-inset rounded-xl">
+                  <p className="text-sm text-muted-foreground">Add more price checks to see the graph</p>
+                </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No price history yet</p>
+                <div className="p-6 text-center neumorphic-inset rounded-xl">
+                  <p className="text-sm text-muted-foreground">No price history yet</p>
+                </div>
               )}
             </div>
           </div>

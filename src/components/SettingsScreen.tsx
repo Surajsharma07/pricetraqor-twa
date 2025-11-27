@@ -4,18 +4,16 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
-import { Bell, Gear, Palette } from '@phosphor-icons/react'
+import { Bell, Gear } from '@phosphor-icons/react'
 import { NeumorphicRadioGroup } from '@/components/NeumorphicRadioGroup'
 import { LampSwitch } from '@/components/ui/lamp-switch'
 
 interface SettingsScreenProps {
   settings: UserSettings
   onUpdateSettings: (settings: UserSettings) => void
-  onShowNeumorphic?: () => void
 }
 
-export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }: SettingsScreenProps) {
+export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenProps) {
   const handleToggleNotifications = (enabled: boolean) => {
     onUpdateSettings({ ...settings, notificationsEnabled: enabled })
   }
@@ -151,31 +149,6 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
           </li>
         </ul>
       </Card>
-
-      {onShowNeumorphic && (
-        <Card className="p-6 glass-card border-accent/30 relative overflow-hidden group hover:border-accent/60 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5 opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="relative z-10 flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-accent/20 to-primary/10 group-hover:scale-110 transition-transform duration-300">
-              <Palette className="w-6 h-6 text-accent" weight="bold" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                Neumorphic Components
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Explore tactile, real-world inspired UI elements with depth and dimension
-              </p>
-              <Button
-                onClick={onShowNeumorphic}
-                className="w-full glass-button hover:glow-accent"
-              >
-                View Showcase
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
     </div>
   )
 }
