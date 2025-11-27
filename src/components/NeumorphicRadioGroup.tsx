@@ -64,7 +64,7 @@ export function NeumorphicRadioGroup({
                     ? "opacity-100 translate-x-2"
                     : "opacity-70",
                   "hover:opacity-100",
-                  "text-white"
+                  "text-foreground"
                 )}
               >
                 {option.label}
@@ -77,7 +77,7 @@ export function NeumorphicRadioGroup({
                       ? "opacity-80 translate-x-2"
                       : "opacity-50",
                     "hover:opacity-70",
-                    "text-white"
+                    "text-foreground"
                   )}
                 >
                   {option.description}
