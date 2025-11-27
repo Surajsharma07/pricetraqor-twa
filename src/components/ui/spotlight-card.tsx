@@ -183,4 +183,4 @@ const GlowCard: React.FC<GlowCardProps> = ({
   );
 };
 
-export { GlowCard };
+export { GlowCard }

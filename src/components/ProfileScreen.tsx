@@ -80,21 +80,46 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
         </div>
       </div>
 
-      <Card className="p-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
+      <Card 
+        className="p-6 relative overflow-hidden neumorphic-raised"
+        style={{
+          background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
         <div className="flex items-center gap-4 relative z-10">
-          <Avatar className="w-20 h-20 neumorphic-raised ring-2 ring-border/60">
+          <Avatar className="w-20 h-20 neumorphic-raised ring-2 ring-border/60 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-50 pointer-events-none z-10"></div>
             <AvatarImage src={user?.avatarUrl} alt={user?.login || 'User'} />
-            <AvatarFallback className="text-xl font-bold bg-gradient-to-br from-primary/90 via-primary/80 to-primary/70 neumorphic-inset">
-              {user ? getInitials(user.login) : 'U'}
+            <AvatarFallback 
+              className="text-xl font-bold neumorphic-inset relative"
+              style={{
+                background: 'linear-gradient(145deg, oklch(0.55 0.18 250), oklch(0.45 0.18 250))',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+              <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                {user ? getInitials(user.login) : 'U'}
+              </span>
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h2 className="text-xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{user?.login || 'Loading...'}</h2>
+            <h2 className="text-xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{user?.login || 'Loading...'}</h2>
             {user?.email && (
-              <p className="text-sm text-muted-foreground mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{user.email}</p>
+              <p className="text-sm text-muted-foreground mt-0.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">{user.email}</p>
             )}
             {user?.isOwner && (
-              <Badge variant="secondary" className="mt-2 glass-morphism">
+              <Badge 
+                variant="secondary" 
+                className="mt-2 glass-morphism border border-accent/30 glow-accent"
+                style={{
+                  background: 'linear-gradient(145deg, oklch(0.20 0.04 250 / 0.8), oklch(0.16 0.03 250 / 0.6))',
+                }}
+              >
+                <Sparkle className="w-3 h-3 mr-1" weight="fill" />
                 Owner
               </Badge>
             )}
@@ -102,56 +127,89 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
         </div>
       </Card>
 
-      <Card className="p-6 glass-card relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 via-accent/10 to-transparent blur-3xl"></div>
+      <Card 
+        className="p-6 relative overflow-hidden neumorphic-raised"
+        style={{
+          background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
+      >
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/25 via-accent/10 to-transparent blur-3xl pointer-events-none"></div>
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full neumorphic-raised flex items-center justify-center">
-                <Crown className="w-5 h-5 text-accent drop-shadow-[0_2px_6px_rgba(var(--accent),0.6)]" weight="fill" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full neumorphic-raised flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/30 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+                <Crown className="w-6 h-6 text-accent drop-shadow-[0_3px_8px_oklch(0.65_0.20_230_/_0.7)] relative z-10 glow-accent" weight="fill" />
               </div>
               <div>
-                <h3 className="text-lg font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">Subscription</h3>
+                <h3 className="text-lg font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">Subscription</h3>
                 <p className="text-xs text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{subscriptionPlan} Plan</p>
               </div>
             </div>
-            <Badge variant="secondary" className="glass-morphism px-3 py-1">
-              <Sparkle className="w-3 h-3 mr-1" weight="fill" />
-              Active
+            <Badge 
+              variant="secondary" 
+              className="px-3 py-1.5 neumorphic-inset border border-accent/30 glow-accent"
+              style={{
+                background: 'linear-gradient(145deg, oklch(0.12 0.02 250), oklch(0.16 0.03 250))',
+              }}
+            >
+              <Sparkle className="w-3.5 h-3.5 mr-1.5" weight="fill" />
+              <span className="font-bold">Active</span>
             </Badge>
           </div>
 
-          <div className="space-y-4 mb-5">
+          <div className="space-y-5 mb-6">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Products Tracked</span>
-                <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{usedProducts} / {maxProducts}</span>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-sm text-muted-foreground font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Products Tracked</span>
+                <span className="text-sm font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{usedProducts} / {maxProducts}</span>
               </div>
-              <div className="h-2.5 neumorphic-inset rounded-full overflow-hidden">
+              <div className="h-3 neumorphic-inset rounded-full overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-30 pointer-events-none"></div>
                 <div 
-                  className="h-full bg-gradient-to-r from-accent via-accent/90 to-accent/80 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(var(--accent),0.5)]"
-                  style={{ width: `${Math.min((usedProducts / maxProducts) * 100, 100)}%` }}
+                  className="h-full bg-gradient-to-r from-accent via-accent/90 to-accent/80 rounded-full transition-all duration-500 relative glow-accent"
+                  style={{ 
+                    width: `${Math.min((usedProducts / maxProducts) * 100, 100)}%`,
+                    boxShadow: '0 0 12px oklch(0.65 0.20 230 / 0.6), inset 0 1px 0 oklch(0.95 0 0 / 0.2)'
+                  }}
                 ></div>
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Price Checks Used</span>
-                <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{usedPriceChecks} / {maxPriceChecks}</span>
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-sm text-muted-foreground font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Price Checks Used</span>
+                <span className="text-sm font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{usedPriceChecks} / {maxPriceChecks}</span>
               </div>
-              <div className="h-2.5 neumorphic-inset rounded-full overflow-hidden">
+              <div className="h-3 neumorphic-inset rounded-full overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-30 pointer-events-none"></div>
                 <div 
-                  className="h-full bg-gradient-to-r from-success via-success/90 to-success/80 rounded-full transition-all duration-500 shadow-[0_0_12px_rgba(var(--success),0.4)]"
-                  style={{ width: `${Math.min((usedPriceChecks / maxPriceChecks) * 100, 100)}%` }}
+                  className="h-full bg-gradient-to-r from-success via-success/90 to-success/80 rounded-full transition-all duration-500 relative glow-success"
+                  style={{ 
+                    width: `${Math.min((usedPriceChecks / maxPriceChecks) * 100, 100)}%`,
+                    boxShadow: '0 0 12px oklch(0.65 0.20 145 / 0.5), inset 0 1px 0 oklch(0.95 0 0 / 0.2)'
+                  }}
                 ></div>
               </div>
             </div>
           </div>
 
-          <div className="p-4 frosted-glass rounded-xl border border-border/30 mb-4">
-            <p className="text-xs font-semibold text-muted-foreground mb-3 drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Free Plan Includes:</p>
-            <div className="space-y-2">
+          <div 
+            className="p-5 rounded-xl border mb-5 neumorphic-inset relative overflow-hidden"
+            style={{
+              borderColor: 'oklch(0.25 0.04 250 / 0.4)',
+              background: 'linear-gradient(145deg, oklch(0.12 0.02 250 / 0.8), oklch(0.16 0.03 250 / 0.6))',
+            }}
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <p className="text-xs font-bold text-muted-foreground mb-4 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] flex items-center gap-2">
+              <div className="w-1 h-1 rounded-full bg-accent shadow-[0_0_6px_oklch(0.65_0.20_230_/_0.8)]"></div>
+              Free Plan Includes:
+            </p>
+            <div className="space-y-3">
               {[
                 `Track up to ${maxProducts} products`,
                 `${maxPriceChecks} price checks per month`,
@@ -159,76 +217,119 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
                 'Email notifications',
                 'Price history charts'
               ].map((feature, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full neumorphic-inset flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-success" weight="bold" />
+                <div key={index} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full neumorphic-inset flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-success/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                    <Check className="w-3.5 h-3.5 text-success drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] relative z-10" weight="bold" />
                   </div>
-                  <span className="text-xs font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">{feature}</span>
+                  <span className="text-xs font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">{feature}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <Button 
-            className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary/90 to-primary/80 shadow-[0_4px_16px_rgba(var(--primary),0.3)]"
+            className="w-full neumorphic-button hover:glow-primary active:scale-95 relative overflow-hidden"
             size="lg"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.55 0.18 250), oklch(0.45 0.18 250))',
+              boxShadow: `
+                8px 8px 16px oklch(0.06 0.01 250 / 0.6),
+                -4px -4px 12px oklch(0.22 0.04 250 / 0.4),
+                inset 0 1px 0 oklch(0.95 0 0 / 0.15),
+                0 0 30px oklch(0.50 0.18 250 / 0.3)
+              `
+            }}
           >
-            <Crown className="w-5 h-5 mr-2" weight="fill" />
-            Upgrade to Pro
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/25 via-transparent to-transparent opacity-70 pointer-events-none"></div>
+            <Crown className="w-5 h-5 mr-2 relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" weight="fill" />
+            <span className="relative z-10 font-bold">Upgrade to Pro</span>
           </Button>
         </div>
       </Card>
 
       <div>
-        <h3 className="text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
-          <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(var(--accent),0.6)]"></div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2 drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">
+          <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_oklch(0.65_0.20_230_/_0.8)] glow-accent"></div>
           Statistics
         </h3>
         <div className="grid grid-cols-2 gap-3">
-          <Card className="p-4 glass-card hover:glow-accent transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center">
-                <Package className="w-6 h-6 text-accent drop-shadow-[0_2px_6px_rgba(var(--accent),0.5)]" weight="bold" />
+          <Card 
+            className="p-4 hover:glow-accent transition-all duration-300 cursor-pointer active:scale-[0.98] neumorphic-raised relative overflow-hidden group"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                <Package className="w-6 h-6 text-accent drop-shadow-[0_3px_6px_oklch(0.65_0.20_230_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{products.length}</p>
-                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Total Products</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{products.length}</p>
+                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Total Products</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-4 glass-card hover:glow-accent transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center">
-                <ChartLine className="w-6 h-6 text-success drop-shadow-[0_2px_6px_rgba(var(--success),0.5)]" weight="bold" />
+          <Card 
+            className="p-4 hover:glow-success transition-all duration-300 cursor-pointer active:scale-[0.98] neumorphic-raised relative overflow-hidden group"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-success/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                <ChartLine className="w-6 h-6 text-success drop-shadow-[0_3px_6px_oklch(0.65_0.20_145_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{activeProducts.length}</p>
-                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Active Tracking</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{activeProducts.length}</p>
+                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Active Tracking</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-4 glass-card hover:glow-accent transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center">
-                <TrendDown className="w-6 h-6 text-success drop-shadow-[0_2px_6px_rgba(var(--success),0.5)]" weight="bold" />
+          <Card 
+            className="p-4 hover:glow-success transition-all duration-300 cursor-pointer active:scale-[0.98] neumorphic-raised relative overflow-hidden group"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-success/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                <TrendDown className="w-6 h-6 text-success drop-shadow-[0_3px_6px_oklch(0.65_0.20_145_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{productsWithDrops.length}</p>
-                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Price Drops</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{productsWithDrops.length}</p>
+                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Price Drops</p>
               </div>
             </div>
           </Card>
 
-          <Card className="p-4 glass-card hover:glow-accent transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center">
-                <Bell className="w-6 h-6 text-accent drop-shadow-[0_2px_6px_rgba(var(--accent),0.5)]" weight="bold" />
+          <Card 
+            className="p-4 hover:glow-accent transition-all duration-300 cursor-pointer active:scale-[0.98] neumorphic-raised relative overflow-hidden group"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.18 0.04 250 / 0.95), oklch(0.14 0.03 250 / 0.9))',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="w-12 h-12 rounded-full neumorphic-inset flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+                <Bell className="w-6 h-6 text-accent drop-shadow-[0_3px_6px_oklch(0.65_0.20_230_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">${totalSavings.toFixed(0)}</p>
-                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Total Savings</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">${totalSavings.toFixed(0)}</p>
+                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Total Savings</p>
               </div>
             </div>
           </Card>

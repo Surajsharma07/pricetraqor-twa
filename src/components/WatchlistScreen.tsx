@@ -66,42 +66,73 @@ export function WatchlistScreen({
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">Watchlist</h1>
-            <p className="text-sm text-muted-foreground mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text drop-shadow-[0_3px_8px_rgba(0,0,0,0.7)]">Watchlist</h1>
+            <p className="text-sm text-muted-foreground mt-1 drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">
               {products.length} {products.length === 1 ? 'product' : 'products'} tracked
             </p>
           </div>
           <Button 
             onClick={onAddProduct} 
             size="icon" 
-            className="rounded-full h-14 w-14 neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200 relative before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-tr before:from-white/20 before:via-transparent before:to-transparent before:opacity-60"
+            className="rounded-full h-16 w-16 neumorphic-button hover:glow-primary active:scale-95 transition-all duration-200 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(145deg, oklch(0.55 0.18 250), oklch(0.45 0.18 250))',
+              boxShadow: `
+                8px 8px 16px oklch(0.06 0.01 250 / 0.6),
+                -4px -4px 12px oklch(0.22 0.04 250 / 0.4),
+                inset 0 1px 0 oklch(0.95 0 0 / 0.15),
+                0 0 30px oklch(0.50 0.18 250 / 0.3)
+              `
+            }}
           >
-            <Plus className="w-7 h-7 relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/25 via-transparent to-transparent opacity-70 pointer-events-none"></div>
+            <Plus className="w-8 h-8 relative z-10 drop-shadow-[0_3px_6px_rgba(0,0,0,0.5)]" weight="bold" />
           </Button>
         </div>
 
         {products.length > 0 && (
           <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
-            <TabsList className="grid w-full grid-cols-4 glass-morphism">
-              <TabsTrigger value="all" className="text-xs data-[state=active]:neumorphic-inset data-[state=active]:glow-accent">
+            <TabsList 
+              className="grid w-full grid-cols-4 p-1 neumorphic-inset relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, oklch(0.12 0.02 250), oklch(0.16 0.03 250))',
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-50 pointer-events-none"></div>
+              <TabsTrigger 
+                value="all" 
+                className="text-xs data-[state=active]:neumorphic-raised data-[state=active]:glow-accent relative z-10 transition-all duration-200"
+                style={{
+                  ['--tw-shadow' as string]: 'data-[state=active]:0 0 16px oklch(0.65 0.20 230 / 0.25)',
+                }}
+              >
                 All
                 {counts.all > 0 && (
                   <span className="ml-1.5 text-muted-foreground">({counts.all})</span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="dropped" className="text-xs data-[state=active]:neumorphic-inset data-[state=active]:glow-accent">
+              <TabsTrigger 
+                value="dropped" 
+                className="text-xs data-[state=active]:neumorphic-raised data-[state=active]:glow-success relative z-10 transition-all duration-200"
+              >
                 Dropped
                 {counts.dropped > 0 && (
-                  <span className="ml-1.5 text-success">({counts.dropped})</span>
+                  <span className="ml-1.5 text-success font-bold">({counts.dropped})</span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="increased" className="text-xs data-[state=active]:neumorphic-inset data-[state=active]:glow-accent">
+              <TabsTrigger 
+                value="increased" 
+                className="text-xs data-[state=active]:neumorphic-raised data-[state=active]:shadow-[0_0_16px_oklch(0.55_0.22_15_/_0.25)] relative z-10 transition-all duration-200"
+              >
                 Increased
                 {counts.increased > 0 && (
-                  <span className="ml-1.5 text-destructive">({counts.increased})</span>
+                  <span className="ml-1.5 text-destructive font-bold">({counts.increased})</span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="out-of-stock" className="text-xs data-[state=active]:neumorphic-inset data-[state=active]:glow-accent">
+              <TabsTrigger 
+                value="out-of-stock" 
+                className="text-xs data-[state=active]:neumorphic-raised data-[state=active]:glow-accent relative z-10 transition-all duration-200"
+              >
                 OOS
                 {counts['out-of-stock'] > 0 && (
                   <span className="ml-1.5 text-muted-foreground">({counts['out-of-stock']})</span>
@@ -113,22 +144,30 @@ export function WatchlistScreen({
 
         {filteredProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="w-20 h-20 rounded-full neumorphic-inset flex items-center justify-center mb-5">
-              <Package className="w-10 h-10 text-muted-foreground drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" weight="bold" />
+            <div className="w-24 h-24 rounded-full neumorphic-inset flex items-center justify-center mb-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-50"></div>
+              <Package className="w-12 h-12 text-muted-foreground drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)] relative z-10" weight="bold" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
+            <h3 className="text-lg font-semibold mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
               {filter === 'all' ? 'No products yet' : 'No products found'}
             </h3>
-            <p className="text-sm text-muted-foreground mb-8 max-w-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">
+            <p className="text-sm text-muted-foreground mb-8 max-w-xs drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
               {filter === 'all' 
                 ? 'Start tracking product prices by adding your first product'
                 : `No products match the "${filter}" filter`
               }
             </p>
             {filter === 'all' && (
-              <Button onClick={onAddProduct} className="neumorphic-button hover:glow-primary active:scale-95">
-                <Plus className="w-5 h-5 mr-2" weight="bold" />
-                Add Your First Product
+              <Button 
+                onClick={onAddProduct} 
+                className="neumorphic-button hover:glow-primary active:scale-95 relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(145deg, oklch(0.55 0.18 250), oklch(0.45 0.18 250))',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-60 pointer-events-none"></div>
+                <Plus className="w-5 h-5 mr-2 relative z-10" weight="bold" />
+                <span className="relative z-10">Add Your First Product</span>
               </Button>
             )}
           </div>
