@@ -26,11 +26,23 @@ function App() {
   const [prefillUrl, setPrefillUrl] = useState<string>()
 
   useEffect(() => {
-    if (settings?.theme === 'light') {
-      document.documentElement.classList.add('light-theme')
-    } else {
-      document.documentElement.classList.remove('light-theme')
+    const updateTheme = (withAnimation = false) => {
+      if (withAnimation) {
+        document.body.classList.add('theme-transitioning')
+        setTimeout(() => {
+          document.body.classList.remove('theme-transitioning')
+        }, 800)
+      }
+      
+      if (settings?.theme === 'light') {
+        document.documentElement.classList.add('light-theme')
+      } else {
+        document.documentElement.classList.remove('light-theme')
+      }
     }
+    
+    const hasThemeChanged = document.documentElement.classList.contains('light-theme') !== (settings?.theme === 'light')
+    updateTheme(hasThemeChanged)
   }, [settings?.theme])
 
   useEffect(() => {

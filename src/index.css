@@ -4,6 +4,13 @@
 @layer base {
   * {
     @apply border-border;
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow, background;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.8s;
+  }
+  
+  *:is(button, a, [role="button"]) {
+    transition-duration: 0.2s;
   }
   
   body {
@@ -13,14 +20,40 @@
                 radial-gradient(ellipse 60% 80% at 80% 100%, oklch(0.12 0.06 230 / 0.2), transparent),
                 oklch(0.08 0.02 250);
     background-attachment: fixed;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
   }
 
-  .light-theme body {
-    background: radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.93 0.005 250 / 0.3), transparent),
-                radial-gradient(ellipse 60% 80% at 80% 100%, oklch(0.95 0.005 250 / 0.2), transparent),
-                oklch(0.93 0.005 250);
-    background-attachment: fixed;
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.96 0.01 60 / 0.4), transparent),
+                radial-gradient(ellipse 60% 80% at 80% 100%, oklch(0.94 0.015 50 / 0.3), transparent),
+                oklch(0.94 0.01 70);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+  }
+
+  .light-theme body::before {
+    opacity: 1;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, oklch(0.94 0.01 70 / 0.5), transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 9999;
+  }
+
+  body.theme-transitioning::after {
+    opacity: 1;
   }
 }
 
@@ -87,43 +120,43 @@
 }
 
 .light-theme {
-  --background: oklch(0.93 0.005 250);
-  --foreground: oklch(0.15 0 0);
+  --background: oklch(0.94 0.01 70);
+  --foreground: oklch(0.20 0.02 250);
 
-  --card: oklch(0.95 0.005 250);
-  --card-foreground: oklch(0.15 0 0);
+  --card: oklch(0.96 0.008 60);
+  --card-foreground: oklch(0.22 0.02 250);
   
-  --popover: oklch(0.96 0.005 250);
-  --popover-foreground: oklch(0.15 0 0);
+  --popover: oklch(0.97 0.008 60);
+  --popover-foreground: oklch(0.22 0.02 250);
 
   --primary: oklch(0.50 0.18 250);
   --primary-foreground: oklch(0.98 0 0);
 
-  --secondary: oklch(0.88 0.005 250);
-  --secondary-foreground: oklch(0.15 0 0);
+  --secondary: oklch(0.88 0.01 60);
+  --secondary-foreground: oklch(0.22 0.02 250);
 
-  --muted: oklch(0.90 0.005 250);
-  --muted-foreground: oklch(0.45 0.01 250);
+  --muted: oklch(0.90 0.01 60);
+  --muted-foreground: oklch(0.45 0.02 250);
 
   --accent: oklch(0.65 0.20 230);
-  --accent-foreground: oklch(0.98 0 0);
+  --accent-foreground: oklch(0.15 0.02 250);
 
   --destructive: oklch(0.55 0.22 15);
   --destructive-foreground: oklch(0.98 0 0);
 
   --success: oklch(0.65 0.20 145);
-  --success-foreground: oklch(0.98 0 0);
+  --success-foreground: oklch(0.15 0.02 250);
 
-  --border: oklch(0.82 0.01 250);
-  --input: oklch(0.88 0.005 250);
+  --border: oklch(0.78 0.015 60);
+  --input: oklch(0.85 0.012 60);
   --ring: oklch(0.50 0.18 250);
   
-  --glass-bg: oklch(0.95 0.005 250 / 0.4);
-  --glass-border: oklch(0.82 0.01 250 / 0.3);
-  --glass-highlight: oklch(1 0 0 / 0.6);
+  --glass-bg: oklch(0.95 0.01 60 / 0.5);
+  --glass-border: oklch(0.78 0.015 60 / 0.4);
+  --glass-highlight: oklch(1 0 0 / 0.7);
   
-  --neomorph-shadow-dark: oklch(0.82 0.01 250);
-  --neomorph-shadow-light: oklch(1 0 0);
+  --neomorph-shadow-dark: oklch(0.75 0.018 60);
+  --neomorph-shadow-light: oklch(0.99 0.005 60);
 }
 
 @theme {
@@ -416,6 +449,14 @@
   box-shadow: 
     inset 4px 4px 8px oklch(0.82 0.01 250),
     inset -2px -2px 6px oklch(1 0 0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-switch-track {
+  background: oklch(0.90 0.012 60);
+  box-shadow: 
+    inset 5px 5px 10px oklch(0.75 0.018 60),
+    inset -3px -3px 7px oklch(0.99 0.005 60);
 }
 
 .neumorphic-switch-thumb {
@@ -424,6 +465,15 @@
     4px 4px 8px oklch(0.82 0.01 250),
     -2px -2px 6px oklch(1 0 0),
     inset 0 1px 2px oklch(1 0 0 / 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-switch-thumb {
+  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.92 0.012 60));
+  box-shadow: 
+    5px 5px 10px oklch(0.75 0.018 60),
+    -3px -3px 7px oklch(0.99 0.005 60),
+    inset 0 1px 2px oklch(1 0 0 / 0.6);
 }
 
 .neumorphic-checkbox {
@@ -432,12 +482,27 @@
     6px 6px 12px oklch(0.82 0.01 250),
     -4px -4px 8px oklch(1 0 0),
     inset 0 1px 0 oklch(1 0 0 / 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-checkbox {
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  box-shadow: 
+    7px 7px 14px oklch(0.75 0.018 60),
+    -5px -5px 10px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.4);
 }
 
 .neumorphic-checkbox:active {
   box-shadow: 
     inset 3px 3px 6px oklch(0.82 0.01 250),
     inset -2px -2px 4px oklch(1 0 0);
+}
+
+.light-theme .neumorphic-checkbox:active {
+  box-shadow: 
+    inset 4px 4px 8px oklch(0.75 0.018 60),
+    inset -3px -3px 6px oklch(0.99 0.005 60);
 }
 
 .neumorphic-checkbox-inner {
@@ -452,6 +517,11 @@
 .neumorphic-checkbox-inner.checked {
   background: linear-gradient(145deg, oklch(0.91 0.005 250), oklch(0.95 0.005 250));
   border-radius: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-checkbox-inner.checked {
+  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.96 0.01 60));
 }
 
 .neumorphic-btn {
@@ -461,6 +531,15 @@
     -4px -4px 12px oklch(1 0 0),
     inset 0 1px 0 oklch(1 0 0 / 0.4);
   position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-btn {
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  box-shadow: 
+    9px 9px 18px oklch(0.75 0.018 60),
+    -5px -5px 14px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.5);
 }
 
 .neumorphic-btn::before {
@@ -482,6 +561,13 @@
     inset 0 1px 0 oklch(1 0 0 / 0.5);
 }
 
+.light-theme .neumorphic-btn:hover {
+  box-shadow: 
+    11px 11px 22px oklch(0.75 0.018 60),
+    -6px -6px 16px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
+}
+
 .neumorphic-btn:active {
   background: linear-gradient(145deg, oklch(0.91 0.005 250), oklch(0.95 0.005 250));
   box-shadow: 
@@ -490,17 +576,40 @@
   transform: scale(0.98);
 }
 
+.light-theme .neumorphic-btn:active {
+  background: linear-gradient(145deg, oklch(0.92 0.012 60), oklch(0.96 0.01 60));
+  box-shadow: 
+    inset 6px 6px 12px oklch(0.75 0.018 60),
+    inset -4px -4px 10px oklch(0.99 0.005 60);
+  transform: scale(0.98);
+}
+
 .neumorphic-slider-track {
   background: linear-gradient(145deg, oklch(0.88 0.005 250), oklch(0.94 0.005 250));
   box-shadow: 
     inset 4px 4px 8px oklch(0.82 0.01 250),
     inset -2px -2px 6px oklch(1 0 0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-slider-track {
+  background: linear-gradient(145deg, oklch(0.88 0.012 60), oklch(0.94 0.01 60));
+  box-shadow: 
+    inset 5px 5px 10px oklch(0.75 0.018 60),
+    inset -3px -3px 7px oklch(0.99 0.005 60);
 }
 
 .neumorphic-slider-fill {
   background: linear-gradient(90deg, oklch(0.50 0.18 250), oklch(0.65 0.20 230));
   box-shadow: 
     0 2px 4px oklch(0.50 0.18 250 / 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-slider-fill {
+  background: linear-gradient(90deg, oklch(0.50 0.18 250), oklch(0.65 0.20 230));
+  box-shadow: 
+    0 2px 5px oklch(0.50 0.18 250 / 0.4);
 }
 
 .neumorphic-slider-thumb {
@@ -510,6 +619,15 @@
     -4px -4px 8px oklch(1 0 0),
     inset 0 1px 2px oklch(1 0 0 / 0.6);
   z-index: 10;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-slider-thumb {
+  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.93 0.012 60));
+  box-shadow: 
+    7px 7px 14px oklch(0.75 0.018 60),
+    -5px -5px 10px oklch(0.99 0.005 60),
+    inset 0 1px 2px oklch(1 0 0 / 0.7);
 }
 
 .neumorphic-slider-thumb:active {
@@ -520,12 +638,29 @@
   transform: translate(-50%, -50%) scale(0.95);
 }
 
+.light-theme .neumorphic-slider-thumb:active {
+  box-shadow: 
+    5px 5px 10px oklch(0.75 0.018 60),
+    -3px -3px 7px oklch(0.99 0.005 60),
+    inset 2px 2px 5px oklch(0.75 0.018 60 / 0.4);
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
 .neumorphic-card {
   background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
   box-shadow: 
     12px 12px 24px oklch(0.82 0.01 250),
     -8px -8px 16px oklch(1 0 0),
     inset 0 1px 0 oklch(1 0 0 / 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-card {
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
+  box-shadow: 
+    14px 14px 28px oklch(0.75 0.018 60),
+    -10px -10px 20px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.5);
 }
 
 .neumorphic-inset-card {
@@ -533,108 +668,116 @@
   box-shadow: 
     inset 8px 8px 16px oklch(0.82 0.01 250),
     inset -6px -6px 12px oklch(1 0 0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-theme .neumorphic-inset-card {
+  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.94 0.01 60));
+  box-shadow: 
+    inset 9px 9px 18px oklch(0.75 0.018 60),
+    inset -7px -7px 14px oklch(0.99 0.005 60);
 }
 
 .light-theme .neumorphic-bg {
-  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
 }
 
 .light-theme .neumorphic-card {
-  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
   box-shadow: 
-    12px 12px 24px oklch(0.82 0.01 250),
-    -8px -8px 16px oklch(1 0 0),
-    inset 0 1px 0 oklch(1 0 0 / 0.4);
-  border: 1px solid oklch(0.88 0.01 250 / 0.3);
+    14px 14px 28px oklch(0.75 0.018 60),
+    -10px -10px 20px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.5);
+  border: 1px solid oklch(0.85 0.015 60 / 0.4);
 }
 
 .light-theme .glass-card {
   background: linear-gradient(
     135deg,
-    oklch(0.96 0.005 250 / 0.7) 0%,
-    oklch(0.94 0.005 250 / 0.6) 100%
+    oklch(0.97 0.008 60 / 0.8) 0%,
+    oklch(0.95 0.01 60 / 0.7) 100%
   );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid oklch(0.88 0.01 250 / 0.3);
+  border: 1px solid oklch(0.80 0.018 60 / 0.4);
   box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.6),
-    inset 0 -1px 0 0 oklch(0.82 0.01 250 / 0.2);
+    0 8px 32px 0 rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.7),
+    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.3);
 }
 
 .light-theme .neumorphic-raised {
-  background: linear-gradient(145deg, oklch(0.96 0.005 250), oklch(0.92 0.005 250));
+  background: linear-gradient(145deg, oklch(0.97 0.008 60), oklch(0.93 0.012 60));
   box-shadow: 
-    8px 8px 16px oklch(0.82 0.01 250),
-    -4px -4px 12px oklch(1 0 0),
-    inset 0 1px 0 oklch(1 0 0 / 0.5);
+    10px 10px 20px oklch(0.75 0.018 60),
+    -6px -6px 14px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
 }
 
 .light-theme .neumorphic-inset {
-  background: linear-gradient(145deg, oklch(0.89 0.005 250), oklch(0.93 0.005 250));
+  background: linear-gradient(145deg, oklch(0.90 0.012 60), oklch(0.94 0.01 60));
   box-shadow: 
-    inset 6px 6px 12px oklch(0.82 0.01 250),
-    inset -4px -4px 8px oklch(1 0 0);
+    inset 7px 7px 14px oklch(0.75 0.018 60),
+    inset -5px -5px 10px oklch(0.99 0.005 60);
 }
 
 .light-theme .neumorphic-button {
-  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  background: linear-gradient(145deg, oklch(0.96 0.01 60), oklch(0.92 0.012 60));
   box-shadow: 
-    6px 6px 12px oklch(0.82 0.01 250),
-    -3px -3px 8px oklch(1 0 0),
-    inset 0 1px 0 oklch(1 0 0 / 0.5);
+    7px 7px 14px oklch(0.75 0.018 60),
+    -4px -4px 10px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.6);
 }
 
 .light-theme .neumorphic-button:hover {
   box-shadow: 
-    8px 8px 16px oklch(0.82 0.01 250),
-    -4px -4px 10px oklch(1 0 0),
-    inset 0 1px 0 oklch(1 0 0 / 0.6);
+    9px 9px 18px oklch(0.75 0.018 60),
+    -5px -5px 12px oklch(0.99 0.005 60),
+    inset 0 1px 0 oklch(1 0 0 / 0.7);
 }
 
 .light-theme .neumorphic-button:active {
   box-shadow: 
-    inset 4px 4px 8px oklch(0.82 0.01 250),
-    inset -2px -2px 6px oklch(1 0 0);
+    inset 5px 5px 10px oklch(0.75 0.018 60),
+    inset -3px -3px 8px oklch(0.99 0.005 60);
 }
 
 .light-theme .frosted-glass {
   background: linear-gradient(
     135deg,
-    oklch(0.96 0.005 250 / 0.55) 0%,
-    oklch(0.94 0.005 250 / 0.45) 100%
+    oklch(0.97 0.008 60 / 0.65) 0%,
+    oklch(0.95 0.01 60 / 0.55) 100%
   );
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid oklch(0.88 0.01 250 / 0.35);
+  border: 1px solid oklch(0.82 0.016 60 / 0.4);
 }
 
 .light-theme .glass-button {
   background: linear-gradient(
     135deg,
-    oklch(0.96 0.005 250 / 0.8) 0%,
-    oklch(0.93 0.005 250 / 0.7) 100%
+    oklch(0.97 0.008 60 / 0.85) 0%,
+    oklch(0.94 0.01 60 / 0.75) 100%
   );
-  border: 1px solid oklch(0.88 0.01 250 / 0.4);
+  border: 1px solid oklch(0.82 0.016 60 / 0.45);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.6),
-    inset 0 -1px 0 0 oklch(0.82 0.01 250 / 0.2);
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.7),
+    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.25);
 }
 
 .light-theme .glass-button:hover {
   box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 0 oklch(1 0 0 / 0.7),
-    inset 0 -1px 0 0 oklch(0.82 0.01 250 / 0.25);
+    0 6px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 0 oklch(1 0 0 / 0.8),
+    inset 0 -1px 0 0 oklch(0.75 0.018 60 / 0.3);
 }
 
 .light-theme .glass-button:active {
   box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 0 oklch(0.82 0.01 250 / 0.15),
-    inset 0 -1px 0 0 oklch(1 0 0 / 0.4);
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 0 oklch(0.75 0.018 60 / 0.2),
+    inset 0 -1px 0 0 oklch(1 0 0 / 0.5);
 }
 
 @keyframes sway {
@@ -683,6 +826,7 @@
   border-radius: 999px;
   display: block;
   margin-bottom: 2px;
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .light-theme .lamp-bead {
@@ -699,9 +843,9 @@
   position: relative;
   margin-top: 10px;
   transition:
-    background-color 0.35s ease,
-    border-color 0.35s ease,
-    box-shadow 0.35s ease;
+    background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lamp-bulb::before {
@@ -715,6 +859,7 @@
   border-radius: 6px;
   background-color: oklch(0.12 0.02 250);
   border: 2px solid oklch(0.35 0.04 250);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lamp-bulb::after {
@@ -724,7 +869,7 @@
   border-radius: inherit;
   background: radial-gradient(circle, rgba(252, 211, 77, 0.85) 0%, transparent 65%);
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
