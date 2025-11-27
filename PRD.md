@@ -113,17 +113,26 @@ Animations should be purposeful and fast, primarily serving to confirm user acti
   - Avatar for potential user profile
   - Separator for visual grouping
   - ScrollArea for long lists
+  - **Neumorphic Components**: Radio groups, switches, checkboxes, sliders, and buttons with tactile depth and real-world feel
   
 - **Customizations**: 
   - Custom price display component with automatic formatting and change indicators
   - Custom product card with integrated image, title, price, and quick actions
   - Custom alert banner component with inline action buttons
   - Custom empty state illustrations
+  - **Neumorphic Design System**: Complete suite of tactile UI components including:
+    - Radio groups with pressed/extruded indicators
+    - Switches with recessed tracks and raised thumbs
+    - Checkboxes with inset selection states
+    - Sliders with 3D depth and raised thumbs
+    - Buttons with soft shadows and pressed states
+    - Cards with raised and inset surface variations
   
 - **States**: 
   - Buttons: default with subtle border, hover with background shift, active with scale down, disabled with reduced opacity
   - Inputs: default with border, focus with accent ring and border color shift, error with destructive color and icon, success with green checkmark
   - Cards: default flat, hover with subtle elevation increase, active/selected with accent border
+  - **Neumorphic States**: Pressed (inset shadows), raised (outset shadows), hover (enhanced depth), active (scaled down with inverted shadows)
   
 - **Icon Selection**: 
   - Plus (add product)
@@ -136,6 +145,8 @@ Animations should be purposeful and fast, primarily serving to confirm user acti
   - Check (success states)
   - X (close/remove)
   - Link (external product link)
+  - Palette (design showcase)
+  - Heart, Star, ShoppingCart (neumorphic button icons)
   
 - **Spacing**: 
   - Container padding: p-4 (16px)
@@ -143,6 +154,7 @@ Animations should be purposeful and fast, primarily serving to confirm user acti
   - Stack spacing: gap-4 for major sections, gap-2 for related items
   - Grid gaps: gap-3 for product grid
   - Section margins: mb-6 between major sections
+  - Neumorphic padding: p-8 to p-12 for soft, spacious feel
   
 - **Mobile**: 
   - Single column layout for watchlist (grid on tablet+)
@@ -152,3 +164,26 @@ Animations should be purposeful and fast, primarily serving to confirm user acti
   - Simplified header with back button
   - Sticky bottom action bar for primary CTAs
   - Reduced padding in tight spaces (p-3 instead of p-4)
+
+## Neumorphic Design System
+
+The app includes a complete neumorphic (soft UI) design system that creates the illusion of extruded or pressed surfaces through careful use of highlights and shadows. This creates a tactile, real-world feel inspired by physical materials.
+
+### Core Principles
+- **Soft shadows**: Dual shadows (light and dark) create depth without harsh edges
+- **Subtle gradients**: Linear gradients simulate light hitting raised or recessed surfaces
+- **Limited color palette**: Monochromatic scheme (light grays) with subtle variations
+- **Purposeful states**: Interactive elements respond with inverted shadows when pressed
+- **Accessibility**: Maintains WCAG contrast ratios despite subtle nature
+
+### Component Variations
+- **Raised surfaces**: Cards, buttons, and toggles that appear to extrude from the background
+- **Inset surfaces**: Input fields and pressed states that appear recessed into the background
+- **Interactive feedback**: Transitions between raised and inset states on interaction
+
+### Implementation Details
+- Base color: `oklch(0.93 0.005 250)` - soft, nearly neutral light gray
+- Light shadow: `oklch(1 0 0)` - pure white for highlights
+- Dark shadow: `oklch(0.82 0.01 250)` - subtle gray for depth
+- Shadow distances: 4-12px for components, up to 24px for cards
+- Accent integration: Primary/accent colors used sparingly in sliders and active states

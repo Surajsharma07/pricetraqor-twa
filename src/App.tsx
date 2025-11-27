@@ -6,11 +6,12 @@ import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
 import { ProductDetailScreen } from "@/components/ProductDetailScreen"
 import { SettingsScreen } from "@/components/SettingsScreen"
+import { NeumorphicShowcase } from "@/components/NeumorphicShowcase"
 import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
-type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
+type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings' | 'neumorphic'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
@@ -176,6 +177,14 @@ function App() {
           <SettingsScreen
             settings={settings || { notificationsEnabled: true, alertType: 'drops' }}
             onUpdateSettings={handleUpdateSettings}
+            onShowNeumorphic={() => setActiveScreen('neumorphic')}
+          />
+        )
+      
+      case 'neumorphic':
+        return (
+          <NeumorphicShowcase
+            onBack={() => setActiveScreen('settings')}
           />
         )
     }

@@ -298,3 +298,177 @@
     inset 0 1px 0 0 rgba(0, 0, 0, 0.2),
     inset 0 -1px 0 0 oklch(0.95 0 0 / 0.1);
 }
+
+.neumorphic-radiogroup {
+  background: oklch(0.93 0.005 250);
+  box-shadow: 
+    4px 4px 4px 0px oklch(0.82 0.01 250) inset, 
+    -4px -4px 4px 0px oklch(1 0 0) inset;
+}
+
+.neumorphic-indicator {
+  box-shadow: 
+    -8px -4px 8px 0px oklch(1 0 0), 
+    8px 4px 12px 0px oklch(0.82 0.01 250);
+}
+
+.neumorphic-indicator-inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.neumorphic-indicator-inner::before,
+.neumorphic-indicator-inner::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  height: 80%;
+  width: 80%;
+  border-radius: 50%;
+}
+
+.neumorphic-indicator-inner::before {
+  box-shadow: 
+    -4px -2px 4px 0px oklch(0.82 0.01 250), 
+    4px 2px 8px 0px oklch(1 0 0);
+}
+
+.neumorphic-indicator-inner::after {
+  background-color: oklch(0.93 0.005 250);
+  box-shadow: 
+    -4px -2px 4px 0px oklch(1 0 0), 
+    4px 2px 8px 0px oklch(0.82 0.01 250);
+  transform: scale3d(1, 1, 1);
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+}
+
+.neumorphic-indicator-inner.checked::after {
+  transform: scale3d(0.975, 0.975, 1) translate3d(0, 10%, 0);
+  opacity: 0;
+}
+
+.neumorphic-switch-track {
+  background: oklch(0.93 0.005 250);
+  box-shadow: 
+    inset 4px 4px 8px oklch(0.82 0.01 250),
+    inset -2px -2px 6px oklch(1 0 0);
+}
+
+.neumorphic-switch-thumb {
+  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.90 0.005 250));
+  box-shadow: 
+    4px 4px 8px oklch(0.82 0.01 250),
+    -2px -2px 6px oklch(1 0 0),
+    inset 0 1px 2px oklch(1 0 0 / 0.5);
+}
+
+.neumorphic-checkbox {
+  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  box-shadow: 
+    6px 6px 12px oklch(0.82 0.01 250),
+    -4px -4px 8px oklch(1 0 0),
+    inset 0 1px 0 oklch(1 0 0 / 0.3);
+}
+
+.neumorphic-checkbox:active {
+  box-shadow: 
+    inset 3px 3px 6px oklch(0.82 0.01 250),
+    inset -2px -2px 4px oklch(1 0 0);
+}
+
+.neumorphic-checkbox-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neumorphic-checkbox-inner.checked {
+  background: linear-gradient(145deg, oklch(0.91 0.005 250), oklch(0.95 0.005 250));
+  border-radius: 6px;
+}
+
+.neumorphic-btn {
+  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  box-shadow: 
+    8px 8px 16px oklch(0.82 0.01 250),
+    -4px -4px 12px oklch(1 0 0),
+    inset 0 1px 0 oklch(1 0 0 / 0.4);
+  position: relative;
+}
+
+.neumorphic-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, oklch(1 0 0 / 0.15) 0%, transparent 50%, oklch(0 0 0 / 0.05) 100%);
+  pointer-events: none;
+}
+
+.neumorphic-btn:hover {
+  box-shadow: 
+    10px 10px 20px oklch(0.82 0.01 250),
+    -5px -5px 14px oklch(1 0 0),
+    inset 0 1px 0 oklch(1 0 0 / 0.5);
+}
+
+.neumorphic-btn:active {
+  background: linear-gradient(145deg, oklch(0.91 0.005 250), oklch(0.95 0.005 250));
+  box-shadow: 
+    inset 5px 5px 10px oklch(0.82 0.01 250),
+    inset -3px -3px 8px oklch(1 0 0);
+  transform: scale(0.98);
+}
+
+.neumorphic-slider-track {
+  background: linear-gradient(145deg, oklch(0.88 0.005 250), oklch(0.94 0.005 250));
+  box-shadow: 
+    inset 4px 4px 8px oklch(0.82 0.01 250),
+    inset -2px -2px 6px oklch(1 0 0);
+}
+
+.neumorphic-slider-fill {
+  background: linear-gradient(90deg, oklch(0.50 0.18 250), oklch(0.65 0.20 230));
+  box-shadow: 
+    0 2px 4px oklch(0.50 0.18 250 / 0.3);
+}
+
+.neumorphic-slider-thumb {
+  background: linear-gradient(145deg, oklch(0.96 0.005 250), oklch(0.92 0.005 250));
+  box-shadow: 
+    6px 6px 12px oklch(0.82 0.01 250),
+    -4px -4px 8px oklch(1 0 0),
+    inset 0 1px 2px oklch(1 0 0 / 0.6);
+  z-index: 10;
+}
+
+.neumorphic-slider-thumb:active {
+  box-shadow: 
+    4px 4px 8px oklch(0.82 0.01 250),
+    -2px -2px 6px oklch(1 0 0),
+    inset 2px 2px 4px oklch(0.82 0.01 250 / 0.3);
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.neumorphic-card {
+  background: linear-gradient(145deg, oklch(0.95 0.005 250), oklch(0.91 0.005 250));
+  box-shadow: 
+    12px 12px 24px oklch(0.82 0.01 250),
+    -8px -8px 16px oklch(1 0 0),
+    inset 0 1px 0 oklch(1 0 0 / 0.4);
+}
+
+.neumorphic-inset-card {
+  background: linear-gradient(145deg, oklch(0.89 0.005 250), oklch(0.93 0.005 250));
+  box-shadow: 
+    inset 8px 8px 16px oklch(0.82 0.01 250),
+    inset -6px -6px 12px oklch(1 0 0);
+}
