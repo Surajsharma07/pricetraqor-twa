@@ -46,7 +46,7 @@ export function NeumorphicShowcase({ onBack }: NeumorphicShowcaseProps) {
             <NeumorphicRadioGroup
               name="alert-type"
               value={alertType}
-              onChange={setAlertType}
+              onValueChange={setAlertType}
               options={[
                 { value: "drops", label: "Price Drops Only" },
                 { value: "all", label: "All Price Changes" },
@@ -62,7 +62,7 @@ export function NeumorphicShowcase({ onBack }: NeumorphicShowcaseProps) {
             <NeumorphicRadioGroup
               name="theme"
               value={theme}
-              onChange={setTheme}
+              onValueChange={setTheme}
               options={[
                 { value: "auto", label: "System Default" },
                 { value: "light", label: "Always Light" },

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Bell, Gear, Palette } from '@phosphor-icons/react'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { NeumorphicRadioGroup } from '@/components/NeumorphicRadioGroup'
 
 interface SettingsScreenProps {
   settings: UserSettings
@@ -72,34 +72,22 @@ export function SettingsScreen({ settings, onUpdateSettings, onShowNeumorphic }:
 
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Alert Type</Label>
-                  <RadioGroup
+                  <NeumorphicRadioGroup
                     value={settings.alertType}
                     onValueChange={handleAlertTypeChange}
-                    className="space-y-3"
-                  >
-                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 glass-morphism hover:glow-accent transition-all duration-200">
-                      <RadioGroupItem value="drops" id="alert-drops" />
-                      <div className="flex-1">
-                        <Label htmlFor="alert-drops" className="text-sm font-semibold cursor-pointer">
-                          Price drops only
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Only notify when prices decrease
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 rounded-xl border border-border/50 p-4 glass-morphism hover:glow-accent transition-all duration-200">
-                      <RadioGroupItem value="all" id="alert-all" />
-                      <div className="flex-1">
-                        <Label htmlFor="alert-all" className="text-sm font-semibold cursor-pointer">
-                          All price changes
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Notify for any price change (up or down)
-                        </p>
-                      </div>
-                    </div>
-                  </RadioGroup>
+                    options={[
+                      {
+                        value: 'drops',
+                        label: 'Price drops only',
+                        description: 'Only notify when prices decrease'
+                      },
+                      {
+                        value: 'all',
+                        label: 'All price changes',
+                        description: 'Notify for any price change (up or down)'
+                      }
+                    ]}
+                  />
                 </div>
 
                 <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
