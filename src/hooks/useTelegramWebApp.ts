@@ -18,7 +18,7 @@ export function useTelegramWebApp() {
 
   // Haptic feedback utilities
   const haptic = {
-    impact: useCallback((style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'medium') => {
+    impact: useCallback((style: 'light' | 'medium' | 'heavy' = 'medium') => {
       if (WebApp.HapticFeedback) {
         WebApp.HapticFeedback.impactOccurred(style)
       }
@@ -44,6 +44,8 @@ export function useTelegramWebApp() {
         WebApp.MainButton.setText(text)
         WebApp.MainButton.show()
         WebApp.MainButton.enable()
+        // Remove previous handler before adding new one
+        WebApp.MainButton.offClick(onClick)
         WebApp.MainButton.onClick(onClick)
       }
     }, []),
@@ -83,8 +85,10 @@ export function useTelegramWebApp() {
   const backButton = {
     show: useCallback((onClick: () => void) => {
       if (WebApp.BackButton) {
-        WebApp.BackButton.show()
+        // Remove previous handler before adding new one
+        WebApp.BackButton.offClick(onClick)
         WebApp.BackButton.onClick(onClick)
+        WebApp.BackButton.show()
       }
     }, []),
     
