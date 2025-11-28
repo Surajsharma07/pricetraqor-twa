@@ -5,16 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Package } from '@phosphor-icons/react'
 import { filterProducts } from '@/lib/helpers'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface WatchlistScreenProps {
@@ -34,24 +24,13 @@ export function WatchlistScreen({
 }: WatchlistScreenProps) {
   const twa = useTelegramWebApp()
   const [filter, setFilter] = useState<FilterType>('all')
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [productToDelete, setProductToDelete] = useState<string | null>(null)
 
   const filteredProducts = filterProducts(products, filter)
 
   const handleDeleteClick = (id: string) => {
     twa.haptic.impact('light')
-    setProductToDelete(id)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    if (productToDelete) {
-      twa.haptic.notification('success')
-      onDelete(productToDelete)
-      setDeleteDialogOpen(false)
-      setProductToDelete(null)
-    }
+    // Pass to parent which handles the native dialog
+    onDelete(id)
   }
 
   const handleFilterChange = (value: FilterType) => {
@@ -199,23 +178,6 @@ export function WatchlistScreen({
           </div>
         )}
       </div>
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="glass-overlay shadow-[0_16px_64px_rgba(0,0,0,0.35)]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove product?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will stop tracking this product and remove it from your watchlist. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="neumorphic-button">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 neumorphic-button">
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }

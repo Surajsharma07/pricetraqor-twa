@@ -346,6 +346,37 @@ function App() {
     }
   }, [activeScreen, twa])
 
+  // Enable closing confirmation when user is on add-product screen
+  useEffect(() => {
+    if (activeScreen === 'add-product') {
+      twa.enableClosingConfirmation()
+    } else {
+      twa.disableClosingConfirmation()
+    }
+
+    return () => {
+      twa.disableClosingConfirmation()
+    }
+  }, [activeScreen, twa])
+
+  // Handle viewport height to ensure proper display
+  useEffect(() => {
+    const setViewportHeight = () => {
+      // Use stable viewport height for better consistency
+      const height = twa.viewport.stableHeight || twa.viewport.height || window.innerHeight
+      document.documentElement.style.setProperty('--twa-viewport-height', `${height}px`)
+    }
+
+    setViewportHeight()
+    
+    // Listen for viewport changes
+    window.addEventListener('resize', setViewportHeight)
+    
+    return () => {
+      window.removeEventListener('resize', setViewportHeight)
+    }
+  }, [twa])
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">

@@ -19,16 +19,6 @@ import {
   ShareNetwork
 } from '@phosphor-icons/react'
 import { formatPrice, calculatePriceChange, getRelativeTime, getSiteName, addAffiliateTag } from '@/lib/helpers'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { toast } from 'sonner'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
@@ -49,7 +39,6 @@ export function ProductDetailScreen({
   onUpdateTargetPrice 
 }: ProductDetailScreenProps) {
   const twa = useTelegramWebApp()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [targetPriceInput, setTargetPriceInput] = useState(
     product.targetPrice?.toString() || ''
@@ -78,6 +67,20 @@ export function ProductDetailScreen({
     }
   }
 
+  const handleDeleteClick = async () => {
+    try {
+      const confirmed = await twa.dialog.showConfirm('Are you sure you want to remove this product from your watchlist?')
+      if (confirmed) {
+        twa.haptic.impact('medium')
+        onDelete(product.id)
+      }
+    } catch (error) {
+      console.error('Delete confirmation failed:', error)
+      // Fallback to direct delete
+      onDelete(product.id)
+    }
+  }
+
   const handleSaveTargetPrice = () => {
     const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
     
@@ -94,6 +97,12 @@ export function ProductDetailScreen({
   const handleCancelEdit = () => {
     setTargetPriceInput(product.targetPrice?.toString() || '')
     setIsEditingTarget(false)
+  }
+
+  const handleOpenProduct = () => {
+    twa.haptic.impact('light')
+    const url = addAffiliateTag(product.productUrl, product.siteDomain)
+    twa.navigation.openLink(url, { try_instant_view: false })
   }
 
   return (
@@ -122,7 +131,7 @@ export function ProductDetailScreen({
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => window.open(addAffiliateTag(product.productUrl, product.site), '_blank')}
+                  onClick={handleOpenProduct}
                   className="flex-shrink-0 rounded-full neumorphic-button hover:glow-accent active:scale-95 bg-gradient-to-b from-secondary/70 to-secondary/50"
                 >
                   <ArrowSquareOut className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
@@ -436,36 +445,13 @@ export function ProductDetailScreen({
           <Button
             variant="destructive"
             className="flex-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)]"
-            onClick={() => setDeleteDialogOpen(true)}
+            onClick={handleDeleteClick}
           >
             <Trash className="w-5 h-5 mr-2" />
             Remove
           </Button>
         </div>
       </div>
-
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="shadow-[0_16px_64px_rgba(0,0,0,0.35)]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove product?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will stop tracking this product and remove it from your watchlist. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                onDelete(product.id)
-                setDeleteDialogOpen(false)
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-[0_4px_16px_rgba(0,0,0,0.2)]"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DotsThree } from '@phosphor-icons/react'
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface ProductCardProps {
   product: TrackedProduct
@@ -21,12 +22,30 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick, onToggleActive, onDelete }: ProductCardProps) {
+  const twa = useTelegramWebApp()
   const [isHovered, setIsHovered] = useState(false)
   const isLightTheme = document.documentElement.classList.contains('light-theme')
   
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
     : null
+
+  const handleClick = () => {
+    twa.haptic.selection()
+    onClick()
+  }
+
+  const handleToggleActive = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    twa.haptic.impact('light')
+    onToggleActive(product.id)
+  }
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    twa.haptic.impact('medium')
+    onDelete(product.id)
+  }
 
   const getPriceChangeColor = () => {
     if (!priceChangeData) return 'text-muted-foreground'
@@ -45,7 +64,7 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
   return (
     <Card 
       className="overflow-hidden cursor-pointer group active:scale-[0.98] transition-all duration-300 relative neumorphic-raised"
-      onClick={onClick}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -165,10 +184,7 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
                   WebkitBackdropFilter: 'blur(24px)',
                 }}
               >
-                <DropdownMenuItem onClick={(e) => {
-                  e.stopPropagation()
-                  onToggleActive(product.id)
-                }} className="cursor-pointer">
+                <DropdownMenuItem onClick={handleToggleActive} className="cursor-pointer">
                   {product.isActive ? (
                     <>
                       <PauseCircle className="w-4 h-4 mr-2" />
@@ -182,10 +198,7 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onDelete(product.id)
-                  }}
+                  onClick={handleDelete}
                   className="text-destructive focus:text-destructive cursor-pointer"
                 >
                   <Trash className="w-4 h-4 mr-2" />
