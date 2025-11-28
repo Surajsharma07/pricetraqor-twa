@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft, Plus, Link as LinkIcon, CurrencyDollar } from '@phosphor-icons/react'
+import { ArrowLeft, Plus, Link as LinkIcon, CurrencyDollar, QrCode } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface AddProductScreenProps {
   onBack: () => void
@@ -14,6 +15,7 @@ interface AddProductScreenProps {
 }
 
 export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreenProps) {
+  const twa = useTelegramWebApp()
   const [url, setUrl] = useState(prefillUrl || '')
   const [targetPrice, setTargetPrice] = useState('')
   const [urlError, setUrlError] = useState('')
@@ -28,6 +30,30 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
   const handleUrlChange = (value: string) => {
     setUrl(value)
     setUrlError('')
+  }
+
+  const handleScanQR = async () => {
+    try {
+      twa.haptic.impact('light')
+      const scannedData = await twa.scanQR('Scan product QR code or barcode')
+      
+      // Check if the scanned data is a URL
+      if (scannedData && scannedData.startsWith('http')) {
+        setUrl(scannedData)
+        twa.haptic.notification('success')
+        toast.success('QR code scanned successfully')
+      } else if (scannedData) {
+        // If it's not a URL, it might be a product code - show it to user
+        toast.info(`Scanned: ${scannedData}`)
+        twa.haptic.notification('warning')
+      }
+    } catch (error: any) {
+      console.error('QR scan error:', error)
+      if (error.message !== 'QR Scanner not available') {
+        twa.haptic.notification('error')
+        toast.error('Failed to scan QR code')
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,16 +107,28 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
             <Label htmlFor="product-url" className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
               Product URL
             </Label>
-            <div className="relative">
-              <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
-              <Input
-                id="product-url"
-                type="url"
-                placeholder="https://www.amazon.com/product/..."
-                value={url}
-                onChange={(e) => handleUrlChange(e.target.value)}
-                className={`pl-10 neumorphic-inset ${urlError ? 'border-destructive' : ''}`}
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
+                <Input
+                  id="product-url"
+                  type="url"
+                  placeholder="https://www.amazon.com/product/..."
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={`pl-10 neumorphic-inset ${urlError ? 'border-destructive' : ''}`}
+                />
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="icon"
+                onClick={handleScanQR}
+                className="neumorphic-button hover:glow-accent active:scale-95 shrink-0"
+                title="Scan QR Code"
+              >
+                <QrCode className="w-5 h-5" weight="bold" />
+              </Button>
             </div>
             {urlError && (
               <p className="text-xs text-destructive font-medium">{urlError}</p>

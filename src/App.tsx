@@ -11,10 +11,12 @@ import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { authService } from "@/services/auth"
 import { productService } from "@/services/products"
+import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 
 type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
 
 function App() {
+  const twa = useTelegramWebApp()
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
   const [products, setProducts] = useState<TrackedProduct[]>([])
   const [user, setUser] = useState<User | null>(null)
@@ -28,14 +30,26 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
   const [prefillUrl, setPrefillUrl] = useState<string>()
 
+  // Load settings from CloudStorage on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const storedSettings = await twa.cloudStorage.getItem('user_settings')
+        if (storedSettings) {
+          const parsed = JSON.parse(storedSettings)
+          setSettings(parsed)
+        }
+      } catch (error) {
+        console.error('Failed to load settings from CloudStorage:', error)
+      }
+    }
+    loadSettings()
+  }, [twa])
+
   // Initialize Telegram WebApp and authenticate
   useEffect(() => {
     const initApp = async () => {
       try {
-        // Initialize Telegram WebApp SDK
-        WebApp.ready()
-        WebApp.expand()
-        
         console.log('Telegram WebApp initialized:', {
           initData: WebApp.initData ? 'present' : 'missing',
           user: WebApp.initDataUnsafe?.user
@@ -115,7 +129,7 @@ function App() {
     }
   }
 
-  // Theme effect
+  // Theme effect - integrate with Telegram theme
   useEffect(() => {
     const updateTheme = (withAnimation = false) => {
       if (withAnimation) {
@@ -125,16 +139,25 @@ function App() {
         }, 800)
       }
       
-      if (settings?.theme === 'light') {
+      // Use Telegram's color scheme if available
+      const telegramColorScheme = twa.theme.colorScheme
+      const finalTheme = settings?.theme || (telegramColorScheme === 'light' ? 'light' : 'dark')
+      
+      if (finalTheme === 'light') {
         document.documentElement.classList.add('light-theme')
       } else {
         document.documentElement.classList.remove('light-theme')
       }
+
+      // Set Telegram header and background colors to match theme
+      const bgColor = finalTheme === 'light' ? '#f5f5f5' : '#0a0a0b'
+      twa.theme.setBackgroundColor(bgColor)
+      twa.theme.setHeaderColor(bgColor)
     }
     
     const hasThemeChanged = document.documentElement.classList.contains('light-theme') !== (settings?.theme === 'light')
     updateTheme(hasThemeChanged)
-  }, [settings?.theme])
+  }, [settings?.theme, twa])
 
   // Handle URL params
   useEffect(() => {
@@ -158,11 +181,13 @@ function App() {
     try {
       const existingProduct = products.find(p => p.productUrl === url)
       if (existingProduct) {
+        twa.haptic.notification('warning')
         toast.error('This product is already in your watchlist')
         return
       }
 
       // Add product via API
+      twa.haptic.impact('light')
       const newProduct = await productService.addProduct({
         url,
         desired_price: targetPrice,
@@ -172,15 +197,18 @@ function App() {
       const trackedProduct = productToTrackedProduct(newProduct)
       setProducts([...products, trackedProduct])
       setActiveScreen('watchlist')
+      twa.haptic.notification('success')
       toast.success('Product added to watchlist')
     } catch (error: any) {
       console.error('Failed to add product:', error)
+      twa.haptic.notification('error')
       toast.error(error.message || 'Failed to add product')
     }
   }
 
   const handleProductClick = async (product: TrackedProduct) => {
     try {
+      twa.haptic.selection()
       // Load full product details with price history
       const priceHistory = await productService.getPriceHistory(product.id)
       const fullProduct = await productService.getProduct(product.id)
@@ -190,6 +218,7 @@ function App() {
       setActiveScreen('product-detail')
     } catch (error: any) {
       console.error('Failed to load product details:', error)
+      twa.haptic.notification('error')
       toast.error(error.message || 'Failed to load product details')
     }
   }
@@ -199,6 +228,7 @@ function App() {
       const product = products.find(p => p.id === id)
       if (!product) return
 
+      twa.haptic.impact('light')
       const updatedProduct = await productService.toggleActive(id, !product.isActive)
       
       // Update local state
@@ -214,6 +244,7 @@ function App() {
         setSelectedProduct(trackedProduct)
       }
       
+      twa.haptic.notification('success')
       toast.success(
         product.isActive 
           ? 'Tracking paused' 
@@ -221,15 +252,25 @@ function App() {
       )
     } catch (error: any) {
       console.error('Failed to toggle product:', error)
+      twa.haptic.notification('error')
       toast.error(error.message || 'Failed to update product')
     }
   }
 
   const handleDeleteProduct = async (id: string) => {
     try {
+      // Use native Telegram confirmation dialog
+      const confirmed = await twa.dialog.showConfirm('Are you sure you want to remove this product from your watchlist?')
+      
+      if (!confirmed) {
+        return
+      }
+
+      twa.haptic.impact('medium')
       await productService.deleteProduct(id)
       
       setProducts(products.filter(p => p.id !== id))
+      twa.haptic.notification('success')
       toast.success('Product removed from watchlist')
       
       if (activeScreen === 'product-detail') {
@@ -237,6 +278,7 @@ function App() {
       }
     } catch (error: any) {
       console.error('Failed to delete product:', error)
+      twa.haptic.notification('error')
       toast.error(error.message || 'Failed to delete product')
     }
   }
@@ -264,15 +306,45 @@ function App() {
     }
   }
 
-  const handleUpdateSettings = (newSettings: UserSettings) => {
+  const handleUpdateSettings = async (newSettings: UserSettings) => {
     setSettings(newSettings)
-    // Could also save to backend/user preferences here
-    toast.success('Settings saved')
+    
+    // Save to CloudStorage
+    try {
+      await twa.cloudStorage.setItem('user_settings', JSON.stringify(newSettings))
+      twa.haptic.notification('success')
+      toast.success('Settings saved')
+    } catch (error) {
+      console.error('Failed to save settings to CloudStorage:', error)
+      twa.haptic.notification('error')
+      toast.error('Settings saved locally only')
+    }
   }
 
   const handleBottomNavClick = (screen: 'watchlist' | 'profile' | 'settings') => {
+    twa.haptic.selection()
     setActiveScreen(screen)
   }
+
+  // Handle BackButton visibility based on current screen
+  useEffect(() => {
+    const shouldShowBack = activeScreen !== 'watchlist' && activeScreen !== 'profile' && activeScreen !== 'settings'
+    
+    if (shouldShowBack) {
+      twa.backButton.show(() => {
+        twa.haptic.impact('light')
+        if (activeScreen === 'add-product' || activeScreen === 'product-detail') {
+          setActiveScreen('watchlist')
+        }
+      })
+    } else {
+      twa.backButton.hide()
+    }
+
+    return () => {
+      twa.backButton.hide()
+    }
+  }, [activeScreen, twa])
 
   if (isLoading) {
     return (

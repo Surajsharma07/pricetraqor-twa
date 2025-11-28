@@ -15,7 +15,8 @@ import {
   PauseCircle, 
   PlayCircle,
   Check,
-  X
+  X,
+  ShareNetwork
 } from '@phosphor-icons/react'
 import { formatPrice, calculatePriceChange, getRelativeTime, getSiteName, addAffiliateTag } from '@/lib/helpers'
 import {
@@ -30,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from 'sonner'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface ProductDetailScreenProps {
   product: TrackedProduct
@@ -46,6 +48,7 @@ export function ProductDetailScreen({
   onDelete,
   onUpdateTargetPrice 
 }: ProductDetailScreenProps) {
+  const twa = useTelegramWebApp()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [targetPriceInput, setTargetPriceInput] = useState(
@@ -55,6 +58,25 @@ export function ProductDetailScreen({
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
     : null
+
+  const handleShareProduct = () => {
+    try {
+      twa.haptic.impact('light')
+      const priceInfo = formatPrice(product.currentPrice, product.currency)
+      const changeInfo = priceChangeData 
+        ? ` (${priceChangeData.direction === 'down' ? '📉' : '📈'} ${Math.abs(priceChangeData.percent).toFixed(1)}%)`
+        : ''
+      
+      const shareMessage = `Check out this product: ${product.title}\n💰 Current Price: ${priceInfo}${changeInfo}\n🔗 ${product.productUrl}`
+      
+      twa.share.switchInlineQuery(shareMessage, ['users', 'groups', 'channels'])
+      twa.haptic.notification('success')
+    } catch (error) {
+      console.error('Share failed:', error)
+      twa.haptic.notification('error')
+      toast.error('Failed to share product')
+    }
+  }
 
   const handleSaveTargetPrice = () => {
     const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
@@ -394,14 +416,22 @@ export function ProductDetailScreen({
             {product.isActive ? (
               <>
                 <PauseCircle className="w-5 h-5 mr-2" />
-                Pause Tracking
+                Pause
               </>
             ) : (
               <>
                 <PlayCircle className="w-5 h-5 mr-2" />
-                Resume Tracking
+                Resume
               </>
             )}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.2)]"
+            onClick={handleShareProduct}
+          >
+            <ShareNetwork className="w-5 h-5 mr-2" />
+            Share
           </Button>
           <Button
             variant="destructive"

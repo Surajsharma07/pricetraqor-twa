@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface WatchlistScreenProps {
   products: TrackedProduct[]
@@ -31,6 +32,7 @@ export function WatchlistScreen({
   onToggleActive,
   onDelete 
 }: WatchlistScreenProps) {
+  const twa = useTelegramWebApp()
   const [filter, setFilter] = useState<FilterType>('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [productToDelete, setProductToDelete] = useState<string | null>(null)
@@ -38,16 +40,28 @@ export function WatchlistScreen({
   const filteredProducts = filterProducts(products, filter)
 
   const handleDeleteClick = (id: string) => {
+    twa.haptic.impact('light')
     setProductToDelete(id)
     setDeleteDialogOpen(true)
   }
 
   const handleConfirmDelete = () => {
     if (productToDelete) {
+      twa.haptic.notification('success')
       onDelete(productToDelete)
       setDeleteDialogOpen(false)
       setProductToDelete(null)
     }
+  }
+
+  const handleFilterChange = (value: FilterType) => {
+    twa.haptic.selection()
+    setFilter(value)
+  }
+
+  const handleAddProductClick = () => {
+    twa.haptic.impact('medium')
+    onAddProduct()
   }
 
   const getFilterCounts = () => {
@@ -72,7 +86,7 @@ export function WatchlistScreen({
             </p>
           </div>
           <Button 
-            onClick={onAddProduct} 
+            onClick={handleAddProductClick} 
             size="icon" 
             className="rounded-full h-16 w-16 neumorphic-button hover:glow-primary active:scale-95 transition-all duration-200 relative overflow-hidden"
             style={{
@@ -91,7 +105,7 @@ export function WatchlistScreen({
         </div>
 
         {products.length > 0 && (
-          <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterType)}>
+          <Tabs value={filter} onValueChange={(v) => handleFilterChange(v as FilterType)}>
             <TabsList 
               className="grid w-full grid-cols-4 p-1 neumorphic-inset relative overflow-hidden"
               style={{
