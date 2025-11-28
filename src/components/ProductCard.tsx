@@ -84,7 +84,7 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
       
       <div className="flex gap-4 p-4 relative z-10">
         <div 
-          className="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden relative neumorphic-inset transition-all duration-500"
+          className="w-24 h-24 flex-shrink-0 rounded-lg relative neumorphic-inset transition-all duration-500 flex items-center justify-center p-2 bg-background"
           style={{
             transform: isHovered ? 'scale(1.05) rotate(-1deg)' : 'scale(1)',
             boxShadow: isLightTheme
@@ -99,12 +99,12 @@ export function ProductCard({ product, onClick, onToggleActive, onDelete }: Prod
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-60 pointer-events-none z-10 transition-opacity duration-300"
             style={{ opacity: isHovered ? 0.8 : 0.6 }}
           ></div>
-          <div className="absolute inset-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)] rounded-2xl pointer-events-none z-10"></div>
+          <div className="absolute inset-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)] rounded-lg pointer-events-none z-10"></div>
           <img 
             src={product.imageUrl} 
             alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-700"
-            style={{ transform: isHovered ? 'scale(1.1)' : 'scale(1)' }}
+            className="w-full h-full object-contain transition-transform duration-700"
+            style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
           />
         </div>
 

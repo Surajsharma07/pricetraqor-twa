@@ -17,7 +17,7 @@ import {
   Check,
   X
 } from '@phosphor-icons/react'
-import { formatPrice, calculatePriceChange, getRelativeTime, getSiteName } from '@/lib/helpers'
+import { formatPrice, calculatePriceChange, getRelativeTime, getSiteName, addAffiliateTag } from '@/lib/helpers'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -100,7 +100,7 @@ export function ProductDetailScreen({
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => window.open(product.productUrl, '_blank')}
+                  onClick={() => window.open(addAffiliateTag(product.productUrl, product.site), '_blank')}
                   className="flex-shrink-0 rounded-full neumorphic-button hover:glow-accent active:scale-95 bg-gradient-to-b from-secondary/70 to-secondary/50"
                 >
                   <ArrowSquareOut className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
@@ -230,11 +230,38 @@ export function ProductDetailScreen({
                   <div className="neumorphic-inset p-4 rounded-xl">
                     <ResponsiveContainer width="100%" height={200}>
                       <LineChart 
-                        data={product.priceHistory.map(entry => ({
-                          date: new Date(entry.checkedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                          price: entry.price,
-                          fullDate: entry.checkedAt
-                        }))}
+                        data={product.priceHistory.map(entry => {
+                          let dateStr = 'Unknown'
+                          try {
+                            const timestamp = entry.checkedAt
+                            if (!timestamp) return { date: 'Unknown', price: entry.price, fullDate: '' }
+                            
+                            // Try ISO date first
+                            let date = new Date(timestamp)
+                            
+                            // Try ObjectId if ISO fails
+                            if (isNaN(date.getTime()) && typeof timestamp === 'string' && timestamp.length === 24 && /^[0-9a-f]{24}$/i.test(timestamp)) {
+                              const seconds = parseInt(timestamp.substring(0, 8), 16)
+                              date = new Date(seconds * 1000)
+                            }
+                            
+                            // Try epoch number if still invalid
+                            if (isNaN(date.getTime()) && !isNaN(Number(timestamp))) {
+                              date = new Date(Number(timestamp))
+                            }
+                            
+                            if (!isNaN(date.getTime())) {
+                              dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            }
+                          } catch (e) {
+                            dateStr = 'Unknown'
+                          }
+                          return {
+                            date: dateStr,
+                            price: entry.price,
+                            fullDate: entry.checkedAt
+                          }
+                        })}
                         margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
                       >
                         <defs>
@@ -258,7 +285,7 @@ export function ProductDetailScreen({
                           stroke="var(--color-muted-foreground)"
                           style={{ fontSize: '11px', fontWeight: 500 }}
                           tickLine={false}
-                          tickFormatter={(value) => `$${value}`}
+                          tickFormatter={(value) => formatPrice(value, product.currency)}
                         />
                         <Tooltip 
                           contentStyle={{
@@ -280,7 +307,7 @@ export function ProductDetailScreen({
                             fontSize: '13px',
                             fontWeight: 700
                           }}
-                          formatter={(value: number) => [`$${value.toFixed(2)}`, 'Price']}
+                          formatter={(value: number) => [formatPrice(value, product.currency), 'Price']}
                         />
                         <Line 
                           type="monotone" 
@@ -316,11 +343,30 @@ export function ProductDetailScreen({
                           {formatPrice(entry.price, entry.currency)}
                         </span>
                         <span className="text-xs text-muted-foreground font-medium">
-                          {new Date(entry.checkedAt).toLocaleDateString(undefined, {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {(() => {
+                            try {
+                              const timestamp = entry.checkedAt
+                              // Handle MongoDB ObjectId timestamp (first 8 chars are hex timestamp)
+                              if (typeof timestamp === 'string' && timestamp.length === 24 && /^[0-9a-f]{24}$/i.test(timestamp)) {
+                                const seconds = parseInt(timestamp.substring(0, 8), 16)
+                                const date = new Date(seconds * 1000)
+                                return date.toLocaleDateString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })
+                              }
+                              // Handle regular ISO date string
+                              const date = new Date(timestamp)
+                              return isNaN(date.getTime()) ? 'Unknown' : date.toLocaleDateString(undefined, {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })
+                            } catch (e) {
+                              return 'Unknown'
+                            }
+                          })()}
                         </span>
                       </div>
                     ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { useKV } from "@github/spark/hooks"
-import { TrackedProduct, UserSettings, PriceHistoryEntry } from "@/lib/types"
+import WebApp from "@twa-dev/sdk"
+import { TrackedProduct, UserSettings, productToTrackedProduct, User } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
 import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
@@ -9,13 +9,17 @@ import { SettingsScreen } from "@/components/SettingsScreen"
 import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { authService } from "@/services/auth"
+import { productService } from "@/services/products"
 
 type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
 
 function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
-  const [products, setProducts] = useKV<TrackedProduct[]>("tracked-products", [])
-  const [settings, setSettings] = useKV<UserSettings>("user-settings", {
+  const [products, setProducts] = useState<TrackedProduct[]>([])
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [settings, setSettings] = useState<UserSettings>({
     notificationsEnabled: true,
     alertType: 'drops',
     defaultTargetPercent: 10,
@@ -24,6 +28,94 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
   const [prefillUrl, setPrefillUrl] = useState<string>()
 
+  // Initialize Telegram WebApp and authenticate
+  useEffect(() => {
+    const initApp = async () => {
+      try {
+        // Initialize Telegram WebApp SDK
+        WebApp.ready()
+        WebApp.expand()
+        
+        console.log('Telegram WebApp initialized:', {
+          initData: WebApp.initData ? 'present' : 'missing',
+          user: WebApp.initDataUnsafe?.user
+        })
+
+        // Check if already authenticated
+        if (authService.isAuthenticated()) {
+          console.log('User already authenticated, loading profile...')
+          try {
+            const userData = await authService.getCurrentUser()
+            setUser(userData)
+            await loadProducts()
+          } catch (error) {
+            console.error('Failed to get user, re-authenticating:', error)
+            await authenticateWithTelegram()
+          }
+        } else {
+          // Not authenticated, authenticate with Telegram
+          await authenticateWithTelegram()
+        }
+      } catch (error) {
+        console.error('App initialization failed:', error)
+        toast.error('Failed to initialize app')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    initApp()
+  }, [])
+
+  // Authenticate with Telegram WebApp
+  const authenticateWithTelegram = async () => {
+    try {
+      const initData = WebApp.initData
+      
+      if (!initData) {
+        console.warn('No Telegram initData available - running in development mode')
+        // For development/testing without Telegram
+        toast.info('Development mode - authentication skipped')
+        setIsLoading(false)
+        return
+      }
+
+      console.log('Authenticating with Telegram initData...')
+      const authResponse = await authService.authenticateWithTelegram(initData)
+      setUser(authResponse.user)
+      await loadProducts()
+      toast.success(`Welcome ${authResponse.user.full_name}!`)
+    } catch (error: any) {
+      console.error('Telegram authentication failed:', error)
+      toast.error(error.message || 'Authentication failed')
+    }
+  }
+
+  // Load products from backend
+  const loadProducts = async () => {
+    try {
+      const backendProducts = await productService.getProducts()
+      
+      // Load price history for each product to get current price
+      const trackedProducts = await Promise.all(
+        backendProducts.map(async (p) => {
+          try {
+            const priceHistory = await productService.getPriceHistory(p._id)
+            return productToTrackedProduct(p, priceHistory)
+          } catch (err) {
+            console.error(`Failed to load history for product ${p._id}:`, err)
+            return productToTrackedProduct(p)
+          }
+        })
+      )
+      setProducts(trackedProducts)
+    } catch (error: any) {
+      console.error('Failed to load products:', error)
+      toast.error(error.message || 'Failed to load products')
+    }
+  }
+
+  // Theme effect
   useEffect(() => {
     const updateTheme = (withAnimation = false) => {
       if (withAnimation) {
@@ -44,6 +136,7 @@ function App() {
     updateTheme(hasThemeChanged)
   }, [settings?.theme])
 
+  // Handle URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const productUrl = urlParams.get('url')
@@ -61,113 +154,119 @@ function App() {
     }
   }, [products])
 
-  const handleAddProduct = (url: string, targetPrice?: number) => {
-    if (!products) return
-    
-    const existingProduct = products.find(p => p.productUrl === url)
-    if (existingProduct) {
-      toast.error('This product is already in your watchlist')
-      return
-    }
+  const handleAddProduct = async (url: string, targetPrice?: number) => {
+    try {
+      const existingProduct = products.find(p => p.productUrl === url)
+      if (existingProduct) {
+        toast.error('This product is already in your watchlist')
+        return
+      }
 
-    const mockPrice = Math.random() * 500 + 50
-    const siteDomain = new URL(url).hostname.replace('www.', '')
-    
-    const generatePriceHistory = (currentPrice: number): PriceHistoryEntry[] => {
-      const history: PriceHistoryEntry[] = []
-      const daysAgo = Math.floor(Math.random() * 15) + 5
+      // Add product via API
+      const newProduct = await productService.addProduct({
+        url,
+        desired_price: targetPrice,
+      })
+
+      // Convert to tracked product and add to list
+      const trackedProduct = productToTrackedProduct(newProduct)
+      setProducts([...products, trackedProduct])
+      setActiveScreen('watchlist')
+      toast.success('Product added to watchlist')
+    } catch (error: any) {
+      console.error('Failed to add product:', error)
+      toast.error(error.message || 'Failed to add product')
+    }
+  }
+
+  const handleProductClick = async (product: TrackedProduct) => {
+    try {
+      // Load full product details with price history
+      const priceHistory = await productService.getPriceHistory(product.id)
+      const fullProduct = await productService.getProduct(product.id)
+      const trackedProduct = productToTrackedProduct(fullProduct, priceHistory)
       
-      for (let i = daysAgo; i >= 0; i--) {
-        const date = new Date()
-        date.setDate(date.getDate() - i)
-        
-        const variance = (Math.random() - 0.5) * 50
-        const trendFactor = (daysAgo - i) / daysAgo
-        const price = i === 0 
-          ? currentPrice 
-          : currentPrice + variance + (Math.random() * 30 * trendFactor)
-        
-        history.push({
-          price: Math.max(10, price),
-          currency: 'USD',
-          checkedAt: date.toISOString(),
-        })
+      setSelectedProduct(trackedProduct)
+      setActiveScreen('product-detail')
+    } catch (error: any) {
+      console.error('Failed to load product details:', error)
+      toast.error(error.message || 'Failed to load product details')
+    }
+  }
+
+  const handleToggleActive = async (id: string) => {
+    try {
+      const product = products.find(p => p.id === id)
+      if (!product) return
+
+      const updatedProduct = await productService.toggleActive(id, !product.isActive)
+      
+      // Update local state
+      setProducts(
+        products.map(p =>
+          p.id === id ? { ...p, isActive: !p.isActive } : p
+        )
+      )
+      
+      // Update selected product if it's the one being toggled
+      if (selectedProduct?.id === id) {
+        const trackedProduct = productToTrackedProduct(updatedProduct)
+        setSelectedProduct(trackedProduct)
       }
       
-      return history
-    }
-    
-    const priceHistory = generatePriceHistory(mockPrice)
-    const previousPrice = priceHistory.length > 1 ? priceHistory[priceHistory.length - 2].price : undefined
-    
-    const newProduct: TrackedProduct = {
-      id: Date.now().toString(),
-      productUrl: url,
-      siteDomain,
-      title: `Product from ${siteDomain}`,
-      imageUrl: `https://picsum.photos/seed/${Date.now()}/400/400`,
-      currentPrice: mockPrice,
-      currency: 'USD',
-      targetPrice,
-      isActive: true,
-      lastCheckedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      priceHistory,
-      previousPrice,
-      inStock: true,
-    }
-
-    setProducts([...products, newProduct])
-    setActiveScreen('watchlist')
-    toast.success('Product added to watchlist')
-  }
-
-  const handleProductClick = (product: TrackedProduct) => {
-    setSelectedProduct(product)
-    setActiveScreen('product-detail')
-  }
-
-  const handleToggleActive = (id: string) => {
-    if (!products) return
-    
-    setProducts(
-      products.map(p =>
-        p.id === id ? { ...p, isActive: !p.isActive } : p
+      toast.success(
+        product.isActive 
+          ? 'Tracking paused' 
+          : 'Tracking resumed'
       )
-    )
-    const product = products.find(p => p.id === id)
-    toast.success(
-      product?.isActive 
-        ? 'Tracking paused' 
-        : 'Tracking resumed'
-    )
-  }
-
-  const handleDeleteProduct = (id: string) => {
-    if (!products) return
-    
-    setProducts(products.filter(p => p.id !== id))
-    toast.success('Product removed from watchlist')
-    if (activeScreen === 'product-detail') {
-      setActiveScreen('watchlist')
+    } catch (error: any) {
+      console.error('Failed to toggle product:', error)
+      toast.error(error.message || 'Failed to update product')
     }
   }
 
-  const handleUpdateTargetPrice = (id: string, price?: number) => {
-    if (!products) return
-    
-    setProducts(
-      products.map(p =>
-        p.id === id ? { ...p, targetPrice: price } : p
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      await productService.deleteProduct(id)
+      
+      setProducts(products.filter(p => p.id !== id))
+      toast.success('Product removed from watchlist')
+      
+      if (activeScreen === 'product-detail') {
+        setActiveScreen('watchlist')
+      }
+    } catch (error: any) {
+      console.error('Failed to delete product:', error)
+      toast.error(error.message || 'Failed to delete product')
+    }
+  }
+
+  const handleUpdateTargetPrice = async (id: string, price?: number) => {
+    try {
+      const updatedProduct = await productService.updateDesiredPrice(id, price)
+      
+      // Update local state
+      setProducts(
+        products.map(p =>
+          p.id === id ? { ...p, targetPrice: price } : p
+        )
       )
-    )
-    if (selectedProduct?.id === id) {
-      setSelectedProduct(prev => prev ? { ...prev, targetPrice: price } : null)
+      
+      if (selectedProduct?.id === id) {
+        const trackedProduct = productToTrackedProduct(updatedProduct)
+        setSelectedProduct(trackedProduct)
+      }
+      
+      toast.success('Target price updated')
+    } catch (error: any) {
+      console.error('Failed to update target price:', error)
+      toast.error(error.message || 'Failed to update target price')
     }
   }
 
   const handleUpdateSettings = (newSettings: UserSettings) => {
     setSettings(newSettings)
+    // Could also save to backend/user preferences here
     toast.success('Settings saved')
   }
 
@@ -175,12 +274,23 @@ function App() {
     setActiveScreen(screen)
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   const renderScreen = () => {
     switch (activeScreen) {
       case 'watchlist':
         return (
           <WatchlistScreen
-            products={products || []}
+            products={products}
             onProductClick={handleProductClick}
             onAddProduct={() => setActiveScreen('add-product')}
             onToggleActive={handleToggleActive}
@@ -191,7 +301,7 @@ function App() {
       case 'profile':
         return (
           <ProfileScreen
-            products={products || []}
+            products={products}
           />
         )
       
@@ -218,7 +328,7 @@ function App() {
       case 'settings':
         return (
           <SettingsScreen
-            settings={settings || { notificationsEnabled: true, alertType: 'drops', theme: 'dark' }}
+            settings={settings}
             onUpdateSettings={handleUpdateSettings}
           />
         )

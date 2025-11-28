@@ -1,6 +1,34 @@
 import { TrackedProduct } from './types'
 
+export function addAffiliateTag(url: string, site: string): string {
+  try {
+    const urlObj = new URL(url)
+    const hostname = urlObj.hostname.toLowerCase()
+    
+    if (hostname.includes('amazon')) {
+      const tag = import.meta.env.VITE_AMAZON_AFFILIATE_TAG
+      if (tag) {
+        urlObj.searchParams.set('tag', tag)
+      }
+    } else if (hostname.includes('flipkart')) {
+      const tag = import.meta.env.VITE_FLIPKART_AFFILIATE_TAG
+      if (tag) {
+        urlObj.searchParams.set('affid', tag)
+      }
+    }
+    
+    return urlObj.toString()
+  } catch (e) {
+    return url
+  }
+}
+
 export function formatPrice(price: number, currency: string): string {
+  // Handle undefined or null price
+  if (price === undefined || price === null || isNaN(price)) {
+    return 'N/A'
+  }
+  
   const symbols: Record<string, string> = {
     USD: '$',
     EUR: '€',

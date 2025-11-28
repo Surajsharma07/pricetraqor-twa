@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import { TrackedProduct } from '@/lib/types'
+import { TrackedProduct, User as UserType } from '@/lib/types'
+import { authService } from '@/services/auth'
+import { formatPrice } from '@/lib/helpers'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
   User, 
-  ChartLine, 
+  ChartLine,
   TrendDown, 
   Bell, 
   Package,
@@ -20,21 +22,14 @@ interface ProfileScreenProps {
   products: TrackedProduct[]
 }
 
-interface UserInfo {
-  login: string
-  email?: string
-  avatarUrl: string
-  isOwner: boolean
-}
-
 export function ProfileScreen({ products }: ProfileScreenProps) {
-  const [user, setUser] = useState<UserInfo | null>(null)
+  const [user, setUser] = useState<UserType | null>(null)
   const isLightTheme = document.documentElement.classList.contains('light-theme')
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userInfo = await window.spark.user()
+        const userInfo = await authService.getCurrentUser()
         setUser(userInfo)
       } catch (error) {
         console.error('Failed to load user:', error)
@@ -65,10 +60,10 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
       .slice(0, 2)
   }
 
-  const subscriptionPlan = 'Free'
-  const maxProducts = 10
+  const subscriptionPlan = user?.plan?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Free'
+  const maxProducts = user?.max_products || 10
   const maxPriceChecks = 100
-  const usedProducts = products.length
+  const usedProducts = user?.current_count || products.length
   const usedPriceChecks = products.reduce((sum, p) => sum + p.priceHistory.length, 0)
 
   return (
@@ -94,7 +89,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
         <div className="flex items-center gap-4 relative z-10">
           <Avatar className="w-20 h-20 neumorphic-raised ring-2 ring-border/60 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-50 pointer-events-none z-10"></div>
-            <AvatarImage src={user?.avatarUrl} alt={user?.login || 'User'} />
+            <AvatarImage src={user?.photo_url} alt={user?.full_name || user?.telegram_username || 'User'} />
             <AvatarFallback 
               className="text-xl font-bold neumorphic-inset relative"
               style={{
@@ -103,16 +98,16 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             >
               <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-60 pointer-events-none"></div>
               <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                {user ? getInitials(user.login) : 'U'}
+                {user?.full_name || user?.telegram_username ? getInitials(user?.full_name || user?.telegram_username || '') : 'U'}
               </span>
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h2 className="text-xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{user?.login || 'Loading...'}</h2>
-            {user?.email && (
-              <p className="text-sm text-muted-foreground mt-0.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">{user.email}</p>
+            <h2 className="text-xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{user?.full_name || user?.telegram_username || 'Loading...'}</h2>
+            {user?.telegram_username && (
+              <p className="text-sm text-muted-foreground mt-0.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.4)]">@{user.telegram_username}</p>
             )}
-            {user?.isOwner && (
+            {user?.is_admin && (
               <Badge 
                 variant="secondary" 
                 className="mt-2 glass-morphism border border-accent/30 glow-accent"
@@ -329,7 +324,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
                 <Bell className="w-6 h-6 text-accent drop-shadow-[0_3px_6px_oklch(0.65_0.20_230_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">${totalSavings.toFixed(0)}</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{formatPrice(totalSavings, 'INR')}</p>
                 <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Total Savings</p>
               </div>
             </div>
@@ -346,7 +341,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 frosted-glass rounded-lg border border-border/30">
               <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Average product price</span>
-              <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">${averagePrice.toFixed(2)}</span>
+              <span className="text-sm font-bold drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]">{formatPrice(averagePrice, 'INR')}</span>
             </div>
             <div className="flex items-center justify-between p-3 frosted-glass rounded-lg border border-border/30">
               <span className="text-sm text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Most tracked site</span>

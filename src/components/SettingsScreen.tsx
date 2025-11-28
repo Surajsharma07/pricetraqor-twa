@@ -35,7 +35,7 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
   }
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative z-0 pb-24">
       <LampSwitch 
         isLight={settings.theme === 'light'}
         onToggle={() => handleThemeChange(settings.theme !== 'light')}
