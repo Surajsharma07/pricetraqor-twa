@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Plus, Link as LinkIcon, CurrencyDollar, QrCode } from '@phosphor-icons/react'
+import { Plus, Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 interface AddProductScreenProps {
   onBack: () => void
@@ -17,7 +18,9 @@ interface AddProductScreenProps {
 export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreenProps) {
   const twa = useTelegramWebApp()
   const [url, setUrl] = useState(prefillUrl || '')
+  const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>('none')
   const [targetPrice, setTargetPrice] = useState('')
+  const [targetPercent, setTargetPercent] = useState('10')
   const [urlError, setUrlError] = useState('')
   const [isValidating, setIsValidating] = useState(false)
 
@@ -75,16 +78,28 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
         return
       }
 
-      const target = targetPrice ? parseFloat(targetPrice) : undefined
-      
-      if (targetPrice && (isNaN(target!) || target! <= 0)) {
-        toast.error('Please enter a valid target price')
-        setIsValidating(false)
-        return
+      let finalTargetPrice: number | undefined
+
+      if (alertType === 'price_below') {
+        const target = targetPrice ? parseFloat(targetPrice) : undefined
+        if (targetPrice && (isNaN(target!) || target! <= 0)) {
+          toast.error('Please enter a valid target price')
+          setIsValidating(false)
+          return
+        }
+        finalTargetPrice = target
+      } else if (alertType === 'percentage_drop') {
+        const percent = parseFloat(targetPercent)
+        if (isNaN(percent) || percent <= 0 || percent > 100) {
+          toast.error('Please enter a valid percentage (1-100)')
+          setIsValidating(false)
+          return
+        }
+        // Backend will calculate the actual price based on percentage
+        finalTargetPrice = percent // This will be handled by backend as percentage
       }
 
-      onAdd(url, target)
-      toast.success('Product added to watchlist!')
+      onAdd(url, finalTargetPrice)
       setIsValidating(false)
     }, 800)
   }
@@ -133,26 +148,73 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="target-price" className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
-              Target Price (Optional)
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+              Price Alert (Optional)
             </Label>
-            <div className="relative">
-              <CurrencyDollar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]" />
-              <Input
-                id="target-price"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={targetPrice}
-                onChange={(e) => setTargetPrice(e.target.value)}
-                className="pl-10 neumorphic-inset"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Get notified when the price drops to or below this amount
-            </p>
+            <RadioGroup value={alertType} onValueChange={(value: any) => setAlertType(value)}>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="none" id="alert-none" />
+                  <Label htmlFor="alert-none" className="font-normal cursor-pointer">
+                    No alert - Just track price
+                  </Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="percentage_drop" id="alert-percent" />
+                    <Label htmlFor="alert-percent" className="font-normal cursor-pointer">
+                      Notify on percentage drop
+                    </Label>
+                  </div>
+                  {alertType === 'percentage_drop' && (
+                    <div className="ml-6 relative">
+                      <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        type="number"
+                        step="1"
+                        min="1"
+                        max="100"
+                        placeholder="10"
+                        value={targetPercent}
+                        onChange={(e) => setTargetPercent(e.target.value)}
+                        className="pl-10 neumorphic-inset"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Alert when price drops by this percentage
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="price_below" id="alert-price" />
+                    <Label htmlFor="alert-price" className="font-normal cursor-pointer">
+                      Notify at target price
+                    </Label>
+                  </div>
+                  {alertType === 'price_below' && (
+                    <div className="ml-6 relative">
+                      <CurrencyCircleDollar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        value={targetPrice}
+                        onChange={(e) => setTargetPrice(e.target.value)}
+                        className="pl-10 neumorphic-inset"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Alert when price drops to or below this amount
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </RadioGroup>
           </div>
 
           <Button type="submit" className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200" disabled={isValidating}>

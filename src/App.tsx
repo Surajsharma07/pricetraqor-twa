@@ -202,7 +202,8 @@ function App() {
     } catch (error: any) {
       console.error('Failed to add product:', error)
       twa.haptic.notification('error')
-      toast.error(error.message || 'Failed to add product')
+      const errorMessage = error?.message || error?.response?.data?.detail || 'Failed to add product'
+      toast.error(errorMessage)
     }
   }
 

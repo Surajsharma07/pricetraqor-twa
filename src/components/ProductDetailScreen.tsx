@@ -57,12 +57,28 @@ export function ProductDetailScreen({
       
       const shareMessage = `Check out this product: ${product.title}\n💰 Current Price: ${priceInfo}${changeInfo}\n🔗 ${product.productUrl}`
       
-      twa.share.switchInlineQuery(shareMessage, ['users', 'groups', 'channels'])
-      twa.haptic.notification('success')
+      if (twa.share && twa.share.switchInlineQuery) {
+        twa.share.switchInlineQuery(shareMessage, ['users', 'groups', 'channels'])
+        twa.haptic.notification('success')
+        toast.success('Share dialog opened')
+      } else {
+        // Fallback for web/desktop
+        if (navigator.share) {
+          navigator.share({
+            title: product.title,
+            text: shareMessage,
+            url: product.productUrl
+          })
+        } else {
+          navigator.clipboard.writeText(shareMessage)
+          toast.success('Share text copied to clipboard')
+        }
+        twa.haptic.notification('success')
+      }
     } catch (error) {
       console.error('Share failed:', error)
       twa.haptic.notification('error')
-      toast.error('Failed to share product')
+      toast.error(error instanceof Error ? error.message : 'Failed to share product')
     }
   }
 
