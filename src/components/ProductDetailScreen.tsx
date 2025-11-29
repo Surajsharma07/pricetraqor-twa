@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { 
-  ArrowLeft, 
   ArrowSquareOut, 
   TrendDown, 
   TrendUp, 
@@ -114,10 +113,7 @@ export function ProductDetailScreen({
   return (
     <>
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full neumorphic-button hover:glow-accent active:scale-95 bg-gradient-to-b from-secondary/60 to-secondary/40">
-            <ArrowLeft className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
-          </Button>
+        <div>
           <h1 className="text-xl font-bold tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Product Details</h1>
         </div>
 

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft, Plus, Link as LinkIcon, CurrencyDollar, QrCode } from '@phosphor-icons/react'
+import { Plus, Link as LinkIcon, CurrencyDollar, QrCode } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
@@ -91,14 +91,9 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full neumorphic-button hover:glow-accent active:scale-95 bg-gradient-to-b from-secondary/60 to-secondary/40">
-          <ArrowLeft className="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Add Product</h1>
-          <p className="text-sm text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Track prices from any supported store</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Add Product</h1>
+        <p className="text-sm text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Track prices from any supported store</p>
       </div>
 
       <Card className="p-6 glass-card relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-accent/5 before:via-transparent before:to-transparent before:opacity-50">
