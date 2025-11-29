@@ -179,6 +179,13 @@ function App() {
 
   const handleAddProduct = async (url: string, targetPrice?: number, alertType?: string, alertPercentage?: number) => {
     try {
+      // Safety check for undefined url
+      if (!url || typeof url !== 'string') {
+        twa.haptic.notification('error')
+        toast.error('Invalid product URL')
+        return
+      }
+
       const existingProduct = products.find(p => p.productUrl === url)
       if (existingProduct) {
         twa.haptic.notification('warning')
@@ -187,29 +194,70 @@ function App() {
       }
 
       // Detect marketplace from URL
-      const marketplace = url.toLowerCase().includes('flipkart.com') ? 'flipkart' :
-                         url.toLowerCase().includes('reliance') || url.toLowerCase().includes('jiomart') ? 'reliance' :
-                         url.toLowerCase().includes('croma.com') ? 'croma' : 'amazon'
+      const lowerUrl = url.toLowerCase()
+      const marketplace = lowerUrl.includes('flipkart.com') ? 'flipkart' :
+                         lowerUrl.includes('reliance') || lowerUrl.includes('jiomart') ? 'reliance' :
+                         lowerUrl.includes('croma.com') ? 'croma' : 'amazon'
 
       // Add product via API with correct field names
       twa.haptic.impact('light')
-      const newProduct = await productService.addProduct({
+      
+      // Build payload - only include alert fields if alert type is specified
+      const payload: any = {
         url,
         marketplace,
-        alert_type: alertType as any || null,
-        alert_threshold_percentage: alertType === 'percentage_drop' ? alertPercentage : undefined,
-        alert_threshold_price: alertType === 'price_below' ? targetPrice : undefined,
-      })
+      }
+      
+      if (alertType && alertType !== 'none') {
+        payload.alert_type = alertType
+        if (alertType === 'percentage_drop' && alertPercentage) {
+          payload.alert_threshold_percentage = alertPercentage
+        }
+        if (alertType === 'price_below' && targetPrice) {
+          payload.alert_threshold_price = targetPrice
+        }
+      }
+      
+      const newProduct = await productService.addProduct(payload)
+
+      // Debug: log the response
+      console.log('Product added successfully:', newProduct)
 
       // Convert to tracked product and add to list
       const trackedProduct = productToTrackedProduct(newProduct)
+      console.log('Converted to tracked product:', trackedProduct)
+      
       setProducts([...products, trackedProduct])
       setActiveScreen('watchlist')
       twa.haptic.notification('success')
       toast.success('Product added to watchlist')
     } catch (error: any) {
       console.error('Failed to add product:', error)
+      console.error('Error details:', {
+        message: error?.message,
+        response: error?.response,
+        data: error?.response?.data
+      })
       twa.haptic.notification('error')
+      
+      // Check if this is actually a success but wrongly caught as error
+      // This can happen if the response structure is unexpected
+      if (error?.response?.status === 201 || error?.response?.status === 200) {
+        // Product was actually added successfully
+        console.log('Product was added despite error - reloading products')
+        toast.success('Product added! Refreshing list...')
+        
+        // Reload products from backend
+        try {
+          const refreshedProducts = await productService.getProducts()
+          const trackedProducts = refreshedProducts.map(p => productToTrackedProduct(p))
+          setProducts(trackedProducts)
+          setActiveScreen('watchlist')
+        } catch (refreshError) {
+          console.error('Failed to refresh products:', refreshError)
+        }
+        return
+      }
       
       // Extract error message with multiple fallbacks
       let errorMessage = 'Failed to add product'
@@ -261,19 +309,19 @@ function App() {
       if (!product) return
 
       twa.haptic.impact('light')
-      const updatedProduct = await productService.toggleActive(id, !product.isActive)
+      await productService.toggleActive(id, !product.isActive)
       
       // Update local state
+      const newIsActive = !product.isActive
       setProducts(
         products.map(p =>
-          p.id === id ? { ...p, isActive: !p.isActive } : p
+          p.id === id ? { ...p, isActive: newIsActive } : p
         )
       )
       
       // Update selected product if it's the one being toggled
       if (selectedProduct?.id === id) {
-        const trackedProduct = productToTrackedProduct(updatedProduct)
-        setSelectedProduct(trackedProduct)
+        setSelectedProduct({ ...selectedProduct, isActive: newIsActive })
       }
       
       twa.haptic.notification('success')
@@ -317,7 +365,8 @@ function App() {
 
   const handleUpdateTargetPrice = async (id: string, price?: number) => {
     try {
-      const updatedProduct = await productService.updateDesiredPrice(id, price)
+      twa.haptic.impact('light')
+      await productService.updateDesiredPrice(id, price)
       
       // Update local state
       setProducts(
@@ -327,14 +376,50 @@ function App() {
       )
       
       if (selectedProduct?.id === id) {
-        const trackedProduct = productToTrackedProduct(updatedProduct)
-        setSelectedProduct(trackedProduct)
+        setSelectedProduct({ ...selectedProduct, targetPrice: price })
       }
       
-      toast.success('Target price updated')
+      twa.haptic.notification('success')
+      toast.success(price ? 'Target price updated' : 'Target price removed')
     } catch (error: any) {
       console.error('Failed to update target price:', error)
+      twa.haptic.notification('error')
       toast.error(error.message || 'Failed to update target price')
+    }
+  }
+
+  const handleUpdateAlert = async (
+    id: string,
+    alertType?: string,
+    targetPrice?: number,
+    percentage?: number
+  ) => {
+    try {
+      twa.haptic.impact('light')
+      await productService.updateAlert(id, alertType, targetPrice, percentage)
+      
+      // Update local state
+      setProducts(products.map(p => 
+        p.id === id ? { 
+          ...p, 
+          targetPrice: alertType === 'price_below' ? targetPrice : undefined 
+        } : p
+      ))
+      
+      // Update selected product if it's the one being edited
+      if (selectedProduct && selectedProduct.id === id) {
+        setSelectedProduct({ 
+          ...selectedProduct, 
+          targetPrice: alertType === 'price_below' ? targetPrice : undefined 
+        })
+      }
+      
+      twa.haptic.notification('success')
+      toast.success('Alert settings updated')
+    } catch (error: any) {
+      console.error('Failed to update alert:', error)
+      twa.haptic.notification('error')
+      toast.error(error.message || 'Failed to update alert')
     }
   }
 
@@ -457,6 +542,7 @@ function App() {
             onToggleActive={handleToggleActive}
             onDelete={handleDeleteProduct}
             onUpdateTargetPrice={handleUpdateTargetPrice}
+            onUpdateAlert={handleUpdateAlert}
           />
         ) : null
       

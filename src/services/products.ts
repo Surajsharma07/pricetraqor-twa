@@ -7,19 +7,32 @@ import apiClient from './api';
 
 export interface Product {
   _id: string;
-  user_id: string;
+  marketplace: string;
   url: string;
-  title: string;
-  current_price: number;
-  desired_price?: number;
-  image_url?: string;
-  platform: string;
-  currency?: string;
-  is_active: boolean;
-  in_stock?: boolean;
-  last_checked?: string;
+  affiliate_url?: string | null;
+  title: string | null;
+  image_url?: string | null;
+  mrp?: number | null;
+  last_snapshot_price: number | null;
+  last_snapshot_currency?: string | null;
+  last_snapshot_at?: string | null;
+  last_alert_at?: string | null;
+  price_change_pct?: number | null;
+  availability_text?: string | null;
+  status: string;
+  alert_type?: string | null;
+  alert_threshold_percentage?: number | null;
+  alert_threshold_price?: number | null;
   created_at: string;
-  updated_at?: string;
+  updated_at: string;
+  hydrated_at?: string | null;
+  category?: string | null;
+  tags?: string[];
+  notes?: string | null;
+  specifications?: any[] | null;
+  brand?: string | null;
+  rating?: number | null;
+  slug?: string | null;
 }
 
 export interface PriceSnapshot {
@@ -114,9 +127,11 @@ class ProductService {
       };
       
       const response = await apiClient.post<{ product: Product }>('/products', payload);
-      return response.data.product; // Backend returns { product, initial_snapshot_enqueued }
+      // Backend returns { product: ProductOut, initial_snapshot_enqueued: bool }
+      return response.data.product;
     } catch (error: any) {
       console.error('Failed to add product:', error);
+      console.error('Error response:', error.response);
       throw new Error(
         error.response?.data?.detail?.message || 
         error.response?.data?.detail || 
@@ -130,15 +145,15 @@ class ProductService {
    */
   async updateProduct(id: string, data: UpdateProductRequest): Promise<Product> {
     try {
-      const response = await apiClient.patch<Product>(`/products/${id}`, data);
-      return response.data;
+      const response = await apiClient.patch<{ status: string; data: Product }>(`/products/${id}`, data)
+      return response.data.data
     } catch (error: any) {
-      console.error('Failed to update product:', error);
+      console.error('Failed to update product:', error)
       throw new Error(
         error.response?.data?.detail?.message || 
         error.response?.data?.detail || 
         'Failed to update product'
-      );
+      )
     }
   }
 
@@ -178,15 +193,76 @@ class ProductService {
   /**
    * Toggle product active status
    */
-  async toggleActive(id: string, isActive: boolean): Promise<Product> {
-    return this.updateProduct(id, { is_active: isActive });
+  async toggleActive(id: string, isActive: boolean): Promise<void> {
+    try {
+      const endpoint = isActive ? 'resume' : 'pause'
+      await apiClient.patch(`/products/${id}/${endpoint}`)
+    } catch (error: any) {
+      console.error('Failed to toggle product:', error)
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to toggle product status'
+      )
+    }
   }
 
   /**
    * Update desired price for a product
    */
-  async updateDesiredPrice(id: string, desiredPrice?: number): Promise<Product> {
-    return this.updateProduct(id, { desired_price: desiredPrice });
+  async updateDesiredPrice(id: string, desiredPrice?: number): Promise<void> {
+    try {
+      await apiClient.patch(`/products/${id}`, { 
+        alert_type: desiredPrice ? 'price_below' : null,
+        alert_threshold_price: desiredPrice || null 
+      })
+    } catch (error: any) {
+      console.error('Failed to update desired price:', error)
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to update desired price'
+      )
+    }
+  }
+
+  /**
+   * Update product alert configuration
+   */
+  async updateAlert(
+    id: string,
+    alertType?: string,
+    alertThresholdPrice?: number,
+    alertThresholdPercentage?: number
+  ): Promise<Product> {
+    try {
+      const payload: any = {}
+      
+      if (alertType) {
+        payload.alert_type = alertType
+        if (alertType === 'price_below' && alertThresholdPrice) {
+          payload.alert_threshold_price = alertThresholdPrice
+        }
+        if (alertType === 'percentage_drop' && alertThresholdPercentage) {
+          payload.alert_threshold_percentage = alertThresholdPercentage
+        }
+      } else {
+        // Remove alerts
+        payload.alert_type = null
+        payload.alert_threshold_price = null
+        payload.alert_threshold_percentage = null
+      }
+      
+      const response = await apiClient.patch<{ data: Product }>(`/products/${id}`, payload)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Failed to update alert:', error)
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to update alert'
+      )
+    }
   }
 
   /**

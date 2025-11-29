@@ -15,8 +15,11 @@ import {
   PlayCircle,
   Check,
   X,
-  ShareNetwork
+  ShareNetwork,
+  Percent,
+  CurrencyCircleDollar
 } from '@phosphor-icons/react'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { formatPrice, calculatePriceChange, getRelativeTime, getSiteName, addAffiliateTag } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -28,6 +31,7 @@ interface ProductDetailScreenProps {
   onToggleActive: (id: string) => void
   onDelete: (id: string) => void
   onUpdateTargetPrice: (id: string, price?: number) => void
+  onUpdateAlert?: (id: string, alertType?: string, targetPrice?: number, percentage?: number) => void
 }
 
 export function ProductDetailScreen({ 
@@ -35,13 +39,18 @@ export function ProductDetailScreen({
   onBack, 
   onToggleActive, 
   onDelete,
-  onUpdateTargetPrice 
+  onUpdateTargetPrice,
+  onUpdateAlert
 }: ProductDetailScreenProps) {
   const twa = useTelegramWebApp()
   const [isEditingTarget, setIsEditingTarget] = useState(false)
+  const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>(
+    product.targetPrice ? 'price_below' : 'none'
+  )
   const [targetPriceInput, setTargetPriceInput] = useState(
     product.targetPrice?.toString() || ''
   )
+  const [percentageInput, setPercentageInput] = useState('10')
 
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
@@ -97,16 +106,42 @@ export function ProductDetailScreen({
   }
 
   const handleSaveTargetPrice = () => {
-    const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
+    if (onUpdateAlert) {
+      // New API with full alert type support
+      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
+      const percentage = percentageInput.trim() ? parseFloat(percentageInput) : undefined
+      
+      if (alertType === 'price_below' && (!price || price <= 0)) {
+        toast.error('Please enter a valid target price')
+        return
+      }
+      
+      if (alertType === 'percentage_drop' && (!percentage || percentage <= 0 || percentage > 100)) {
+        toast.error('Please enter a valid percentage (1-100)')
+        return
+      }
+      
+      onUpdateAlert(
+        product.id,
+        alertType === 'none' ? undefined : alertType,
+        price,
+        percentage
+      )
+      setIsEditingTarget(false)
+      toast.success('Alert settings updated')
+    } else {
+      // Fallback to old API (target price only)
+      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
     
-    if (targetPriceInput.trim() && (isNaN(price!) || price! <= 0)) {
-      toast.error('Please enter a valid price')
-      return
-    }
+      if (targetPriceInput.trim() && (isNaN(price!) || price! <= 0)) {
+        toast.error('Please enter a valid price')
+        return
+      }
 
-    onUpdateTargetPrice(product.id, price)
-    setIsEditingTarget(false)
-    toast.success(price ? 'Target price updated' : 'Target price removed')
+      onUpdateTargetPrice(product.id, price)
+      setIsEditingTarget(false)
+      toast.success(price ? 'Target price updated' : 'Target price removed')
+    }
   }
 
   const handleCancelEdit = () => {
@@ -207,13 +242,13 @@ export function ProductDetailScreen({
             <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
 
             <div>
-              <Label className="text-sm font-semibold mb-3 block">Target Price Alert</Label>
+              <Label className="text-sm font-semibold mb-3 block">Price Alert</Label>
               {!isEditingTarget ? (
                 <div className="flex items-center gap-2">
                   {product.targetPrice ? (
                     <>
                       <div className="flex-1 px-4 py-2.5 bg-gradient-to-br from-muted/80 to-muted/60 rounded-lg text-sm font-medium shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]">
-                        Notify me when price ≤ {formatPrice(product.targetPrice, product.currency)}
+                        Notify when price ≤ {formatPrice(product.targetPrice, product.currency)}
                       </div>
                       <Button
                         variant="outline"
@@ -230,42 +265,89 @@ export function ProductDetailScreen({
                       className="w-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                       onClick={() => setIsEditingTarget(true)}
                     >
-                      Set Target Price
+                      Set Price Alert
                     </Button>
                   )}
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="Enter target price"
-                      value={targetPriceInput}
-                      onChange={(e) => setTargetPriceInput(e.target.value)}
-                      className="flex-1 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)]"
-                    />
+                <div className="space-y-3">
+                  <RadioGroup value={alertType} onValueChange={(value: any) => setAlertType(value)}>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="none" id="edit-alert-none" />
+                        <Label htmlFor="edit-alert-none" className="font-normal cursor-pointer">
+                          No alert - Just track price
+                        </Label>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="percentage_drop" id="edit-alert-percent" />
+                          <Label htmlFor="edit-alert-percent" className="font-normal cursor-pointer">
+                            Notify on percentage drop
+                          </Label>
+                        </div>
+                        {alertType === 'percentage_drop' && (
+                          <div className="ml-6 relative">
+                            <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              step="1"
+                              min="1"
+                              max="100"
+                              placeholder="10"
+                              value={percentageInput}
+                              onChange={(e) => setPercentageInput(e.target.value)}
+                              className="pl-9 text-sm"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="price_below" id="edit-alert-price" />
+                          <Label htmlFor="edit-alert-price" className="font-normal cursor-pointer">
+                            Notify at target price
+                          </Label>
+                        </div>
+                        {alertType === 'price_below' && (
+                          <div className="ml-6 relative">
+                            <CurrencyCircleDollar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder="Enter target price"
+                              value={targetPriceInput}
+                              onChange={(e) => setTargetPriceInput(e.target.value)}
+                              className="pl-9 text-sm"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </RadioGroup>
+                  
+                  <div className="flex gap-2 pt-2">
                     <Button
                       variant="default"
-                      size="icon"
+                      size="sm"
                       onClick={handleSaveTargetPrice}
-                      className="rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
+                      className="flex-1"
                     >
-                      <Check className="w-5 h-5" />
+                      <Check className="w-4 h-4 mr-2" />
+                      Save Alert
                     </Button>
                     <Button
                       variant="outline"
-                      size="icon"
+                      size="sm"
                       onClick={handleCancelEdit}
-                      className="rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
                     >
-                      <X className="w-5 h-5" />
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Leave empty to remove target price
-                  </p>
                 </div>
               )}
             </div>
