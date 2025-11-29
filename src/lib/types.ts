@@ -156,7 +156,7 @@ export function productToTrackedProduct(
     id: product._id,
     productUrl: product.url,
     siteDomain,
-    title: product.title || 'Untitled Product',
+    title: product.title || 'Loading product details...',
     imageUrl: product.image_url || '',
     currentPrice: currentPrice,
     currency: product.last_snapshot_currency || 'INR',

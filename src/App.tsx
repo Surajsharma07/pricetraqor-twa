@@ -230,7 +230,41 @@ function App() {
       setProducts([...products, trackedProduct])
       setActiveScreen('watchlist')
       twa.haptic.notification('success')
-      toast.success('Product added to watchlist')
+      toast.success('Product added! Fetching details...')
+
+      // Poll for product data to be hydrated by worker
+      // The backend enqueues a snapshot job, which usually completes within 5-15 seconds
+      let pollAttempts = 0
+      const maxPollAttempts = 6 // Poll for up to 30 seconds (6 * 5 seconds)
+      
+      const pollForProductData = async () => {
+        try {
+          pollAttempts++
+          const updatedProduct = await productService.getProduct(newProduct._id)
+          
+          // Check if product has been hydrated (has title and price)
+          if (updatedProduct.title && updatedProduct.last_snapshot_price) {
+            // Product has been hydrated, update the list
+            const updatedTrackedProduct = productToTrackedProduct(updatedProduct)
+            setProducts(prevProducts => 
+              prevProducts.map(p => p.id === updatedProduct._id ? updatedTrackedProduct : p)
+            )
+            console.log('Product hydrated successfully:', updatedProduct)
+          } else if (pollAttempts < maxPollAttempts) {
+            // Not hydrated yet, poll again in 5 seconds
+            setTimeout(pollForProductData, 5000)
+          } else {
+            // Max attempts reached, product might take longer to hydrate
+            console.log('Product hydration taking longer than expected')
+          }
+        } catch (error) {
+          console.error('Failed to poll for product data:', error)
+          // Don't retry on error, just log it
+        }
+      }
+      
+      // Start polling after 3 seconds (give worker time to start)
+      setTimeout(pollForProductData, 3000)
     } catch (error: any) {
       console.error('Failed to add product:', error)
       console.error('Error details:', {
