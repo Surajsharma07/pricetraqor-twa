@@ -100,9 +100,15 @@ export function ProductDetailScreen({
   }
 
   const handleOpenProduct = () => {
-    twa.haptic.impact('light')
-    const url = addAffiliateTag(product.productUrl, product.siteDomain)
-    twa.navigation.openLink(url, { try_instant_view: false })
+    try {
+      twa.haptic.impact('medium')
+      const url = addAffiliateTag(product.productUrl, product.siteDomain)
+      twa.navigation.openLink(url, { try_instant_view: false })
+    } catch (error) {
+      console.error('Failed to open product link:', error)
+      twa.haptic.notification('error')
+      toast.error('Failed to open product link')
+    }
   }
 
   return (
@@ -415,6 +421,14 @@ export function ProductDetailScreen({
             </div>
           </div>
         </Card>
+
+        <Button
+          onClick={handleOpenProduct}
+          className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 shadow-[0_6px_20px_rgba(0,0,0,0.2)]"
+        >
+          <ArrowSquareOut className="w-5 h-5 mr-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
+          <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">View Product</span>
+        </Button>
 
         <div className="flex gap-3">
           <Button

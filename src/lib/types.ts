@@ -36,6 +36,7 @@ export interface Product {
   is_active: boolean
   in_stock?: boolean
   last_checked?: string
+  last_snapshot_at?: string
   created_at: string
   updated_at?: string
 }
@@ -149,7 +150,7 @@ export function productToTrackedProduct(
     currency: product.currency || 'INR',
     targetPrice: product.desired_price,
     isActive: product.is_active ?? true,
-    lastCheckedAt: product.last_checked || product.updated_at || product.created_at,
+    lastCheckedAt: product.last_snapshot_at || product.updated_at || product.created_at,
     createdAt: product.created_at,
     priceHistory,
     previousPrice,

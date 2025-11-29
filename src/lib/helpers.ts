@@ -6,15 +6,11 @@ export function addAffiliateTag(url: string, site: string): string {
     const hostname = urlObj.hostname.toLowerCase()
     
     if (hostname.includes('amazon')) {
-      const tag = import.meta.env.VITE_AMAZON_AFFILIATE_TAG
-      if (tag) {
-        urlObj.searchParams.set('tag', tag)
-      }
+      const tag = import.meta.env.VITE_AMAZON_AFFILIATE_TAG || 'pricetraqor-21'
+      urlObj.searchParams.set('tag', tag)
     } else if (hostname.includes('flipkart')) {
-      const tag = import.meta.env.VITE_FLIPKART_AFFILIATE_TAG
-      if (tag) {
-        urlObj.searchParams.set('affid', tag)
-      }
+      const tag = import.meta.env.VITE_FLIPKART_AFFILIATE_TAG || 'pricetraq'
+      urlObj.searchParams.set('affid', tag)
     }
     
     return urlObj.toString()
