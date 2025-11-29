@@ -177,7 +177,7 @@ function App() {
     }
   }, [products])
 
-  const handleAddProduct = async (url: string, targetPrice?: number) => {
+  const handleAddProduct = async (url: string, targetPrice?: number, alertType?: string, alertPercentage?: number) => {
     try {
       const existingProduct = products.find(p => p.productUrl === url)
       if (existingProduct) {
@@ -186,11 +186,19 @@ function App() {
         return
       }
 
-      // Add product via API
+      // Detect marketplace from URL
+      const marketplace = url.toLowerCase().includes('flipkart.com') ? 'flipkart' :
+                         url.toLowerCase().includes('reliance') || url.toLowerCase().includes('jiomart') ? 'reliance' :
+                         url.toLowerCase().includes('croma.com') ? 'croma' : 'amazon'
+
+      // Add product via API with correct field names
       twa.haptic.impact('light')
       const newProduct = await productService.addProduct({
         url,
-        desired_price: targetPrice,
+        marketplace,
+        alert_type: alertType as any || null,
+        alert_threshold_percentage: alertType === 'percentage_drop' ? alertPercentage : undefined,
+        alert_threshold_price: alertType === 'price_below' ? targetPrice : undefined,
       })
 
       // Convert to tracked product and add to list
@@ -202,7 +210,30 @@ function App() {
     } catch (error: any) {
       console.error('Failed to add product:', error)
       twa.haptic.notification('error')
-      const errorMessage = error?.message || error?.response?.data?.detail || 'Failed to add product'
+      
+      // Extract error message with multiple fallbacks
+      let errorMessage = 'Failed to add product'
+      
+      if (error?.message && typeof error.message === 'string') {
+        errorMessage = error.message
+      } else if (error?.response?.data?.detail) {
+        const detail = error.response.data.detail
+        if (typeof detail === 'string') {
+          errorMessage = detail
+        } else if (detail?.message) {
+          errorMessage = detail.message
+        } else if (typeof detail === 'object') {
+          errorMessage = JSON.stringify(detail)
+        }
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (error?.toString && typeof error.toString === 'function') {
+        const str = error.toString()
+        if (str !== '[object Object]') {
+          errorMessage = str
+        }
+      }
+      
       toast.error(errorMessage)
     }
   }

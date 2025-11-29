@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 interface AddProductScreenProps {
   onBack: () => void
-  onAdd: (url: string, targetPrice?: number) => void
+  onAdd: (url: string, targetPrice?: number, alertType?: string, alertPercentage?: number) => void
   prefillUrl?: string
 }
 
@@ -79,6 +79,8 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
       }
 
       let finalTargetPrice: number | undefined
+      let finalAlertPercentage: number | undefined
+      let finalAlertType: string | undefined
 
       if (alertType === 'price_below') {
         const target = targetPrice ? parseFloat(targetPrice) : undefined
@@ -88,6 +90,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
           return
         }
         finalTargetPrice = target
+        finalAlertType = 'price_below'
       } else if (alertType === 'percentage_drop') {
         const percent = parseFloat(targetPercent)
         if (isNaN(percent) || percent <= 0 || percent > 100) {
@@ -95,11 +98,11 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
           setIsValidating(false)
           return
         }
-        // Backend will calculate the actual price based on percentage
-        finalTargetPrice = percent // This will be handled by backend as percentage
+        finalAlertPercentage = percent
+        finalAlertType = 'percentage_drop'
       }
 
-      onAdd(url, finalTargetPrice)
+      onAdd(url, finalTargetPrice, finalAlertType, finalAlertPercentage)
       setIsValidating(false)
     }, 800)
   }

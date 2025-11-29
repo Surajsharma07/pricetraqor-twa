@@ -33,12 +33,38 @@ export interface PriceSnapshot {
 
 export interface CreateProductRequest {
   url: string;
-  desired_price?: number;
+  marketplace: 'amazon' | 'flipkart' | 'reliance' | 'croma';
+  alert_type?: 'percentage_drop' | 'fixed_price' | 'price_below' | 'stock_recovery' | null;
+  alert_threshold_percentage?: number;
+  alert_threshold_price?: number;
 }
 
 export interface UpdateProductRequest {
   desired_price?: number;
   is_active?: boolean;
+}
+
+/**
+ * Detect marketplace from product URL
+ */
+function detectMarketplace(url: string): 'amazon' | 'flipkart' | 'reliance' | 'croma' {
+  const lowerUrl = url.toLowerCase();
+  
+  if (lowerUrl.includes('amazon.in') || lowerUrl.includes('amazon.com')) {
+    return 'amazon';
+  }
+  if (lowerUrl.includes('flipkart.com')) {
+    return 'flipkart';
+  }
+  if (lowerUrl.includes('reliancedigital.in') || lowerUrl.includes('jiomart.com')) {
+    return 'reliance';
+  }
+  if (lowerUrl.includes('croma.com')) {
+    return 'croma';
+  }
+  
+  // Default to amazon if can't detect
+  return 'amazon';
 }
 
 class ProductService {
@@ -81,8 +107,14 @@ class ProductService {
    */
   async addProduct(data: CreateProductRequest): Promise<Product> {
     try {
-      const response = await apiClient.post<Product>('/products', data);
-      return response.data;
+      // Auto-detect marketplace if not provided
+      const payload = {
+        ...data,
+        marketplace: data.marketplace || detectMarketplace(data.url),
+      };
+      
+      const response = await apiClient.post<{ product: Product }>('/products', payload);
+      return response.data.product; // Backend returns { product, initial_snapshot_enqueued }
     } catch (error: any) {
       console.error('Failed to add product:', error);
       throw new Error(
