@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import WebApp from "@twa-dev/sdk"
 import { TrackedProduct, UserSettings, productToTrackedProduct, User } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
@@ -477,23 +477,34 @@ function App() {
     setActiveScreen(screen)
   }
 
+  // Track the current back button handler to ensure proper cleanup
+  const backButtonHandlerRef = useRef<(() => void) | null>(null)
+
   // Handle BackButton visibility based on current screen
   useEffect(() => {
     const shouldShowBack = activeScreen !== 'watchlist' && activeScreen !== 'profile' && activeScreen !== 'settings'
     
+    // Clean up previous handler
+    if (backButtonHandlerRef.current) {
+      twa.backButton.hide()
+      backButtonHandlerRef.current = null
+    }
+    
     if (shouldShowBack) {
-      twa.backButton.show(() => {
+      const handleBack = () => {
         twa.haptic.impact('light')
         if (activeScreen === 'add-product' || activeScreen === 'product-detail') {
           setActiveScreen('watchlist')
         }
-      })
-    } else {
-      twa.backButton.hide()
+      }
+      
+      backButtonHandlerRef.current = handleBack
+      twa.backButton.show(handleBack)
     }
 
     return () => {
       twa.backButton.hide()
+      backButtonHandlerRef.current = null
     }
   }, [activeScreen, twa])
 

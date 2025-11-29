@@ -85,8 +85,9 @@ export function useTelegramWebApp() {
   const backButton = {
     show: useCallback((onClick: () => void) => {
       if (WebApp.BackButton) {
-        // Remove previous handler before adding new one
-        WebApp.BackButton.offClick(onClick)
+        // First, completely hide to reset state
+        WebApp.BackButton.hide()
+        // Then set up the new handler and show
         WebApp.BackButton.onClick(onClick)
         WebApp.BackButton.show()
       }
