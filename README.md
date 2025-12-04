@@ -14,6 +14,7 @@ A Telegram mini app for tracking ecommerce product prices with real-time alerts 
 
 ### Telegram Integration
 - ⚡ **Native Back Button** - Seamless navigation with Telegram's header button
+- 🎯 **MainButton** - Primary actions like "Add to Watchlist" use Telegram's native button
 - 📳 **Haptic Feedback** - Tactile responses for all interactions
 - 🎨 **Theme Sync** - Auto-adapts to Telegram's color scheme
 - 💾 **CloudStorage** - Settings persist across devices
@@ -102,6 +103,10 @@ const twa = useTelegramWebApp()
 twa.haptic.impact('medium')
 twa.haptic.notification('success')
 twa.haptic.selection()
+
+// MainButton for primary actions
+twa.mainButton.show('Add to Watchlist', handleAdd)
+twa.mainButton.setLoading(true)
 
 // Navigation
 twa.backButton.show(() => goBack())
@@ -215,7 +220,7 @@ For issues or questions:
 ## 🎯 Roadmap
 
 Future enhancements being considered:
-- [ ] MainButton integration for primary actions
+- [x] MainButton integration for primary actions
 - [ ] Payment integration for premium features
 - [ ] More ecommerce platform support
 - [ ] Price prediction using ML
