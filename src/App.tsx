@@ -24,6 +24,7 @@ function App() {
   const [products, setProducts] = useState<TrackedProduct[]>([])
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [settings, setSettings] = useState<UserSettings>({
     notificationsEnabled: true,
     alertType: 'drops',
@@ -31,6 +32,7 @@ function App() {
     theme: 'dark',
   })
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
+  const [isLoadingProductDetail, setIsLoadingProductDetail] = useState(false)
   const [prefillUrl, setPrefillUrl] = useState<string>()
 
   // Start notification polling when user is authenticated
@@ -121,6 +123,7 @@ function App() {
   // Load products from backend
   const loadProducts = async () => {
     try {
+      setIsLoadingProducts(true)
       const backendProducts = await productService.getProducts()
       
       // Load price history for each product to get current price
@@ -139,6 +142,8 @@ function App() {
     } catch (error: any) {
       console.error('Failed to load products:', error)
       toast.error(error.message || 'Failed to load products')
+    } finally {
+      setIsLoadingProducts(false)
     }
   }
 
@@ -336,17 +341,22 @@ function App() {
   const handleProductClick = async (product: TrackedProduct) => {
     try {
       twa.haptic.selection()
+      setIsLoadingProductDetail(true)
+      setActiveScreen('product-detail')
+      
       // Load full product details with price history
       const priceHistory = await productService.getPriceHistory(product.id)
       const fullProduct = await productService.getProduct(product.id)
       const trackedProduct = productToTrackedProduct(fullProduct, priceHistory)
       
       setSelectedProduct(trackedProduct)
-      setActiveScreen('product-detail')
     } catch (error: any) {
       console.error('Failed to load product details:', error)
       twa.haptic.notification('error')
       toast.error(error.message || 'Failed to load product details')
+      setActiveScreen('watchlist')
+    } finally {
+      setIsLoadingProductDetail(false)
     }
   }
 
@@ -583,6 +593,7 @@ function App() {
             onAddProduct={() => setActiveScreen('add-product')}
             onToggleActive={handleToggleActive}
             onDelete={handleDeleteProduct}
+            isLoading={isLoadingProducts}
           />
         )
       
@@ -603,7 +614,7 @@ function App() {
         )
       
       case 'product-detail':
-        return selectedProduct ? (
+        return (
           <ProductDetailScreen
             product={selectedProduct}
             onBack={() => setActiveScreen('watchlist')}
@@ -611,8 +622,9 @@ function App() {
             onDelete={handleDeleteProduct}
             onUpdateTargetPrice={handleUpdateTargetPrice}
             onUpdateAlert={handleUpdateAlert}
+            isLoading={isLoadingProductDetail}
           />
-        ) : null
+        )
       
       case 'settings':
         return (
