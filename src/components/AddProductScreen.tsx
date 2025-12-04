@@ -117,12 +117,16 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     return () => {
       twa.mainButton.hide()
     }
-  }, [handleAddProduct, twa.mainButton])
+    // twa.mainButton methods are memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleAddProduct])
 
   // Update MainButton loading state
   useEffect(() => {
     twa.mainButton.setLoading(isValidating)
-  }, [isValidating, twa.mainButton])
+    // twa.mainButton.setLoading is memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isValidating])
 
   return (
     <div className="space-y-6">

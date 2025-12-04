@@ -159,7 +159,9 @@ export function ProductDetailScreen({
     return () => {
       twa.mainButton.hide()
     }
-  }, [isEditingTarget, handleSaveTargetPrice, twa.mainButton])
+    // twa.mainButton methods are memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditingTarget, handleSaveTargetPrice])
 
   const handleOpenProduct = () => {
     try {
