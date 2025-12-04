@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { TrackedProduct } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,7 +13,6 @@ import {
   Trash, 
   PauseCircle, 
   PlayCircle,
-  Check,
   X,
   ShareNetwork,
   Percent,
@@ -105,7 +104,7 @@ export function ProductDetailScreen({
     }
   }
 
-  const handleSaveTargetPrice = () => {
+  const handleSaveTargetPrice = useCallback(() => {
     if (onUpdateAlert) {
       // New API with full alert type support
       const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
@@ -142,12 +141,27 @@ export function ProductDetailScreen({
       setIsEditingTarget(false)
       toast.success(price ? 'Target price updated' : 'Target price removed')
     }
-  }
+  }, [alertType, targetPriceInput, percentageInput, product.id, onUpdateAlert, onUpdateTargetPrice])
 
   const handleCancelEdit = () => {
     setTargetPriceInput(product.targetPrice?.toString() || '')
     setIsEditingTarget(false)
   }
+
+  // Setup MainButton for "Save Changes" when editing alert
+  useEffect(() => {
+    if (isEditingTarget) {
+      twa.mainButton.show('Save Changes', handleSaveTargetPrice)
+    } else {
+      twa.mainButton.hide()
+    }
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+    // twa.mainButton methods are memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditingTarget, handleSaveTargetPrice])
 
   const handleOpenProduct = () => {
     try {
@@ -331,18 +345,10 @@ export function ProductDetailScreen({
                   
                   <div className="flex gap-2 pt-2">
                     <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleSaveTargetPrice}
-                      className="flex-1"
-                    >
-                      <Check className="w-4 h-4 mr-2" />
-                      Save Alert
-                    </Button>
-                    <Button
                       variant="outline"
                       size="sm"
                       onClick={handleCancelEdit}
+                      className="w-full"
                     >
                       <X className="w-4 h-4 mr-2" />
                       Cancel

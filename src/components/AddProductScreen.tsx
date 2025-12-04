@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Plus, Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
+import { Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
@@ -59,9 +59,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  const handleAddProduct = useCallback(async () => {
     if (!url.trim()) {
       setUrlError('Please enter a product URL')
       return
@@ -105,7 +103,30 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
       onAdd(url, finalTargetPrice, finalAlertType, finalAlertPercentage)
       setIsValidating(false)
     }, 800)
+  }, [url, alertType, targetPrice, targetPercent, onAdd])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await handleAddProduct()
   }
+
+  // Setup MainButton for "Add to Watchlist"
+  useEffect(() => {
+    twa.mainButton.show('Add to Watchlist', handleAddProduct)
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+    // twa.mainButton methods are memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleAddProduct])
+
+  // Update MainButton loading state
+  useEffect(() => {
+    twa.mainButton.setLoading(isValidating)
+    // twa.mainButton.setLoading is memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isValidating])
 
   return (
     <div className="space-y-6">
@@ -219,19 +240,6 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
               </div>
             </RadioGroup>
           </div>
-
-          <Button type="submit" className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200" disabled={isValidating}>
-            {isValidating ? (
-              <>
-                <span className="animate-pulse drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Validating...</span>
-              </>
-            ) : (
-              <>
-                <Plus className="w-5 h-5 mr-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
-                <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Add to Watchlist</span>
-              </>
-            )}
-          </Button>
         </form>
       </Card>
 
