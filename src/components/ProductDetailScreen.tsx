@@ -151,11 +151,7 @@ export function ProductDetailScreen({
   // Setup MainButton for "Save Changes" when editing alert
   useEffect(() => {
     if (isEditingTarget) {
-      const handleMainButtonClick = () => {
-        handleSaveTargetPrice()
-      }
-
-      twa.mainButton.show('Save Changes', handleMainButtonClick)
+      twa.mainButton.show('Save Changes', handleSaveTargetPrice)
     } else {
       twa.mainButton.hide()
     }
