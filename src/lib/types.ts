@@ -13,6 +13,7 @@ export interface User {
   telegram_username?: string
   telegram_chat_id?: number
   photo_url?: string
+  mobile_number?: string
   plan: string
   current_count: number
   max_products: number
@@ -20,6 +21,9 @@ export interface User {
   updated_at: string
   is_admin: boolean
   needs_profile_setup?: boolean
+  locale?: string
+  timezone?: string
+  currency?: string
 }
 
 // Product from backend (ProductOut schema)

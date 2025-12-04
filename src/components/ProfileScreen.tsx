@@ -6,6 +6,10 @@ import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { EditProfileDialog } from '@/components/EditProfileDialog'
+import { LinkAccountDialog } from '@/components/LinkAccountDialog'
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
+import { DeleteAccountDialog } from '@/components/DeleteAccountDialog'
 import { 
   User, 
   ChartLine,
@@ -15,7 +19,11 @@ import {
   Clock,
   Crown,
   Sparkle,
-  Check
+  Check,
+  PencilSimple,
+  Link as LinkIcon,
+  LockKey,
+  Trash
 } from '@phosphor-icons/react'
 
 interface ProfileScreenProps {
@@ -24,6 +32,10 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ products }: ProfileScreenProps) {
   const [user, setUser] = useState<UserType | null>(null)
+  const [editProfileOpen, setEditProfileOpen] = useState(false)
+  const [linkAccountOpen, setLinkAccountOpen] = useState(false)
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false)
   const isLightTheme = document.documentElement.classList.contains('light-theme')
 
   useEffect(() => {
@@ -65,6 +77,14 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
   const maxPriceChecks = 100
   const usedProducts = user?.current_count || products.length
   const usedPriceChecks = products.reduce((sum, p) => sum + p.priceHistory.length, 0)
+
+  const handleProfileUpdated = (updatedUser: UserType) => {
+    setUser(updatedUser)
+  }
+
+  const handleAccountLinked = (linkedUser: UserType) => {
+    setUser(linkedUser)
+  }
 
   return (
     <div className="space-y-6">
@@ -122,6 +142,44 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
           </div>
         </div>
       </Card>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={() => setEditProfileOpen(true)}
+        >
+          <PencilSimple className="w-4 h-4 mr-2" weight="bold" />
+          Edit Profile
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={() => setLinkAccountOpen(true)}
+        >
+          <LinkIcon className="w-4 h-4 mr-2" weight="bold" />
+          Link Account
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={() => setChangePasswordOpen(true)}
+        >
+          <LockKey className="w-4 h-4 mr-2" weight="bold" />
+          Change Password
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={() => setDeleteAccountOpen(true)}
+        >
+          <Trash className="w-4 h-4 mr-2" weight="bold" />
+          Delete Account
+        </Button>
+      </div>
 
       <Card 
         className="p-6 relative overflow-hidden neumorphic-raised"
@@ -385,6 +443,31 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             Add products to your watchlist to see your tracking statistics here
           </p>
         </Card>
+      )}
+
+      {/* Dialogs */}
+      {user && (
+        <>
+          <EditProfileDialog
+            user={user}
+            open={editProfileOpen}
+            onOpenChange={setEditProfileOpen}
+            onProfileUpdated={handleProfileUpdated}
+          />
+          <LinkAccountDialog
+            open={linkAccountOpen}
+            onOpenChange={setLinkAccountOpen}
+            onAccountLinked={handleAccountLinked}
+          />
+          <ChangePasswordDialog
+            open={changePasswordOpen}
+            onOpenChange={setChangePasswordOpen}
+          />
+          <DeleteAccountDialog
+            open={deleteAccountOpen}
+            onOpenChange={setDeleteAccountOpen}
+          />
+        </>
       )}
     </div>
   )

@@ -13,6 +13,8 @@ export interface User {
   telegram_user_id?: number;
   telegram_username?: string;
   telegram_chat_id?: number;
+  photo_url?: string;
+  mobile_number?: string;
   plan: string;
   current_count: number;
   max_products: number;
@@ -20,6 +22,9 @@ export interface User {
   updated_at: string;
   is_admin: boolean;
   needs_profile_setup?: boolean;
+  locale?: string;
+  timezone?: string;
+  currency?: string;
 }
 
 export interface AuthResponse {
@@ -59,7 +64,8 @@ class AuthService {
 
       console.log('Authenticating with backend...', {
         hasTelegramUser: !!telegramUser.id,
-        userId: telegramUser.id
+        userId: telegramUser.id,
+        hasPhoto: !!telegramUser.photo_url
       });
 
       // Use the /auth/signup endpoint which handles both new and existing users
@@ -69,6 +75,7 @@ class AuthService {
         telegram_user_id: telegramUser.id,
         telegram_username: telegramUser.username,
         full_name: `${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim() || 'Telegram User',
+        photo_url: telegramUser.photo_url, // Include Telegram profile photo
       });
 
       console.log('Authentication successful:', response.data);
@@ -142,7 +149,7 @@ class AuthService {
   /**
    * Update user profile
    */
-  async updateProfile(updates: Partial<Pick<User, 'full_name' | 'telegram_username' | 'email'>>): Promise<User> {
+  async updateProfile(updates: Partial<Pick<User, 'full_name' | 'telegram_username' | 'email' | 'mobile_number' | 'locale' | 'timezone' | 'currency'>>): Promise<User> {
     try {
       const response = await apiClient.patch<User>('/auth/profile', updates);
       
@@ -156,6 +163,53 @@ class AuthService {
         error.response?.data?.detail?.message || 
         error.response?.data?.detail || 
         'Failed to update profile'
+      );
+    }
+  }
+
+  /**
+   * Link Telegram account to existing Pricetracker account
+   */
+  async linkTelegramAccount(email: string, password: string): Promise<{ message: string; user: User }> {
+    try {
+      const response = await apiClient.post<{ message: string; user: User }>('/auth/link-telegram', {
+        email,
+        password
+      });
+      
+      // Update localStorage with linked user data
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to link Telegram account:', error);
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to link account'
+      );
+    }
+  }
+
+  /**
+   * Change user password
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword
+      });
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to change password:', error);
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to change password'
       );
     }
   }
