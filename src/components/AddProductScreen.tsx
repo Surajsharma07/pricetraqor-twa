@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Plus, Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
+import { Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
@@ -29,6 +29,24 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
       setUrl(prefillUrl)
     }
   }, [prefillUrl])
+
+  // Setup MainButton for "Add to Watchlist"
+  useEffect(() => {
+    const handleMainButtonClick = () => {
+      handleSubmit(new Event('submit') as any)
+    }
+
+    twa.mainButton.show('Add to Watchlist', handleMainButtonClick)
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+  }, [url, alertType, targetPrice, targetPercent])
+
+  // Update MainButton loading state
+  useEffect(() => {
+    twa.mainButton.setLoading(isValidating)
+  }, [isValidating])
 
   const handleUrlChange = (value: string) => {
     setUrl(value)
@@ -219,19 +237,6 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
               </div>
             </RadioGroup>
           </div>
-
-          <Button type="submit" className="w-full neumorphic-button hover:glow-primary active:scale-95 bg-gradient-to-br from-primary via-primary to-primary/90 transition-all duration-200" disabled={isValidating}>
-            {isValidating ? (
-              <>
-                <span className="animate-pulse drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Validating...</span>
-              </>
-            ) : (
-              <>
-                <Plus className="w-5 h-5 mr-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" weight="bold" />
-                <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Add to Watchlist</span>
-              </>
-            )}
-          </Button>
         </form>
       </Card>
 

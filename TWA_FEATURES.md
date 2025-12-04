@@ -224,6 +224,41 @@ useEffect(() => {
 }, [twa])
 ```
 
+### 11. **MainButton** ✅
+Native Telegram MainButton for primary actions provides a consistent, accessible interface for critical user actions.
+
+**Behavior:**
+- Shows automatically in screens with primary actions (Add Product, Save Changes)
+- Positioned at the bottom of Telegram's interface
+- Supports loading state during async operations
+- Automatically hidden when not needed
+- Provides haptic feedback on press
+
+**Usage Example:**
+```typescript
+// Show MainButton with action
+useEffect(() => {
+  const handleMainButtonClick = () => {
+    handleSubmit()
+  }
+
+  twa.mainButton.show('Add to Watchlist', handleMainButtonClick)
+  
+  return () => {
+    twa.mainButton.hide()
+  }
+}, [dependencies])
+
+// Update loading state
+twa.mainButton.setLoading(true)
+// ... perform action ...
+twa.mainButton.setLoading(false)
+```
+
+**Where Used:**
+- **AddProductScreen**: "Add to Watchlist" button for adding products
+- **ProductDetailScreen**: "Save Changes" button when editing alert settings
+
 ## useTelegramWebApp Hook
 
 All TWA features are accessible through a single custom hook that provides a clean API:
@@ -234,6 +269,7 @@ const twa = useTelegramWebApp()
 // Access all features
 twa.haptic.impact('medium')
 twa.backButton.show(callback)
+twa.mainButton.show('Add to Watchlist', callback)
 twa.dialog.showConfirm(message)
 twa.cloudStorage.setItem(key, value)
 twa.scanQR(text)
@@ -275,7 +311,7 @@ To test TWA features:
 
 Potential additions (not yet implemented):
 
-- [ ] MainButton for primary actions
+- [x] MainButton for primary actions
 - [ ] SettingsButton for quick access
 - [ ] Payment integration (if needed for premium features)
 - [ ] Biometric authentication

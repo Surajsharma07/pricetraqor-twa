@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TrackedProduct } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,7 +13,6 @@ import {
   Trash, 
   PauseCircle, 
   PlayCircle,
-  Check,
   X,
   ShareNetwork,
   Percent,
@@ -51,6 +50,23 @@ export function ProductDetailScreen({
     product.targetPrice?.toString() || ''
   )
   const [percentageInput, setPercentageInput] = useState('10')
+
+  // Setup MainButton for "Save Changes" when editing alert
+  useEffect(() => {
+    if (isEditingTarget) {
+      const handleMainButtonClick = () => {
+        handleSaveTargetPrice()
+      }
+
+      twa.mainButton.show('Save Changes', handleMainButtonClick)
+    } else {
+      twa.mainButton.hide()
+    }
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+  }, [isEditingTarget, alertType, targetPriceInput, percentageInput])
 
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
@@ -331,18 +347,10 @@ export function ProductDetailScreen({
                   
                   <div className="flex gap-2 pt-2">
                     <Button
-                      variant="default"
-                      size="sm"
-                      onClick={handleSaveTargetPrice}
-                      className="flex-1"
-                    >
-                      <Check className="w-4 h-4 mr-2" />
-                      Save Alert
-                    </Button>
-                    <Button
                       variant="outline"
                       size="sm"
                       onClick={handleCancelEdit}
+                      className="w-full"
                     >
                       <X className="w-4 h-4 mr-2" />
                       Cancel
