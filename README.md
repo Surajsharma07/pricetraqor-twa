@@ -12,8 +12,18 @@ A Telegram mini app for tracking ecommerce product prices with real-time alerts 
 - 🔍 **QR Scanner** - Scan product QR codes to add items quickly
 - 🌓 **Theme Support** - Dark/light mode with neomorphism design
 
+### Enhanced Notification System 🆕
+- 🔄 **Real-Time Push Notifications** - Instant alerts for price drops and product changes
+- 🎛️ **Granular Controls** - Configure notification types, thresholds, and quiet hours
+- 📊 **Notification Center** - View history, manage alerts, and navigate to products
+- 🔁 **Retry Mechanism** - Automatic retry for failed notification deliveries
+- 🎯 **Smart Filtering** - Filter by notification type and read status
+- ⚙️ **Advanced Settings** - Minimum price drop %, quiet hours, sound, and vibration
+- 📈 **Statistics Tracking** - Monitor total, unread, pending, and failed notifications
+
 ### Telegram Integration
 - ⚡ **Native Back Button** - Seamless navigation with Telegram's header button
+- 🎯 **MainButton** - Primary actions like "Add to Watchlist" use Telegram's native button
 - 📳 **Haptic Feedback** - Tactile responses for all interactions
 - 🎨 **Theme Sync** - Auto-adapts to Telegram's color scheme
 - 💾 **CloudStorage** - Settings persist across devices
@@ -103,6 +113,10 @@ twa.haptic.impact('medium')
 twa.haptic.notification('success')
 twa.haptic.selection()
 
+// MainButton for primary actions
+twa.mainButton.show('Add to Watchlist', handleAdd)
+twa.mainButton.setLoading(true)
+
 // Navigation
 twa.backButton.show(() => goBack())
 twa.navigation.openLink(url)
@@ -150,6 +164,7 @@ All TWA features are implemented without breaking this design aesthetic.
 ## 📚 Documentation
 
 - [TWA Features Guide](./TWA_FEATURES.md) - Comprehensive TWA integration docs
+- [Notification System](./NOTIFICATIONS.md) - Complete notification system documentation
 - [Enhancements Summary](./ENHANCEMENTS_SUMMARY.md) - Recent improvements
 - [Integration Guide](./INTEGRATION.md) - Backend integration details
 - [Product Requirements](./PRD.md) - Original product specification
@@ -215,7 +230,7 @@ For issues or questions:
 ## 🎯 Roadmap
 
 Future enhancements being considered:
-- [ ] MainButton integration for primary actions
+- [x] MainButton integration for primary actions
 - [ ] Payment integration for premium features
 - [ ] More ecommerce platform support
 - [ ] Price prediction using ML

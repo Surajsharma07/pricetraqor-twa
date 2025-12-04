@@ -1,12 +1,14 @@
 import { useRef, useEffect } from 'react'
-import { House, User, Gear } from '@phosphor-icons/react'
+import { House, User, Gear, Bell } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
 
 interface BottomNavProps {
-  active: 'watchlist' | 'profile' | 'settings'
-  onNavigate: (screen: 'watchlist' | 'profile' | 'settings') => void
+  active: 'watchlist' | 'profile' | 'settings' | 'notifications'
+  onNavigate: (screen: 'watchlist' | 'profile' | 'settings' | 'notifications') => void
+  notificationCount?: number
 }
 
-export function BottomNav({ active, onNavigate }: BottomNavProps) {
+export function BottomNav({ active, onNavigate, notificationCount = 0 }: BottomNavProps) {
   const navRef = useRef<HTMLDivElement>(null)
   const isLightTheme = document.documentElement.classList.contains('light-theme')
 
@@ -101,6 +103,34 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
               }`} weight={active === 'profile' ? 'fill' : 'regular'} />
             </div>
             <span className="text-[10px] font-bold tracking-wide relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] mt-0.5">Profile</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('notifications')}
+            className={`flex flex-col items-center gap-1 px-5 py-2.5 rounded-2xl transition-all duration-200 relative overflow-hidden group ${
+              active === 'notifications'
+                ? 'text-accent scale-95'
+                : 'text-muted-foreground hover:text-foreground active:scale-95'
+            }`}
+          >
+            <div className={`relative transition-all duration-200 ${
+              active === 'notifications' 
+                ? 'neumorphic-inset w-14 h-14 rounded-full flex items-center justify-center glow-accent' 
+                : 'neumorphic-button w-12 h-12 rounded-full flex items-center justify-center group-hover:glow-accent group-hover:w-14 group-hover:h-14'
+            }`}>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-accent/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <Bell className={`relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] transition-all duration-200 ${
+                active === 'notifications' ? 'w-7 h-7' : 'w-6 h-6 group-hover:w-7 group-hover:h-7'
+              }`} weight={active === 'notifications' ? 'fill' : 'regular'} />
+              {notificationCount > 0 && (
+                <div className="absolute -top-1 -right-1 z-20">
+                  <Badge variant="destructive" className="h-5 min-w-5 px-1 text-[10px] font-bold rounded-full">
+                    {notificationCount > 99 ? '99+' : notificationCount}
+                  </Badge>
+                </div>
+              )}
+            </div>
+            <span className="text-[10px] font-bold tracking-wide relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] mt-0.5">Alerts</span>
           </button>
 
           <button

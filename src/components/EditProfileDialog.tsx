@@ -1,142 +1,122 @@
 import { useState } from 'react'
-import { User } from '@/lib/types'
-import { authService } from '@/services/auth'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import type { ChangeEvent } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
+import type { User } from '@/lib/types'
+import { PencilSimple } from '@phosphor-icons/react'
 
 interface EditProfileDialogProps {
+  isOpen: boolean
+  onClose: () => void
   user: User
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onProfileUpdated: (user: User) => void
+  onSave: (updates: { full_name?: string; email?: string }) => Promise<void>
 }
 
-export function EditProfileDialog({ user, open, onOpenChange, onProfileUpdated }: EditProfileDialogProps) {
+export function EditProfileDialog({ isOpen, onClose, user, onSave }: EditProfileDialogProps) {
   const [fullName, setFullName] = useState(user.full_name || '')
   const [email, setEmail] = useState(user.email || '')
-  const [telegramUsername, setTelegramUsername] = useState(user.telegram_username || '')
-  const [mobileNumber, setMobileNumber] = useState(user.mobile_number || '')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!fullName.trim()) {
-      toast.error('Name is required')
-      return
-    }
-
-    setIsSubmitting(true)
+  const handleSave = async () => {
     try {
-      const updates: any = {
-        full_name: fullName.trim(),
+      setIsSaving(true)
+      const updates: { full_name?: string; email?: string } = {}
+      
+      if (fullName !== user.full_name) {
+        updates.full_name = fullName
       }
       
-      if (email.trim()) {
-        updates.email = email.trim()
+      if (email !== user.email) {
+        updates.email = email
       }
       
-      if (telegramUsername.trim()) {
-        updates.telegram_username = telegramUsername.trim()
+      if (Object.keys(updates).length > 0) {
+        await onSave(updates)
       }
       
-      if (mobileNumber.trim()) {
-        updates.mobile_number = mobileNumber.trim()
-      }
-      
-      const updatedUser = await authService.updateProfile(updates)
-      onProfileUpdated(updatedUser)
-      toast.success('Profile updated successfully')
-      onOpenChange(false)
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile')
+      onClose()
+    } catch (error) {
+      console.error('Failed to save profile:', error)
     } finally {
-      setIsSubmitting(false)
+      setIsSaving(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
+      <DialogContent className="glass-card border border-border/40">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>
-            Update your personal information. Changes will be saved to your account.
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <PencilSimple className="w-5 h-5" weight="bold" />
+            Edit Profile
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="fullName">Full Name *</Label>
-              <Input
-                id="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your.email@example.com"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="telegramUsername">Telegram Username</Label>
-              <Input
-                id="telegramUsername"
-                value={telegramUsername}
-                onChange={(e) => setTelegramUsername(e.target.value)}
-                placeholder="@username"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="mobileNumber">Mobile Number</Label>
-              <Input
-                id="mobileNumber"
-                type="tel"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                placeholder="+1234567890"
-              />
-              <p className="text-xs text-muted-foreground">
-                For future SMS alerts (optional)
-              </p>
-            </div>
+        
+        <div className="space-y-5 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="fullName" className="text-sm font-semibold">
+              Full Name
+            </Label>
+            <Input
+              id="fullName"
+              value={fullName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFullName(e.target.value)}
+              placeholder="Enter your full name"
+              className="neumorphic-inset"
+            />
           </div>
-          
-          <DialogFooter>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-semibold">
+              Email Address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              placeholder="your.email@example.com"
+              className="neumorphic-inset"
+            />
+            <p className="text-xs text-muted-foreground">
+              Used for price drop notifications
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-muted-foreground">
+              Telegram Username
+            </Label>
+            <Input
+              value={user.telegram_username ? `@${user.telegram_username}` : 'Not set'}
+              disabled
+              className="neumorphic-inset cursor-not-allowed opacity-70"
+            />
+            <p className="text-xs text-muted-foreground">
+              Your Telegram username cannot be changed
+            </p>
+          </div>
+
+          <div className="flex gap-3 pt-2">
             <Button
-              type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
+              onClick={onClose}
+              className="flex-1"
+              disabled={isSaving}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            <Button
+              onClick={handleSave}
+              className="flex-1 neumorphic-button hover:glow-primary"
+              disabled={isSaving}
+            >
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
-          </DialogFooter>
-        </form>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

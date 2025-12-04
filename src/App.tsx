@@ -6,17 +6,20 @@ import { ProfileScreen } from "@/components/ProfileScreen"
 import { AddProductScreen } from "@/components/AddProductScreen"
 import { ProductDetailScreen } from "@/components/ProductDetailScreen"
 import { SettingsScreen } from "@/components/SettingsScreen"
+import { NotificationCenter } from "@/components/NotificationCenter"
 import { BottomNav } from "@/components/BottomNav"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { authService } from "@/services/auth"
 import { productService } from "@/services/products"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
+import { useNotifications } from "@/hooks/useNotifications"
 
-type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings'
+type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings' | 'notifications'
 
 function App() {
   const twa = useTelegramWebApp()
+  const { stats: notificationStats, startPolling, stopPolling } = useNotifications()
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
   const [products, setProducts] = useState<TrackedProduct[]>([])
   const [user, setUser] = useState<User | null>(null)
@@ -29,6 +32,16 @@ function App() {
   })
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
   const [prefillUrl, setPrefillUrl] = useState<string>()
+
+  // Start notification polling when user is authenticated
+  useEffect(() => {
+    if (user && settings.notificationsEnabled) {
+      startPolling(30000) // Poll every 30 seconds
+      return () => {
+        stopPolling()
+      }
+    }
+  }, [user, settings.notificationsEnabled, startPolling, stopPolling])
 
   // Load settings from CloudStorage on mount
   useEffect(() => {
@@ -472,9 +485,19 @@ function App() {
     }
   }
 
-  const handleBottomNavClick = (screen: 'watchlist' | 'profile' | 'settings') => {
+  const handleBottomNavClick = (screen: 'watchlist' | 'profile' | 'settings' | 'notifications') => {
     twa.haptic.selection()
     setActiveScreen(screen)
+  }
+
+  const handleNotificationClick = (productId: string) => {
+    const product = products.find(p => p.id === productId)
+    if (product) {
+      setSelectedProduct(product)
+      setActiveScreen('product-detail')
+    } else {
+      toast.error('Product not found')
+    }
   }
 
   // Track the current back button handler to ensure proper cleanup
@@ -482,7 +505,7 @@ function App() {
 
   // Handle BackButton visibility based on current screen
   useEffect(() => {
-    const shouldShowBack = activeScreen !== 'watchlist' && activeScreen !== 'profile' && activeScreen !== 'settings'
+    const shouldShowBack = activeScreen !== 'watchlist' && activeScreen !== 'profile' && activeScreen !== 'settings' && activeScreen !== 'notifications'
     
     // Clean up previous handler
     if (backButtonHandlerRef.current) {
@@ -598,6 +621,14 @@ function App() {
             onUpdateSettings={handleUpdateSettings}
           />
         )
+      
+      case 'notifications':
+        return (
+          <NotificationCenter
+            onNotificationClick={handleNotificationClick}
+            onClose={() => setActiveScreen('watchlist')}
+          />
+        )
     }
   }
 
@@ -607,10 +638,11 @@ function App() {
         {renderScreen()}
       </div>
       
-      {(activeScreen === 'watchlist' || activeScreen === 'profile' || activeScreen === 'settings') && (
+      {(activeScreen === 'watchlist' || activeScreen === 'profile' || activeScreen === 'settings' || activeScreen === 'notifications') && (
         <BottomNav 
           active={activeScreen} 
-          onNavigate={handleBottomNavClick} 
+          onNavigate={handleBottomNavClick}
+          notificationCount={notificationStats.unread}
         />
       )}
       

@@ -160,3 +160,6 @@ export function getThemeAwareNeumorphicBg(): string {
 export function isLightTheme(): boolean {
   return document.documentElement.classList.contains('light-theme')
 }
+
+// Alias for getRelativeTime for consistency
+export const formatRelativeTime = getRelativeTime
