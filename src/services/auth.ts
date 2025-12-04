@@ -64,8 +64,7 @@ class AuthService {
 
       console.log('Authenticating with backend...', {
         hasTelegramUser: !!telegramUser.id,
-        userId: telegramUser.id,
-        hasPhoto: !!telegramUser.photo_url
+        userId: telegramUser.id
       });
 
       // Use the /auth/signup endpoint which handles both new and existing users
@@ -75,7 +74,8 @@ class AuthService {
         telegram_user_id: telegramUser.id,
         telegram_username: telegramUser.username,
         full_name: `${telegramUser.first_name || ''} ${telegramUser.last_name || ''}`.trim() || 'Telegram User',
-        photo_url: telegramUser.photo_url, // Include Telegram profile photo
+        // Note: Telegram Web App initData does not include photo_url
+        // The backend should fetch this via Telegram Bot API using getUserProfilePhotos
       });
 
       console.log('Authentication successful:', response.data);
