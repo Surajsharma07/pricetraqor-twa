@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,24 +30,6 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }
   }, [prefillUrl])
 
-  // Setup MainButton for "Add to Watchlist"
-  useEffect(() => {
-    const handleMainButtonClick = () => {
-      handleSubmit(new Event('submit') as any)
-    }
-
-    twa.mainButton.show('Add to Watchlist', handleMainButtonClick)
-    
-    return () => {
-      twa.mainButton.hide()
-    }
-  }, [url, alertType, targetPrice, targetPercent])
-
-  // Update MainButton loading state
-  useEffect(() => {
-    twa.mainButton.setLoading(isValidating)
-  }, [isValidating])
-
   const handleUrlChange = (value: string) => {
     setUrl(value)
     setUrlError('')
@@ -77,7 +59,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!url.trim()) {
@@ -123,7 +105,25 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
       onAdd(url, finalTargetPrice, finalAlertType, finalAlertPercentage)
       setIsValidating(false)
     }, 800)
-  }
+  }, [url, alertType, targetPrice, targetPercent, onAdd])
+
+  // Setup MainButton for "Add to Watchlist"
+  useEffect(() => {
+    const handleMainButtonClick = () => {
+      handleSubmit(new Event('submit') as any)
+    }
+
+    twa.mainButton.show('Add to Watchlist', handleMainButtonClick)
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+  }, [handleSubmit, twa])
+
+  // Update MainButton loading state
+  useEffect(() => {
+    twa.mainButton.setLoading(isValidating)
+  }, [isValidating, twa])
 
   return (
     <div className="space-y-6">

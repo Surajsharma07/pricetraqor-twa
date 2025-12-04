@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { TrackedProduct } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -50,23 +50,6 @@ export function ProductDetailScreen({
     product.targetPrice?.toString() || ''
   )
   const [percentageInput, setPercentageInput] = useState('10')
-
-  // Setup MainButton for "Save Changes" when editing alert
-  useEffect(() => {
-    if (isEditingTarget) {
-      const handleMainButtonClick = () => {
-        handleSaveTargetPrice()
-      }
-
-      twa.mainButton.show('Save Changes', handleMainButtonClick)
-    } else {
-      twa.mainButton.hide()
-    }
-    
-    return () => {
-      twa.mainButton.hide()
-    }
-  }, [isEditingTarget, alertType, targetPriceInput, percentageInput])
 
   const priceChangeData = product.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
@@ -121,7 +104,7 @@ export function ProductDetailScreen({
     }
   }
 
-  const handleSaveTargetPrice = () => {
+  const handleSaveTargetPrice = useCallback(() => {
     if (onUpdateAlert) {
       // New API with full alert type support
       const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
@@ -158,12 +141,29 @@ export function ProductDetailScreen({
       setIsEditingTarget(false)
       toast.success(price ? 'Target price updated' : 'Target price removed')
     }
-  }
+  }, [alertType, targetPriceInput, percentageInput, product.id, onUpdateAlert, onUpdateTargetPrice])
 
   const handleCancelEdit = () => {
     setTargetPriceInput(product.targetPrice?.toString() || '')
     setIsEditingTarget(false)
   }
+
+  // Setup MainButton for "Save Changes" when editing alert
+  useEffect(() => {
+    if (isEditingTarget) {
+      const handleMainButtonClick = () => {
+        handleSaveTargetPrice()
+      }
+
+      twa.mainButton.show('Save Changes', handleMainButtonClick)
+    } else {
+      twa.mainButton.hide()
+    }
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+  }, [isEditingTarget, handleSaveTargetPrice, twa])
 
   const handleOpenProduct = () => {
     try {
