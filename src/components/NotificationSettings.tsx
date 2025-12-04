@@ -138,7 +138,7 @@ export function NotificationSettings() {
         <Separator />
 
         {/* Notification Types */}
-        <div className="space-y-4 opacity-${enabled ? '100' : '50'}">
+        <div className={`space-y-4 ${enabled ? 'opacity-100' : 'opacity-50'}`}>
           <h3 className="font-semibold">Notification Types</h3>
 
           <div className="flex items-center justify-between">
@@ -205,7 +205,7 @@ export function NotificationSettings() {
         <Separator />
 
         {/* Minimum Price Drop */}
-        <div className="space-y-3 opacity-${enabled && priceDropEnabled ? '100' : '50'}">
+        <div className={`space-y-3 ${enabled && priceDropEnabled ? 'opacity-100' : 'opacity-50'}`}>
           <div className="flex items-center justify-between">
             <Label htmlFor="minPriceDropPercentage">
               Minimum Price Drop

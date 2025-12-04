@@ -4,7 +4,6 @@
  */
 
 import apiClient from './api';
-import { useTelegramWebApp } from '@/hooks/useTelegramWebApp';
 
 export interface NotificationPreferences {
   enabled: boolean;
@@ -320,6 +319,7 @@ class NotificationService {
 
   /**
    * Check if notifications should be shown (respect quiet hours)
+   * Returns true if notifications should be displayed, false if we're in quiet hours
    */
   shouldShowNotification(preferences: NotificationPreferences): boolean {
     if (!preferences.enabled) {
@@ -335,11 +335,14 @@ class NotificationService {
     
     const { quietHoursStart, quietHoursEnd } = preferences;
     
-    // Simple time range check
+    // Check if current time is OUTSIDE quiet hours (when notifications should be shown)
     if (quietHoursStart < quietHoursEnd) {
+      // Regular day hours (e.g., 22:00 to 08:00 next day)
+      // Show notifications when: before start OR after end
       return currentTime < quietHoursStart || currentTime >= quietHoursEnd;
     } else {
-      // Overnight quiet hours
+      // Overnight quiet hours (e.g., 08:00 to 22:00)
+      // Show notifications when: after end AND before start
       return currentTime >= quietHoursEnd && currentTime < quietHoursStart;
     }
   }
