@@ -159,7 +159,7 @@ export function ProductDetailScreen({
     return () => {
       twa.mainButton.hide()
     }
-  }, [isEditingTarget, handleSaveTargetPrice, twa])
+  }, [isEditingTarget, handleSaveTargetPrice, twa.mainButton])
 
   const handleOpenProduct = () => {
     try {

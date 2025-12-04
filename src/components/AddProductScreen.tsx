@@ -117,12 +117,12 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     return () => {
       twa.mainButton.hide()
     }
-  }, [handleAddProduct, twa])
+  }, [handleAddProduct, twa.mainButton])
 
   // Update MainButton loading state
   useEffect(() => {
     twa.mainButton.setLoading(isValidating)
-  }, [isValidating, twa])
+  }, [isValidating, twa.mainButton])
 
   return (
     <div className="space-y-6">
