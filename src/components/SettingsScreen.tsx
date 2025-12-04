@@ -1,12 +1,15 @@
 import { UserSettings } from '@/lib/types'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Bell, Gear } from '@phosphor-icons/react'
+import { Bell, Gear, CaretRight } from '@phosphor-icons/react'
 import { NeumorphicRadioGroup } from '@/components/NeumorphicRadioGroup'
 import { LampSwitch } from '@/components/ui/lamp-switch'
+import { useState } from 'react'
+import { NotificationSettings } from '@/components/NotificationSettings'
 
 interface SettingsScreenProps {
   settings: UserSettings
@@ -14,6 +17,7 @@ interface SettingsScreenProps {
 }
 
 export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenProps) {
+  const [showAdvancedNotifications, setShowAdvancedNotifications] = useState(false)
   const handleToggleNotifications = (enabled: boolean) => {
     onUpdateSettings({ ...settings, notificationsEnabled: enabled })
   }
@@ -32,6 +36,28 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
 
   const handleThemeChange = (isLight: boolean) => {
     onUpdateSettings({ ...settings, theme: isLight ? 'light' : 'dark' })
+  }
+
+  if (showAdvancedNotifications) {
+    return (
+      <div className="space-y-6 relative z-0 pb-24">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowAdvancedNotifications(false)}
+            className="mr-2"
+          >
+            <CaretRight className="w-6 h-6 rotate-180" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Advanced Notifications</h1>
+            <p className="text-sm text-muted-foreground mt-1">Configure detailed notification preferences</p>
+          </div>
+        </div>
+        <NotificationSettings />
+      </div>
+    )
   }
 
   return (
@@ -119,6 +145,17 @@ export function SettingsScreen({ settings, onUpdateSettings }: SettingsScreenPro
                     Automatically notify when price drops by at least this percentage
                   </p>
                 </div>
+
+                <Separator className="shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
+
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAdvancedNotifications(true)}
+                  className="w-full justify-between"
+                >
+                  <span>Advanced Notification Settings</span>
+                  <CaretRight className="w-4 h-4" />
+                </Button>
               </>
             )}
           </div>
