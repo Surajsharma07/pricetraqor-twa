@@ -59,9 +59,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }
   }
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+  const handleAddProduct = useCallback(async () => {
     if (!url.trim()) {
       setUrlError('Please enter a product URL')
       return
@@ -107,18 +105,19 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }, 800)
   }, [url, alertType, targetPrice, targetPercent, onAdd])
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await handleAddProduct()
+  }
+
   // Setup MainButton for "Add to Watchlist"
   useEffect(() => {
-    const handleMainButtonClick = () => {
-      handleSubmit(new Event('submit') as any)
-    }
-
-    twa.mainButton.show('Add to Watchlist', handleMainButtonClick)
+    twa.mainButton.show('Add to Watchlist', handleAddProduct)
     
     return () => {
       twa.mainButton.hide()
     }
-  }, [handleSubmit, twa])
+  }, [handleAddProduct, twa])
 
   // Update MainButton loading state
   useEffect(() => {
