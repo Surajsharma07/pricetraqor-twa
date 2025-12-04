@@ -342,7 +342,9 @@ function App() {
     try {
       twa.haptic.selection()
       setIsLoadingProductDetail(true)
-      setActiveScreen('product-detail')
+      
+      // Set screen after loading state to avoid flash
+      setTimeout(() => setActiveScreen('product-detail'), 0)
       
       // Load full product details with price history
       const priceHistory = await productService.getPriceHistory(product.id)

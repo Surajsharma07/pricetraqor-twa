@@ -1,9 +1,11 @@
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function ProductCardSkeleton() {
-  const isLightTheme = document.documentElement.classList.contains('light-theme')
-  
+interface ProductCardSkeletonProps {
+  isLightTheme?: boolean
+}
+
+export function ProductCardSkeleton({ isLightTheme = false }: ProductCardSkeletonProps) {
   return (
     <Card 
       className="overflow-hidden relative neumorphic-raised"
