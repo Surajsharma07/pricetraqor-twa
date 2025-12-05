@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { authService } from '@/services/auth'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Warning, Trash } from '@phosphor-icons/react'
+import { Warning, Trash, CheckCircle, WarningCircle } from '@phosphor-icons/react'
 
 interface DeleteAccountDialogProps {
   open: boolean
@@ -32,22 +33,34 @@ export function DeleteAccountDialog({ open, onOpenChange }: DeleteAccountDialogP
 
     setIsSubmitting(true)
     try {
-      // Note: This endpoint needs to be implemented in the backend
-      toast.error(
+      await authService.deleteAccount()
+      toast.success(
         <div className="flex items-start gap-2">
-          <Warning className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" weight="fill" />
+          <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" weight="fill" />
           <div>
-            <div className="font-semibold">Feature Not Available</div>
+            <div className="font-semibold">Account Deleted</div>
             <div className="text-xs text-muted-foreground mt-1">
-              Account deletion is not yet supported. Please contact support to delete your account.
+              Your account has been permanently deleted. Redirecting to login...
             </div>
           </div>
         </div>
       )
-      onOpenChange(false)
-      setConfirmText('')
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 2000)
     } catch (error: any) {
-      toast.error(error.message || 'Failed to delete account')
+      toast.error(
+        <div className="flex items-start gap-2">
+          <WarningCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" weight="fill" />
+          <div>
+            <div className="font-semibold">Failed to Delete Account</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {error.message || 'An error occurred while deleting your account.'}
+            </div>
+          </div>
+        </div>
+      )
     } finally {
       setIsSubmitting(false)
     }

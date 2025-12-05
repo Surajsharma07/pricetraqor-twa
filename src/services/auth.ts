@@ -215,6 +215,28 @@ class AuthService {
   }
 
   /**
+   * Delete user account
+   */
+  async deleteAccount(): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>('/auth/delete-account', {});
+      
+      // Clear localStorage after successful deletion
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('user');
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Failed to delete account:', error);
+      throw new Error(
+        error.response?.data?.detail?.message || 
+        error.response?.data?.detail || 
+        'Failed to delete account'
+      );
+    }
+  }
+
+  /**
    * Logout - clear local storage
    */
   logout(): void {

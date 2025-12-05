@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { User } from '@/lib/types'
+import { authService } from '@/services/auth'
 import { PencilSimple } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 
 interface EditProfileDialogProps {
-  isOpen: boolean
-  onClose: () => void
   user: User
-  onSave: (updates: { full_name?: string; email?: string }) => Promise<void>
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onProfileUpdated: (user: User) => void
 }
 
-export function EditProfileDialog({ isOpen, onClose, user, onSave }: EditProfileDialogProps) {
+export function EditProfileDialog({ open, onOpenChange, user, onProfileUpdated }: EditProfileDialogProps) {
   const [fullName, setFullName] = useState(user.full_name || '')
   const [email, setEmail] = useState(user.email || '')
   const [isSaving, setIsSaving] = useState(false)
@@ -33,19 +35,22 @@ export function EditProfileDialog({ isOpen, onClose, user, onSave }: EditProfile
       }
       
       if (Object.keys(updates).length > 0) {
-        await onSave(updates)
+        const updatedUser = await authService.updateProfile(updates)
+        onProfileUpdated(updatedUser)
       }
       
-      onClose()
+      onOpenChange(false)
+      toast.success('Profile updated successfully')
     } catch (error) {
       console.error('Failed to save profile:', error)
+      toast.error('Failed to update profile')
     } finally {
       setIsSaving(false)
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-card border border-border/40">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -102,7 +107,7 @@ export function EditProfileDialog({ isOpen, onClose, user, onSave }: EditProfile
           <div className="flex gap-3 pt-2">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={() => onOpenChange(false)}
               className="flex-1"
               disabled={isSaving}
             >
