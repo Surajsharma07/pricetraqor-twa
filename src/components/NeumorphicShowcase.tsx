@@ -21,7 +21,7 @@ export function NeumorphicShowcase({ onBack }: NeumorphicShowcaseProps) {
   const [volume, setVolume] = useState(50)
 
   return (
-    <div className="min-h-screen py-6" style={{ background: 'oklch(0.93 0.005 250)' }}>
+    <div className="min-h-twa-viewport py-6" style={{ background: 'oklch(0.93 0.005 250)' }}>
       <div className="mx-auto max-w-[600px] px-4">
         <button
           onClick={onBack}
