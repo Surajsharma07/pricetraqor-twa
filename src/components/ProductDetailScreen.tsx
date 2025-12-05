@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { TrackedProduct } from '@/lib/types'
+import { ProductDetailSkeleton } from '@/components/ProductDetailSkeleton'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -25,12 +26,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 
 interface ProductDetailScreenProps {
-  product: TrackedProduct
+  product: TrackedProduct | null
   onBack: () => void
   onToggleActive: (id: string) => void
   onDelete: (id: string) => void
   onUpdateTargetPrice: (id: string, price?: number) => void
   onUpdateAlert?: (id: string, alertType?: string, targetPrice?: number, percentage?: number) => void
+  isLoading?: boolean
 }
 
 export function ProductDetailScreen({ 
@@ -39,21 +41,27 @@ export function ProductDetailScreen({
   onToggleActive, 
   onDelete,
   onUpdateTargetPrice,
-  onUpdateAlert
+  onUpdateAlert,
+  isLoading = false
 }: ProductDetailScreenProps) {
   const twa = useTelegramWebApp()
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>(
-    product.targetPrice ? 'price_below' : 'none'
+    product?.targetPrice ? 'price_below' : 'none'
   )
   const [targetPriceInput, setTargetPriceInput] = useState(
-    product.targetPrice?.toString() || ''
+    product?.targetPrice?.toString() || ''
   )
   const [percentageInput, setPercentageInput] = useState('10')
 
-  const priceChangeData = product.previousPrice 
+  const priceChangeData = product?.previousPrice 
     ? calculatePriceChange(product.currentPrice, product.previousPrice)
     : null
+
+  // Show skeleton if loading or no product
+  if (isLoading || !product) {
+    return <ProductDetailSkeleton />
+  }
 
   const handleShareProduct = () => {
     try {

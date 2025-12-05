@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TrackedProduct, FilterType } from '@/lib/types'
 import { ProductCard } from '@/components/ProductCard'
+import { ProductCardSkeleton } from '@/components/ProductCardSkeleton'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Package } from '@phosphor-icons/react'
@@ -13,6 +14,7 @@ interface WatchlistScreenProps {
   onAddProduct: () => void
   onToggleActive: (id: string) => void
   onDelete: (id: string) => void
+  isLoading?: boolean
 }
 
 export function WatchlistScreen({ 
@@ -20,7 +22,8 @@ export function WatchlistScreen({
   onProductClick, 
   onAddProduct,
   onToggleActive,
-  onDelete 
+  onDelete,
+  isLoading = false
 }: WatchlistScreenProps) {
   const twa = useTelegramWebApp()
   const [filter, setFilter] = useState<FilterType>('all')
@@ -135,7 +138,13 @@ export function WatchlistScreen({
           </Tabs>
         )}
 
-        {filteredProducts.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-24 h-24 rounded-full neumorphic-inset flex items-center justify-center mb-6 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-50"></div>
