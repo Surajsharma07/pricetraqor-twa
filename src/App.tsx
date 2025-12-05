@@ -576,7 +576,7 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="min-h-twa-viewport bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading...</p>
@@ -647,7 +647,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-twa-viewport bg-background text-foreground pb-20">
       <div className="mx-auto max-w-[430px] px-4 pt-6">
         {renderScreen()}
       </div>

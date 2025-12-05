@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <div className="min-h-twa-viewport bg-background p-4 flex items-center justify-center">
           <Card className="p-6 max-w-md">
             <h2 className="text-xl font-bold text-destructive mb-4">
               Something went wrong
