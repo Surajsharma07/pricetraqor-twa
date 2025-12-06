@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { TrackedProduct, User as UserType } from '@/lib/types'
 import { authService } from '@/services/auth'
 import { formatPrice } from '@/lib/helpers'
+import { isAccountFullySynced } from '@/lib/accountHelpers'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -28,9 +29,10 @@ import {
 
 interface ProfileScreenProps {
   products: TrackedProduct[]
+  onLogout?: () => void
 }
 
-export function ProfileScreen({ products }: ProfileScreenProps) {
+export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
   const [user, setUser] = useState<UserType | null>(null)
   const [editProfileOpen, setEditProfileOpen] = useState(false)
   const [linkAccountOpen, setLinkAccountOpen] = useState(false)
@@ -153,14 +155,16 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
           Edit Profile
         </Button>
         
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          onClick={() => setLinkAccountOpen(true)}
-        >
-          <LinkIcon className="w-4 h-4 mr-2" weight="bold" />
-          Link Account
-        </Button>
+        {!isAccountFullySynced(user) && (
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => setLinkAccountOpen(true)}
+          >
+            <LinkIcon className="w-4 h-4 mr-2" weight="bold" />
+            Link Account
+          </Button>
+        )}
         
         <Button
           variant="outline"
@@ -445,6 +449,21 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
         </Card>
       )}
 
+      {/* Logout Button */}
+      {onLogout && (
+        <Button
+          variant="destructive"
+          className="w-full"
+          onClick={() => {
+            if (confirm('Are you sure you want to logout?')) {
+              onLogout()
+            }
+          }}
+        >
+          <span>Logout</span>
+        </Button>
+      )}
+
       {/* Dialogs */}
       {user && (
         <>
@@ -458,6 +477,7 @@ export function ProfileScreen({ products }: ProfileScreenProps) {
             open={linkAccountOpen}
             onOpenChange={setLinkAccountOpen}
             onAccountLinked={handleAccountLinked}
+            currentUser={user}
           />
           <ChangePasswordDialog
             open={changePasswordOpen}

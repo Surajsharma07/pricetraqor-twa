@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { TrackedProduct } from '@/lib/types'
 import { ProductDetailSkeleton } from '@/components/ProductDetailSkeleton'
 import { Button } from '@/components/ui/button'
@@ -45,6 +45,10 @@ export function ProductDetailScreen({
   isLoading = false
 }: ProductDetailScreenProps) {
   const twa = useTelegramWebApp()
+  
+  // Memoize product ID to avoid dependency issues
+  const productId = useMemo(() => product?.id, [product?.id])
+  
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>(
     product?.targetPrice ? 'price_below' : 'none'
@@ -54,8 +58,10 @@ export function ProductDetailScreen({
   )
   const [percentageInput, setPercentageInput] = useState('10')
 
-  const priceChangeData = product?.previousPrice 
-    ? calculatePriceChange(product.currentPrice, product.previousPrice)
+  const priceChangeData = product
+    ? (product.previousPrice 
+        ? calculatePriceChange(product.currentPrice, product.previousPrice)
+        : null)
     : null
 
   // Show skeleton if loading or no product
@@ -64,6 +70,8 @@ export function ProductDetailScreen({
   }
 
   const handleShareProduct = () => {
+    if (!product) return
+    
     try {
       twa.haptic.impact('light')
       const priceInfo = formatPrice(product.currentPrice, product.currency)
@@ -99,20 +107,24 @@ export function ProductDetailScreen({
   }
 
   const handleDeleteClick = async () => {
+    if (!product || !productId) return
+    
     try {
       const confirmed = await twa.dialog.showConfirm('Are you sure you want to remove this product from your watchlist?')
       if (confirmed) {
         twa.haptic.impact('medium')
-        onDelete(product.id)
+        onDelete(productId)
       }
     } catch (error) {
       console.error('Delete confirmation failed:', error)
       // Fallback to direct delete
-      onDelete(product.id)
+      onDelete(productId)
     }
   }
 
   const handleSaveTargetPrice = useCallback(() => {
+    if (!product || !productId) return
+    
     if (onUpdateAlert) {
       // New API with full alert type support
       const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
@@ -129,7 +141,7 @@ export function ProductDetailScreen({
       }
       
       onUpdateAlert(
-        product.id,
+        productId,
         alertType === 'none' ? undefined : alertType,
         price,
         percentage
@@ -145,14 +157,16 @@ export function ProductDetailScreen({
         return
       }
 
-      onUpdateTargetPrice(product.id, price)
+      onUpdateTargetPrice(productId, price)
       setIsEditingTarget(false)
       toast.success(price ? 'Target price updated' : 'Target price removed')
     }
-  }, [alertType, targetPriceInput, percentageInput, product.id, onUpdateAlert, onUpdateTargetPrice])
+  }, [alertType, targetPriceInput, percentageInput, productId, onUpdateAlert, onUpdateTargetPrice])
 
   const handleCancelEdit = () => {
-    setTargetPriceInput(product.targetPrice?.toString() || '')
+    if (product) {
+      setTargetPriceInput(product.targetPrice?.toString() || '')
+    }
     setIsEditingTarget(false)
   }
 
@@ -172,6 +186,8 @@ export function ProductDetailScreen({
   }, [isEditingTarget, handleSaveTargetPrice])
 
   const handleOpenProduct = () => {
+    if (!product) return
+    
     try {
       twa.haptic.impact('medium')
       const url = addAffiliateTag(product.productUrl, product.siteDomain)

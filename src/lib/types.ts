@@ -24,6 +24,9 @@ export interface User {
   locale?: string
   timezone?: string
   currency?: string
+  has_password?: boolean
+  has_email?: boolean
+  has_telegram?: boolean
 }
 
 // Product from backend (ProductOut schema)

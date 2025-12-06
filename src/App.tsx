@@ -8,6 +8,9 @@ import { ProductDetailScreen } from "@/components/ProductDetailScreen"
 import { SettingsScreen } from "@/components/SettingsScreen"
 import { NotificationCenter } from "@/components/NotificationCenter"
 import { BottomNav } from "@/components/BottomNav"
+import { LoginScreen } from "@/components/LoginScreen"
+import { SignupScreen } from "@/components/SignupScreen"
+import { AuthScreen } from "@/components/AuthScreen"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 import { authService } from "@/services/auth"
@@ -15,15 +18,17 @@ import { productService } from "@/services/products"
 import { useTelegramWebApp } from "@/hooks/useTelegramWebApp"
 import { useNotifications } from "@/hooks/useNotifications"
 
-type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings' | 'notifications'
+type Screen = 'watchlist' | 'profile' | 'add-product' | 'product-detail' | 'settings' | 'notifications' | 'login' | 'signup' | 'auth'
+
+type AuthState = 'unauthenticated' | 'authenticating' | 'authenticated' | 'loading'
 
 function App() {
   const twa = useTelegramWebApp()
   const { stats: notificationStats, startPolling, stopPolling } = useNotifications()
   const [activeScreen, setActiveScreen] = useState<Screen>('watchlist')
+  const [authState, setAuthState] = useState<AuthState>('authenticating')
   const [products, setProducts] = useState<TrackedProduct[]>([])
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [settings, setSettings] = useState<UserSettings>({
     notificationsEnabled: true,
@@ -34,6 +39,9 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState<TrackedProduct | null>(null)
   const [isLoadingProductDetail, setIsLoadingProductDetail] = useState(false)
   const [prefillUrl, setPrefillUrl] = useState<string>()
+  
+  // Use ref to prevent multiple initialization attempts
+  const initializingRef = useRef(false)
 
   // Start notification polling when user is authenticated
   useEffect(() => {
@@ -63,6 +71,12 @@ function App() {
 
   // Initialize Telegram WebApp and authenticate
   useEffect(() => {
+    // Prevent multiple initialization attempts
+    if (initializingRef.current) {
+      return
+    }
+    initializingRef.current = true
+
     const initApp = async () => {
       try {
         console.log('Telegram WebApp initialized:', {
@@ -70,26 +84,37 @@ function App() {
           user: WebApp.initDataUnsafe?.user
         })
 
-        // Check if already authenticated
-        if (authService.isAuthenticated()) {
-          console.log('User already authenticated, loading profile...')
+        // Check if user has valid session in localStorage
+        if (authService.hasValidSession()) {
+          console.log('Valid session found, loading profile...')
+          setAuthState('loading')
           try {
             const userData = await authService.getCurrentUser()
             setUser(userData)
             await loadProducts()
+            setAuthState('authenticated')
+            setActiveScreen('watchlist')
           } catch (error) {
-            console.error('Failed to get user, re-authenticating:', error)
-            await authenticateWithTelegram()
+            console.error('Failed to load profile, clearing session:', error)
+            authService.logout()
+            setAuthState('unauthenticated')
+            setActiveScreen('auth')
           }
+        } else if (WebApp.initData) {
+          // No session but Telegram initData available - show auth screen for new users
+          console.log('No session but Telegram initData available, showing auth screen...')
+          setAuthState('unauthenticated')
+          setActiveScreen('auth')
         } else {
-          // Not authenticated, authenticate with Telegram
-          await authenticateWithTelegram()
+          // No session and no Telegram initData - show auth screen
+          console.log('No authentication available, showing auth screen')
+          setAuthState('unauthenticated')
+          setActiveScreen('auth')
         }
       } catch (error) {
         console.error('App initialization failed:', error)
         toast.error('Failed to initialize app')
-      } finally {
-        setIsLoading(false)
+        setAuthState('unauthenticated')
       }
     }
 
@@ -102,10 +127,9 @@ function App() {
       const initData = WebApp.initData
       
       if (!initData) {
-        console.warn('No Telegram initData available - running in development mode')
-        // For development/testing without Telegram
-        toast.info('Development mode - authentication skipped')
-        setIsLoading(false)
+        console.warn('No Telegram initData available')
+        setAuthState('unauthenticated')
+        setActiveScreen('login')
         return
       }
 
@@ -113,10 +137,17 @@ function App() {
       const authResponse = await authService.authenticateWithTelegram(initData)
       setUser(authResponse.user)
       await loadProducts()
+      setAuthState('authenticated')
+      setActiveScreen('watchlist')
       toast.success(`Welcome ${authResponse.user.full_name}!`)
     } catch (error: any) {
       console.error('Telegram authentication failed:', error)
-      toast.error(error.message || 'Authentication failed')
+      // Only show error if it's not already authenticated
+      if (authState !== 'authenticated') {
+        toast.error(error.message || 'Authentication failed')
+        setAuthState('unauthenticated')
+        setActiveScreen('login')
+      }
     }
   }
 
@@ -574,18 +605,81 @@ function App() {
     }
   }, [twa])
 
-  if (isLoading) {
-    return (
-      <div className="min-h-twa-viewport bg-background text-foreground flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
   const renderScreen = () => {
+    // Show loading screen during auth state transitions
+    if (authState === 'authenticating' || authState === 'loading') {
+      return (
+        <div className="min-h-twa-viewport flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Initializing app...</p>
+          </div>
+        </div>
+      )
+    }
+
+    // Show login/signup for unauthenticated users
+    if (authState === 'unauthenticated') {
+      // Show auth screen for new users (with all options)
+      if (activeScreen === 'auth') {
+        return (
+          <AuthScreen
+            onSignupSuccess={() => {
+              setAuthState('authenticated')
+              setActiveScreen('watchlist')
+              // Reload user and products
+              authService.getCurrentUser().then(userData => {
+                setUser(userData)
+                loadProducts()
+              })
+            }}
+            onLoginSuccess={() => {
+              setAuthState('authenticated')
+              setActiveScreen('watchlist')
+              // Reload user and products
+              authService.getCurrentUser().then(userData => {
+                setUser(userData)
+                loadProducts()
+              })
+            }}
+          />
+        )
+      }
+
+      if (activeScreen === 'signup') {
+        return (
+          <SignupScreen
+            onSignupSuccess={() => {
+              setAuthState('authenticated')
+              setActiveScreen('watchlist')
+              // Reload user and products
+              authService.getCurrentUser().then(userData => {
+                setUser(userData)
+                loadProducts()
+              })
+            }}
+            onSwitchToLogin={() => setActiveScreen('login')}
+          />
+        )
+      }
+      
+      return (
+        <LoginScreen
+          onLoginSuccess={() => {
+            setAuthState('authenticated')
+            setActiveScreen('watchlist')
+            // Reload user and products
+            authService.getCurrentUser().then(userData => {
+              setUser(userData)
+              loadProducts()
+            })
+          }}
+          onSwitchToSignup={() => setActiveScreen('signup')}
+        />
+      )
+    }
+
+    // Show app screens for authenticated users
     switch (activeScreen) {
       case 'watchlist':
         return (
@@ -603,6 +697,17 @@ function App() {
         return (
           <ProfileScreen
             products={products}
+            onLogout={() => {
+              // Clear all user data and show auth screen
+              authService.logout()
+              // Disable auto-auth on next mount so user can choose to login
+              sessionStorage.setItem('autoAuthDisabled', 'true')
+              setUser(null)
+              setProducts([])
+              setAuthState('unauthenticated')
+              setActiveScreen('auth')
+              toast.info('Logged out successfully')
+            }}
           />
         )
       
@@ -643,6 +748,18 @@ function App() {
             onClose={() => setActiveScreen('watchlist')}
           />
         )
+      
+      default:
+        return (
+          <WatchlistScreen
+            products={products}
+            onProductClick={handleProductClick}
+            onAddProduct={() => setActiveScreen('add-product')}
+            onToggleActive={handleToggleActive}
+            onDelete={handleDeleteProduct}
+            isLoading={isLoadingProducts}
+          />
+        )
     }
   }
 
@@ -652,7 +769,7 @@ function App() {
         {renderScreen()}
       </div>
       
-      {(activeScreen === 'watchlist' || activeScreen === 'profile' || activeScreen === 'settings' || activeScreen === 'notifications') && (
+      {authState === 'authenticated' && (activeScreen === 'watchlist' || activeScreen === 'profile' || activeScreen === 'settings' || activeScreen === 'notifications') && (
         <BottomNav 
           active={activeScreen} 
           onNavigate={handleBottomNavClick}
