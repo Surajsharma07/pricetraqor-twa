@@ -181,16 +181,21 @@ export function LinkAccountDialog({ open, onOpenChange, onAccountLinked, current
     )
   }
 
-  // Telegram linking mode - user logged in with email, would link Telegram
-  // This would typically be handled via Telegram button in profile, not this dialog
+  // Telegram linking mode - user logged in with email, needs to link via Telegram bot
   if (linkingMode === 'telegram') {
+    const handleOpenTelegramBot = () => {
+      // Open the Pricetracker Telegram bot to link account
+      window.open('https://t.me/pricetraqor_bot?start=link', '_blank')
+      handleClose()
+    }
+
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Link Telegram Account</DialogTitle>
             <DialogDescription>
-              Your email account is not linked to Telegram yet. Link your Telegram account for easier access.
+              Connect your Telegram account to get price alerts and access Pricetracker from Telegram.
             </DialogDescription>
           </DialogHeader>
           
@@ -199,19 +204,30 @@ export function LinkAccountDialog({ open, onOpenChange, onAccountLinked, current
               <div className="flex items-start gap-3">
                 <TelegramLogo className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" weight="fill" />
                 <div className="text-sm">
-                  <p className="font-semibold text-foreground mb-1">Link Your Telegram Account</p>
-                  <p className="text-xs text-muted-foreground">
-                    Linking Telegram will allow you to access Pricetracker directly from your Telegram bot and receive notifications on Telegram.
-                  </p>
+                  <p className="font-semibold text-foreground mb-1">How to Link</p>
+                  <ol className="text-xs text-muted-foreground list-decimal list-inside space-y-1">
+                    <li>Click the button below to open our Telegram bot</li>
+                    <li>Start the bot and follow the linking instructions</li>
+                    <li>Your accounts will be automatically linked</li>
+                  </ol>
                 </div>
               </div>
             </div>
             
             <Button 
+              onClick={handleOpenTelegramBot}
+              className="w-full"
+            >
+              <TelegramLogo className="w-4 h-4 mr-2" weight="fill" />
+              Open Telegram Bot
+            </Button>
+            
+            <Button 
+              variant="outline"
               onClick={handleClose}
               className="w-full"
             >
-              Done
+              Cancel
             </Button>
           </div>
         </DialogContent>

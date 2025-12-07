@@ -1,28 +1,54 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar } from '@phosphor-icons/react'
+import { Link as LinkIcon, QrCode, Percent, CurrencyCircleDollar, SpinnerGap } from '@phosphor-icons/react'
 import { validateProductUrl } from '@/lib/helpers'
 import { toast } from 'sonner'
 import { useTelegramWebApp } from '@/hooks/useTelegramWebApp'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import WebApp from '@twa-dev/sdk'
+
+export type AddProductStatus = 'idle' | 'adding' | 'fetching' | 'success' | 'error'
 
 interface AddProductScreenProps {
   onBack: () => void
   onAdd: (url: string, targetPrice?: number, alertType?: string, alertPercentage?: number) => void
   prefillUrl?: string
+  status?: AddProductStatus
+  theme?: 'dark' | 'light'
 }
 
-export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreenProps) {
+// Global handler reference for MainButton - avoids stale closure issues
+let globalAddProductHandler: (() => void) | null = null
+
+export function AddProductScreen({ onBack, onAdd, prefillUrl, status = 'idle', theme = 'dark' }: AddProductScreenProps) {
   const twa = useTelegramWebApp()
   const [url, setUrl] = useState(prefillUrl || '')
   const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>('none')
   const [targetPrice, setTargetPrice] = useState('')
   const [targetPercent, setTargetPercent] = useState('10')
   const [urlError, setUrlError] = useState('')
-  const [isValidating, setIsValidating] = useState(false)
+  
+  // Derive isSubmitting from status
+  const isSubmitting = status === 'adding' || status === 'fetching'
+  
+  // Use refs for current values - this is the key to avoiding stale closures!
+  const onAddRef = useRef(onAdd)
+  const urlRef = useRef(url)
+  const alertTypeRef = useRef(alertType)
+  const targetPriceRef = useRef(targetPrice)
+  const targetPercentRef = useRef(targetPercent)
+  const isSubmittingRef = useRef(false)
+  
+  // Keep refs in sync
+  useEffect(() => { onAddRef.current = onAdd }, [onAdd])
+  useEffect(() => { urlRef.current = url }, [url])
+  useEffect(() => { alertTypeRef.current = alertType }, [alertType])
+  useEffect(() => { targetPriceRef.current = targetPrice }, [targetPrice])
+  useEffect(() => { targetPercentRef.current = targetPercent }, [targetPercent])
+  useEffect(() => { isSubmittingRef.current = isSubmitting }, [isSubmitting])
 
   useEffect(() => {
     if (prefillUrl) {
@@ -59,77 +85,235 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl }: AddProductScreen
     }
   }
 
-  const handleAddProduct = useCallback(async () => {
-    if (!url.trim()) {
+  const handleAddProduct = useCallback(() => {
+    console.log('[AddProductScreen] handleAddProduct called!')
+    
+    // Prevent multiple submissions
+    if (isSubmittingRef.current) {
+      console.log('[AddProductScreen] Already submitting, ignoring duplicate click')
+      return
+    }
+    
+    const currentUrl = urlRef.current
+    const currentAlertType = alertTypeRef.current
+    const currentTargetPrice = targetPriceRef.current
+    const currentTargetPercent = targetPercentRef.current
+    
+    console.log('[AddProductScreen] Current URL:', currentUrl)
+
+    if (!currentUrl.trim()) {
+      console.log('[AddProductScreen] URL is empty')
       setUrlError('Please enter a product URL')
       return
     }
 
-    setIsValidating(true)
+    const validation = validateProductUrl(currentUrl)
     
-    const validation = validateProductUrl(url)
-    
-    setTimeout(() => {
-      if (!validation.valid) {
-        setUrlError(validation.error || 'Invalid URL')
-        setIsValidating(false)
+    if (!validation.valid) {
+      setUrlError(validation.error || 'Invalid URL')
+      return
+    }
+
+    // Clear any previous errors
+    setUrlError('')
+
+    let finalTargetPrice: number | undefined
+    let finalAlertPercentage: number | undefined
+    let finalAlertType: string | undefined
+
+    if (currentAlertType === 'price_below') {
+      const target = currentTargetPrice ? parseFloat(currentTargetPrice) : undefined
+      if (currentTargetPrice && (isNaN(target!) || target! <= 0)) {
+        toast.error('Please enter a valid target price')
         return
       }
-
-      let finalTargetPrice: number | undefined
-      let finalAlertPercentage: number | undefined
-      let finalAlertType: string | undefined
-
-      if (alertType === 'price_below') {
-        const target = targetPrice ? parseFloat(targetPrice) : undefined
-        if (targetPrice && (isNaN(target!) || target! <= 0)) {
-          toast.error('Please enter a valid target price')
-          setIsValidating(false)
-          return
-        }
-        finalTargetPrice = target
-        finalAlertType = 'price_below'
-      } else if (alertType === 'percentage_drop') {
-        const percent = parseFloat(targetPercent)
-        if (isNaN(percent) || percent <= 0 || percent > 100) {
-          toast.error('Please enter a valid percentage (1-100)')
-          setIsValidating(false)
-          return
-        }
-        finalAlertPercentage = percent
-        finalAlertType = 'percentage_drop'
+      finalTargetPrice = target
+      finalAlertType = 'price_below'
+    } else if (currentAlertType === 'percentage_drop') {
+      const percent = parseFloat(currentTargetPercent)
+      if (isNaN(percent) || percent <= 0 || percent > 100) {
+        toast.error('Please enter a valid percentage (1-100)')
+        return
       }
+      finalAlertPercentage = percent
+      finalAlertType = 'percentage_drop'
+    }
 
-      onAdd(url, finalTargetPrice, finalAlertType, finalAlertPercentage)
-      setIsValidating(false)
-    }, 800)
-  }, [url, alertType, targetPrice, targetPercent, onAdd])
+    // Call onAdd using REF to avoid stale closure!
+    console.log('[AddProductScreen] Calling onAddRef.current')
+    onAddRef.current(currentUrl, finalTargetPrice, finalAlertType, finalAlertPercentage)
+  }, []) // No dependencies - we use refs!
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    await handleAddProduct()
+    handleAddProduct()
   }
 
-  // Setup MainButton for "Add to Watchlist"
+  // Get button text based on status
+  const getButtonText = () => {
+    switch (status) {
+      case 'adding':
+        return 'Adding Product...'
+      case 'fetching':
+        return 'Fetching Details...'
+      case 'success':
+        return 'Success!'
+      case 'error':
+        return 'Add to Watchlist'
+      default:
+        return 'Add to Watchlist'
+    }
+  }
+
+  // Setup MainButton 
   useEffect(() => {
-    twa.mainButton.show('Add to Watchlist', handleAddProduct)
+    const buttonText = getButtonText()
+    
+    // Handler function
+    const onMainButtonClick = () => {
+      console.log('[MainButton] CLICKED - calling handleAddProduct')
+      handleAddProduct()
+    }
+    
+    // Remove any existing handler first
+    if (globalAddProductHandler) {
+      WebApp.MainButton.offClick(globalAddProductHandler)
+    }
+    globalAddProductHandler = onMainButtonClick
+    
+    // Set color based on app theme
+    const isDark = theme === 'dark'
+    const buttonColor = isDark ? '#8774e1' : '#3b82f6' // Purple for dark, blue for light
+    
+    // Use native postEvent for maximum compatibility with all parameters
+    const setupMainButton = (params: {
+      is_visible?: boolean
+      is_active?: boolean
+      is_progress_visible?: boolean
+      text?: string
+      color?: string
+      text_color?: string
+      has_shine_effect?: boolean
+    }) => {
+      try {
+        // Try TelegramWebviewProxy first (mobile/desktop)
+        if ((window as any).TelegramWebviewProxy?.postEvent) {
+          (window as any).TelegramWebviewProxy.postEvent('web_app_setup_main_button', JSON.stringify(params))
+          console.log('[MainButton] Used TelegramWebviewProxy.postEvent with:', params)
+        } 
+        // Fall back to window.parent.postMessage (web)
+        else if (window.parent !== window) {
+          window.parent.postMessage(JSON.stringify({
+            eventType: 'web_app_setup_main_button',
+            eventData: params
+          }), '*')
+          console.log('[MainButton] Used postMessage with:', params)
+        }
+      } catch (e) {
+        console.log('[MainButton] postEvent failed:', e)
+      }
+    }
+    
+    // Setup main button with all parameters including shine effect
+    setupMainButton({
+      is_visible: true,
+      is_active: true,
+      is_progress_visible: false,
+      text: buttonText,
+      color: buttonColor,
+      text_color: '#ffffff',
+      has_shine_effect: true
+    })
+    
+    // Attach click handler using SDK
+    WebApp.MainButton.onClick(onMainButtonClick)
+    
+    console.log('[MainButton] Setup complete with color:', buttonColor)
     
     return () => {
-      twa.mainButton.hide()
+      if (globalAddProductHandler) {
+        WebApp.MainButton.offClick(globalAddProductHandler)
+        globalAddProductHandler = null
+      }
+      setupMainButton({ is_visible: false })
     }
-    // twa.mainButton methods are memoized with useCallback in the hook
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleAddProduct])
+  }, [status, handleAddProduct, theme])
 
-  // Update MainButton loading state
+  // Update loading state using native postEvent
   useEffect(() => {
-    twa.mainButton.setLoading(isValidating)
-    // twa.mainButton.setLoading is memoized with useCallback in the hook
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isValidating])
+    const isDark = theme === 'dark'
+    const buttonColor = isDark ? '#8774e1' : '#3b82f6'
+    const buttonText = getButtonText()
+    
+    const updateMainButton = (params: {
+      is_progress_visible?: boolean
+      is_active?: boolean
+      text?: string
+      color?: string
+      text_color?: string
+    }) => {
+      try {
+        if ((window as any).TelegramWebviewProxy?.postEvent) {
+          (window as any).TelegramWebviewProxy.postEvent('web_app_setup_main_button', JSON.stringify(params))
+        } else if (window.parent !== window) {
+          window.parent.postMessage(JSON.stringify({
+            eventType: 'web_app_setup_main_button',
+            eventData: params
+          }), '*')
+        }
+      } catch (e) {
+        console.log('[MainButton] update failed:', e)
+      }
+    }
+    
+    if (isSubmitting) {
+      updateMainButton({
+        is_progress_visible: true,
+        is_active: false,
+        text: buttonText,
+        color: buttonColor,
+        text_color: '#ffffff'
+      })
+    } else {
+      updateMainButton({
+        is_progress_visible: false,
+        is_active: true,
+        text: buttonText,
+        color: buttonColor,
+        text_color: '#ffffff'
+      })
+    }
+  }, [isSubmitting, theme])
+
+  // Loading overlay component
+  const LoadingOverlay = () => {
+    if (status === 'idle' || status === 'error') return null
+    
+    return (
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 p-6">
+          <SpinnerGap className="w-12 h-12 text-primary animate-spin" weight="bold" />
+          <div className="text-center">
+            <p className="text-lg font-semibold">
+              {status === 'adding' && 'Adding to Watchlist...'}
+              {status === 'fetching' && 'Fetching Product Details...'}
+              {status === 'success' && 'Success!'}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {status === 'adding' && 'Please wait while we add your product'}
+              {status === 'fetching' && 'Getting price and product information'}
+              {status === 'success' && 'Redirecting to product details'}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
+      <LoadingOverlay />
+      
       <div>
         <h1 className="text-2xl font-bold tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Add Product</h1>
         <p className="text-sm text-muted-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">Track prices from any supported store</p>

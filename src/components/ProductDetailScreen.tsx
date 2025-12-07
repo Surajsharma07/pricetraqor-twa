@@ -46,17 +46,86 @@ export function ProductDetailScreen({
 }: ProductDetailScreenProps) {
   const twa = useTelegramWebApp()
   
-  // Memoize product ID to avoid dependency issues
-  const productId = useMemo(() => product?.id, [product?.id])
-  
+  // Declare state first
   const [isEditingTarget, setIsEditingTarget] = useState(false)
-  const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>(
-    product?.targetPrice ? 'price_below' : 'none'
-  )
-  const [targetPriceInput, setTargetPriceInput] = useState(
-    product?.targetPrice?.toString() || ''
-  )
+  const [alertType, setAlertType] = useState<'none' | 'percentage_drop' | 'price_below'>('none')
+  const [targetPriceInput, setTargetPriceInput] = useState('')
   const [percentageInput, setPercentageInput] = useState('10')
+  
+  // Memoize product ID for display purposes only
+  const productId = useMemo(() => product?.id, [product?.id])
+
+  // Sync state when product changes to avoid hook order issues
+  useEffect(() => {
+    if (product) {
+      setAlertType(product.targetPrice ? 'price_below' : 'none')
+      setTargetPriceInput(product.targetPrice?.toString() || '')
+      setIsEditingTarget(false)
+    } else {
+      // Reset state when product is null
+      setAlertType('none')
+      setTargetPriceInput('')
+      setIsEditingTarget(false)
+    }
+  }, [product?.id])
+
+  // Define handleSaveTargetPrice BEFORE early return to ensure hooks are always called in same order
+  // Include all dependencies to ensure callback is always up-to-date
+  const handleSaveTargetPrice = useCallback(() => {
+    if (!product || !productId) return
+    
+    if (onUpdateAlert) {
+      // New API with full alert type support
+      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
+      const percentage = percentageInput.trim() ? parseFloat(percentageInput) : undefined
+      
+      if (alertType === 'price_below' && (!price || price <= 0)) {
+        toast.error('Please enter a valid target price')
+        return
+      }
+      
+      if (alertType === 'percentage_drop' && (!percentage || percentage <= 0 || percentage > 100)) {
+        toast.error('Please enter a valid percentage (1-100)')
+        return
+      }
+      
+      onUpdateAlert(
+        productId,
+        alertType === 'none' ? undefined : alertType,
+        price,
+        percentage
+      )
+      setIsEditingTarget(false)
+      toast.success('Alert settings updated')
+    } else {
+      // Fallback to old API (target price only)
+      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
+    
+      if (targetPriceInput.trim() && (isNaN(price!) || price! <= 0)) {
+        toast.error('Please enter a valid price')
+        return
+      }
+
+      onUpdateTargetPrice(productId, price)
+      setIsEditingTarget(false)
+      toast.success(price ? 'Target price updated' : 'Target price removed')
+    }
+  }, [product, productId, alertType, targetPriceInput, percentageInput, onUpdateAlert, onUpdateTargetPrice])
+
+  // Setup MainButton for "Save Changes" when editing alert - MUST be before early return
+  useEffect(() => {
+    if (isEditingTarget && product) {
+      twa.mainButton.show('Save Changes', handleSaveTargetPrice)
+    } else {
+      twa.mainButton.hide()
+    }
+    
+    return () => {
+      twa.mainButton.hide()
+    }
+    // twa.mainButton methods are memoized with useCallback in the hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditingTarget, handleSaveTargetPrice])
 
   const priceChangeData = product
     ? (product.previousPrice 
@@ -64,7 +133,8 @@ export function ProductDetailScreen({
         : null)
     : null
 
-  // Show skeleton if loading or no product
+  // Show skeleton if loading or no product - MUST be after all hooks
+  // Render conditionally instead of early return to ensure consistent hook calls
   if (isLoading || !product) {
     return <ProductDetailSkeleton />
   }
@@ -122,68 +192,12 @@ export function ProductDetailScreen({
     }
   }
 
-  const handleSaveTargetPrice = useCallback(() => {
-    if (!product || !productId) return
-    
-    if (onUpdateAlert) {
-      // New API with full alert type support
-      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
-      const percentage = percentageInput.trim() ? parseFloat(percentageInput) : undefined
-      
-      if (alertType === 'price_below' && (!price || price <= 0)) {
-        toast.error('Please enter a valid target price')
-        return
-      }
-      
-      if (alertType === 'percentage_drop' && (!percentage || percentage <= 0 || percentage > 100)) {
-        toast.error('Please enter a valid percentage (1-100)')
-        return
-      }
-      
-      onUpdateAlert(
-        productId,
-        alertType === 'none' ? undefined : alertType,
-        price,
-        percentage
-      )
-      setIsEditingTarget(false)
-      toast.success('Alert settings updated')
-    } else {
-      // Fallback to old API (target price only)
-      const price = targetPriceInput.trim() ? parseFloat(targetPriceInput) : undefined
-    
-      if (targetPriceInput.trim() && (isNaN(price!) || price! <= 0)) {
-        toast.error('Please enter a valid price')
-        return
-      }
-
-      onUpdateTargetPrice(productId, price)
-      setIsEditingTarget(false)
-      toast.success(price ? 'Target price updated' : 'Target price removed')
-    }
-  }, [alertType, targetPriceInput, percentageInput, productId, onUpdateAlert, onUpdateTargetPrice])
-
   const handleCancelEdit = () => {
     if (product) {
       setTargetPriceInput(product.targetPrice?.toString() || '')
     }
     setIsEditingTarget(false)
   }
-
-  // Setup MainButton for "Save Changes" when editing alert
-  useEffect(() => {
-    if (isEditingTarget) {
-      twa.mainButton.show('Save Changes', handleSaveTargetPrice)
-    } else {
-      twa.mainButton.hide()
-    }
-    
-    return () => {
-      twa.mainButton.hide()
-    }
-    // twa.mainButton methods are memoized with useCallback in the hook
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditingTarget, handleSaveTargetPrice])
 
   const handleOpenProduct = () => {
     if (!product) return
@@ -391,38 +405,44 @@ export function ProductDetailScreen({
                   <div className="neumorphic-inset p-4 rounded-xl">
                     <ResponsiveContainer width="100%" height={200}>
                       <LineChart 
-                        data={product.priceHistory.map(entry => {
-                          let dateStr = 'Unknown'
-                          try {
-                            const timestamp = entry.checkedAt
-                            if (!timestamp) return { date: 'Unknown', price: entry.price, fullDate: '' }
-                            
-                            // Try ISO date first
-                            let date = new Date(timestamp)
-                            
-                            // Try ObjectId if ISO fails
-                            if (isNaN(date.getTime()) && typeof timestamp === 'string' && timestamp.length === 24 && /^[0-9a-f]{24}$/i.test(timestamp)) {
-                              const seconds = parseInt(timestamp.substring(0, 8), 16)
-                              date = new Date(seconds * 1000)
+                        data={[...product.priceHistory]
+                          .map(entry => {
+                            let dateStr = 'Unknown'
+                            let timestamp = 0
+                            try {
+                              const checkedAt = entry.checkedAt
+                              if (!checkedAt) return { date: 'Unknown', price: entry.price, fullDate: '', timestamp: 0 }
+                              
+                              // Try ISO date first
+                              let date = new Date(checkedAt)
+                              
+                              // Try ObjectId if ISO fails
+                              if (isNaN(date.getTime()) && typeof checkedAt === 'string' && checkedAt.length === 24 && /^[0-9a-f]{24}$/i.test(checkedAt)) {
+                                const seconds = parseInt(checkedAt.substring(0, 8), 16)
+                                date = new Date(seconds * 1000)
+                              }
+                              
+                              // Try epoch number if still invalid
+                              if (isNaN(date.getTime()) && !isNaN(Number(checkedAt))) {
+                                date = new Date(Number(checkedAt))
+                              }
+                              
+                              if (!isNaN(date.getTime())) {
+                                dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                                timestamp = date.getTime()
+                              }
+                            } catch (e) {
+                              dateStr = 'Unknown'
                             }
-                            
-                            // Try epoch number if still invalid
-                            if (isNaN(date.getTime()) && !isNaN(Number(timestamp))) {
-                              date = new Date(Number(timestamp))
+                            return {
+                              date: dateStr,
+                              price: entry.price,
+                              fullDate: entry.checkedAt,
+                              timestamp
                             }
-                            
-                            if (!isNaN(date.getTime())) {
-                              dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                            }
-                          } catch (e) {
-                            dateStr = 'Unknown'
-                          }
-                          return {
-                            date: dateStr,
-                            price: entry.price,
-                            fullDate: entry.checkedAt
-                          }
-                        })}
+                          })
+                          .sort((a, b) => a.timestamp - b.timestamp)
+                        }
                         margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
                       >
                         <defs>

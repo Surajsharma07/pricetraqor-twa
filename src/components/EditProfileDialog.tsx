@@ -51,7 +51,7 @@ export function EditProfileDialog({ open, onOpenChange, user, onProfileUpdated }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border border-border/40">
+      <DialogContent className="bg-background/95 backdrop-blur-xl border border-border/60 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PencilSimple className="w-5 h-5" weight="bold" />

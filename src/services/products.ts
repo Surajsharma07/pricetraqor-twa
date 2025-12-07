@@ -119,25 +119,76 @@ class ProductService {
    * Add a new product to track
    */
   async addProduct(data: CreateProductRequest): Promise<Product> {
+    // Auto-detect marketplace if not provided
+    const payload = {
+      ...data,
+      marketplace: data.marketplace || detectMarketplace(data.url),
+    };
+    
+    console.log('[addProduct] Starting with payload:', payload);
+    
+    // Use fetch instead of axios for more control
+    const token = localStorage.getItem('jwt_token');
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    
+    let response: Response;
     try {
-      // Auto-detect marketplace if not provided
-      const payload = {
-        ...data,
-        marketplace: data.marketplace || detectMarketplace(data.url),
-      };
-      
-      const response = await apiClient.post<{ product: Product }>('/products', payload);
-      // Backend returns { product: ProductOut, initial_snapshot_enqueued: bool }
-      return response.data.product;
-    } catch (error: any) {
-      console.error('Failed to add product:', error);
-      console.error('Error response:', error.response);
-      throw new Error(
-        error.response?.data?.detail?.message || 
-        error.response?.data?.detail || 
-        'Failed to add product'
-      );
+      response = await fetch(`${baseUrl}/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch (fetchErr: any) {
+      console.log('[addProduct] Fetch error:', fetchErr);
+      throw new Error('Network error - please check your connection');
     }
+    
+    console.log('[addProduct] Response status:', response.status);
+    console.log('[addProduct] Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    // Parse response body
+    let responseData: any;
+    const responseText = await response.text();
+    console.log('[addProduct] Response text length:', responseText.length);
+    
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+      console.log('[addProduct] Parsed response data:', responseData);
+    } catch (parseErr: any) {
+      console.log('[addProduct] JSON parse error:', parseErr);
+      console.log('[addProduct] Raw response text:', responseText.substring(0, 500));
+      throw new Error(`Server returned invalid response (status ${response.status})`);
+    }
+    
+    // Handle success (200 or 201)
+    if (response.status === 200 || response.status === 201) {
+      // Backend returns { product: ProductOut, initial_snapshot_enqueued: bool }
+      if (responseData?.product) {
+        console.log('[addProduct] Success - returning product from .product');
+        return responseData.product;
+      }
+      // Fallback if response structure is different
+      if (responseData?._id) {
+        console.log('[addProduct] Success - returning direct product');
+        return responseData as Product;
+      }
+      // If we got 201 but no product in expected format, this is an issue
+      console.log('[addProduct] Got success status but unexpected response format');
+      throw new Error('Product may have been added but response was invalid');
+    }
+    
+    // Handle errors
+    const errorMessage = 
+      responseData?.detail?.message || 
+      responseData?.detail || 
+      responseData?.message ||
+      `Failed to add product (${response.status})`;
+    
+    console.log('[addProduct] Error:', errorMessage);
+    throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
   }
 
   /**

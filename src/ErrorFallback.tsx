@@ -9,6 +9,14 @@ interface ErrorFallbackProps {
 }
 
 export const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
+  // Log full error details for debugging
+  console.error('ErrorFallback caught error:', {
+    message: error.message,
+    stack: error.stack,
+    name: error.name,
+    error: error
+  })
+  
   // When encountering an error in the development mode, rethrow it and don't display the boundary.
   // The parent UI will take care of showing a more helpful dialog.
   if (import.meta.env.DEV) throw error;

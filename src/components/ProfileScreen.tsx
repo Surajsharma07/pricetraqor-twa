@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge'
 import { EditProfileDialog } from '@/components/EditProfileDialog'
 import { LinkAccountDialog } from '@/components/LinkAccountDialog'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
-import { DeleteAccountDialog } from '@/components/DeleteAccountDialog'
 import { 
   User, 
   ChartLine,
@@ -23,8 +22,7 @@ import {
   Check,
   PencilSimple,
   Link as LinkIcon,
-  LockKey,
-  Trash
+  LockKey
 } from '@phosphor-icons/react'
 
 interface ProfileScreenProps {
@@ -37,7 +35,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
   const [editProfileOpen, setEditProfileOpen] = useState(false)
   const [linkAccountOpen, setLinkAccountOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
-  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false)
   const isLightTheme = document.documentElement.classList.contains('light-theme')
 
   useEffect(() => {
@@ -54,12 +51,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
 
   const activeProducts = products.filter(p => p.isActive)
   const productsWithDrops = products.filter(p => p.priceChange && p.priceChange < 0)
-  const totalSavings = productsWithDrops.reduce((sum, p) => {
-    if (p.priceChange && p.previousPrice) {
-      return sum + Math.abs(p.priceChange)
-    }
-    return sum
-  }, 0)
 
   const averagePrice = products.length > 0
     ? products.reduce((sum, p) => sum + p.currentPrice, 0) / products.length
@@ -76,7 +67,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
 
   const subscriptionPlan = user?.plan?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Free'
   const maxProducts = user?.max_products || 10
-  const maxPriceChecks = 100
   const usedProducts = user?.current_count || products.length
   const usedPriceChecks = products.reduce((sum, p) => sum + p.priceHistory.length, 0)
 
@@ -174,15 +164,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
           <LockKey className="w-4 h-4 mr-2" weight="bold" />
           Change Password
         </Button>
-        
-        <Button
-          variant="outline"
-          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-          onClick={() => setDeleteAccountOpen(true)}
-        >
-          <Trash className="w-4 h-4 mr-2" weight="bold" />
-          Delete Account
-        </Button>
       </div>
 
       <Card 
@@ -236,23 +217,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
                 ></div>
               </div>
             </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-sm text-muted-foreground font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Price Checks Used</span>
-                <span className="text-sm font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">{usedPriceChecks} / {maxPriceChecks}</span>
-              </div>
-              <div className="h-3 neumorphic-inset rounded-full overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-30 pointer-events-none"></div>
-                <div 
-                  className="h-full bg-gradient-to-r from-success via-success/90 to-success/80 rounded-full transition-all duration-500 relative glow-success"
-                  style={{ 
-                    width: `${Math.min((usedPriceChecks / maxPriceChecks) * 100, 100)}%`,
-                    boxShadow: '0 0 12px oklch(0.65 0.20 145 / 0.5), inset 0 1px 0 oklch(0.95 0 0 / 0.2)'
-                  }}
-                ></div>
-              </div>
-            </div>
           </div>
 
           <div 
@@ -270,7 +234,7 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
             <div className="space-y-3">
               {[
                 `Track up to ${maxProducts} products`,
-                `${maxPriceChecks} price checks per month`,
+                'Unlimited price checks',
                 'Daily price updates',
                 'Email notifications',
                 'Price history charts'
@@ -386,8 +350,8 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
                 <Bell className="w-6 h-6 text-accent drop-shadow-[0_3px_6px_oklch(0.65_0.20_230_/_0.6)] relative z-10" weight="bold" />
               </div>
               <div>
-                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{formatPrice(totalSavings, 'INR')}</p>
-                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Total Savings</p>
+                <p className="text-2xl font-bold drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">{products.filter(p => p.targetPrice).length}</p>
+                <p className="text-xs text-muted-foreground font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Alerts Active</p>
               </div>
             </div>
           </Card>
@@ -451,17 +415,19 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
 
       {/* Logout Button */}
       {onLogout && (
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={() => {
-            if (confirm('Are you sure you want to logout?')) {
-              onLogout()
-            }
-          }}
-        >
-          <span>Logout</span>
-        </Button>
+        <div className="pb-24">
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={() => {
+              if (confirm('Are you sure you want to logout?')) {
+                onLogout()
+              }
+            }}
+          >
+            <span>Logout</span>
+          </Button>
+        </div>
       )}
 
       {/* Dialogs */}
@@ -482,10 +448,6 @@ export function ProfileScreen({ products, onLogout }: ProfileScreenProps) {
           <ChangePasswordDialog
             open={changePasswordOpen}
             onOpenChange={setChangePasswordOpen}
-          />
-          <DeleteAccountDialog
-            open={deleteAccountOpen}
-            onOpenChange={setDeleteAccountOpen}
           />
         </>
       )}

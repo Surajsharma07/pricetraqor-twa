@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import WebApp from "@twa-dev/sdk"
 import { TrackedProduct, UserSettings, productToTrackedProduct, User } from "@/lib/types"
 import { WatchlistScreen } from "@/components/WatchlistScreen"
@@ -43,15 +43,15 @@ function App() {
   // Use ref to prevent multiple initialization attempts
   const initializingRef = useRef(false)
 
-  // Start notification polling when user is authenticated
-  useEffect(() => {
-    if (user && settings.notificationsEnabled) {
-      startPolling(30000) // Poll every 30 seconds
-      return () => {
-        stopPolling()
-      }
-    }
-  }, [user, settings.notificationsEnabled, startPolling, stopPolling])
+  // Notification polling disabled - endpoint not implemented yet
+  // useEffect(() => {
+  //   if (user && settings.notificationsEnabled) {
+  //     startPolling(30000) // Poll every 30 seconds
+  //     return () => {
+  //       stopPolling()
+  //     }
+  //   }
+  // }, [user, settings.notificationsEnabled, startPolling, stopPolling])
 
   // Load settings from CloudStorage on mount
   useEffect(() => {
@@ -226,146 +226,144 @@ function App() {
     }
   }, [products])
 
+  // Track if product addition is in progress to prevent duplicates
+  const isAddingProductRef = useRef(false)
+  const lastAddAttemptRef = useRef(0)
+  const DEBOUNCE_MS = 2000 // 2 second debounce
+
+  // State to track add product loading status for UI feedback
+  const [addProductStatus, setAddProductStatus] = useState<'idle' | 'adding' | 'fetching' | 'success' | 'error'>('idle')
+
   const handleAddProduct = async (url: string, targetPrice?: number, alertType?: string, alertPercentage?: number) => {
+    console.log('[handleAddProduct] START - URL:', url)
+    
+    // Prevent multiple submissions
+    if (isAddingProductRef.current) {
+      console.log('[handleAddProduct] Already in progress')
+      return
+    }
+    
+    // Debounce
+    const now = Date.now()
+    if (now - lastAddAttemptRef.current < DEBOUNCE_MS) {
+      console.log('[handleAddProduct] Debouncing')
+      return
+    }
+    lastAddAttemptRef.current = now
+    isAddingProductRef.current = true
+    setAddProductStatus('adding')
+    
+    // Validate URL
+    if (!url || typeof url !== 'string') {
+      console.log('[handleAddProduct] Invalid URL')
+      toast.error('Invalid product URL')
+      setAddProductStatus('error')
+      isAddingProductRef.current = false
+      return
+    }
+
+    // Detect marketplace
+    const lowerUrl = url.toLowerCase()
+    const marketplace = lowerUrl.includes('flipkart.com') ? 'flipkart' :
+                       lowerUrl.includes('reliance') || lowerUrl.includes('jiomart') ? 'reliance' :
+                       lowerUrl.includes('croma.com') ? 'croma' : 'amazon'
+
+    const payload: any = { url, marketplace }
+    
+    if (alertType && alertType !== 'none') {
+      payload.alert_type = alertType
+      if (alertType === 'percentage_drop' && alertPercentage) {
+        payload.alert_threshold_percentage = alertPercentage
+      }
+      if (alertType === 'price_below' && targetPrice) {
+        payload.alert_threshold_price = targetPrice
+      }
+    }
+    
+    console.log('[handleAddProduct] Calling API with:', payload)
+    
     try {
-      // Safety check for undefined url
-      if (!url || typeof url !== 'string') {
-        twa.haptic.notification('error')
-        toast.error('Invalid product URL')
-        return
-      }
-
-      const existingProduct = products.find(p => p.productUrl === url)
-      if (existingProduct) {
-        twa.haptic.notification('warning')
-        toast.error('This product is already in your watchlist')
-        return
-      }
-
-      // Detect marketplace from URL
-      const lowerUrl = url.toLowerCase()
-      const marketplace = lowerUrl.includes('flipkart.com') ? 'flipkart' :
-                         lowerUrl.includes('reliance') || lowerUrl.includes('jiomart') ? 'reliance' :
-                         lowerUrl.includes('croma.com') ? 'croma' : 'amazon'
-
-      // Add product via API with correct field names
-      twa.haptic.impact('light')
-      
-      // Build payload - only include alert fields if alert type is specified
-      const payload: any = {
-        url,
-        marketplace,
-      }
-      
-      if (alertType && alertType !== 'none') {
-        payload.alert_type = alertType
-        if (alertType === 'percentage_drop' && alertPercentage) {
-          payload.alert_threshold_percentage = alertPercentage
-        }
-        if (alertType === 'price_below' && targetPrice) {
-          payload.alert_threshold_price = targetPrice
-        }
-      }
-      
       const newProduct = await productService.addProduct(payload)
-
-      // Debug: log the response
-      console.log('Product added successfully:', newProduct)
-
-      // Convert to tracked product and add to list
-      const trackedProduct = productToTrackedProduct(newProduct)
-      console.log('Converted to tracked product:', trackedProduct)
+      console.log('[handleAddProduct] API returned:', JSON.stringify(newProduct))
       
-      setProducts([...products, trackedProduct])
-      setActiveScreen('watchlist')
-      twa.haptic.notification('success')
-      toast.success('Product added! Fetching details...')
-
-      // Poll for product data to be hydrated by worker
-      // The backend enqueues a snapshot job, which usually completes within 5-15 seconds
-      let pollAttempts = 0
-      const maxPollAttempts = 6 // Poll for up to 30 seconds (6 * 5 seconds)
-      
-      const pollForProductData = async () => {
-        try {
-          pollAttempts++
-          const updatedProduct = await productService.getProduct(newProduct._id)
-          
-          // Check if product has been hydrated (has title and price)
-          if (updatedProduct.title && updatedProduct.last_snapshot_price) {
-            // Product has been hydrated, update the list
-            const updatedTrackedProduct = productToTrackedProduct(updatedProduct)
-            setProducts(prevProducts => 
-              prevProducts.map(p => p.id === updatedProduct._id ? updatedTrackedProduct : p)
-            )
-            console.log('Product hydrated successfully:', updatedProduct)
-          } else if (pollAttempts < maxPollAttempts) {
-            // Not hydrated yet, poll again in 5 seconds
-            setTimeout(pollForProductData, 5000)
-          } else {
-            // Max attempts reached, product might take longer to hydrate
-            console.log('Product hydration taking longer than expected')
-          }
-        } catch (error) {
-          console.error('Failed to poll for product data:', error)
-          // Don't retry on error, just log it
-        }
+      // Validate the response has required fields
+      if (!newProduct || typeof newProduct !== 'object') {
+        console.log('[handleAddProduct] Invalid response - not an object')
+        throw new Error('Invalid response from server')
       }
       
-      // Start polling after 3 seconds (give worker time to start)
-      setTimeout(pollForProductData, 3000)
+      if (!newProduct._id) {
+        console.log('[handleAddProduct] Invalid response - no _id')
+        throw new Error('Invalid response from server - missing product ID')
+      }
+      
+      console.log('[handleAddProduct] Product validated, _id:', newProduct._id)
+      
+      // Product added successfully!
+      setAddProductStatus('success')
+      try {
+        twa.haptic.notification('success')
+      } catch (hapticErr) {
+        console.log('[handleAddProduct] Haptic failed (non-critical):', hapticErr)
+      }
+      toast.success('Product added!')
+      
+      // Add to list and navigate - wrap in try-catch
+      try {
+        console.log('[handleAddProduct] Converting to TrackedProduct...')
+        const trackedProduct = productToTrackedProduct(newProduct)
+        console.log('[handleAddProduct] TrackedProduct:', trackedProduct.id)
+        setProducts(prev => [...prev, trackedProduct])
+        setSelectedProduct(trackedProduct)
+        setActiveScreen('product-detail')
+      } catch (convErr: any) {
+        console.log('[handleAddProduct] Error converting product:', convErr)
+        // Still navigate to watchlist even if conversion fails
+        setActiveScreen('watchlist')
+      }
+      
     } catch (error: any) {
-      console.error('Failed to add product:', error)
-      console.error('Error details:', {
-        message: error?.message,
-        response: error?.response,
-        data: error?.response?.data
-      })
-      twa.haptic.notification('error')
+      const errorMsg = error?.message || ''
+      console.log('[handleAddProduct] CATCH - Error:', errorMsg)
       
-      // Check if this is actually a success but wrongly caught as error
-      // This can happen if the response structure is unexpected
-      if (error?.response?.status === 201 || error?.response?.status === 200) {
-        // Product was actually added successfully
-        console.log('Product was added despite error - reloading products')
-        toast.success('Product added! Refreshing list...')
+      // Check if "already tracking" - this is success, not failure!
+      if (errorMsg.toLowerCase().includes('already tracking')) {
+        console.log('[handleAddProduct] Product already exists - treating as success')
         
-        // Reload products from backend
+        // Reload products and find it
         try {
-          const refreshedProducts = await productService.getProducts()
-          const trackedProducts = refreshedProducts.map(p => productToTrackedProduct(p))
-          setProducts(trackedProducts)
+          const allProducts = await productService.getProducts()
+          setProducts(allProducts.map(p => productToTrackedProduct(p)))
+          
+          const existing = allProducts.find(p => 
+            p.url.toLowerCase().includes(url.toLowerCase().split('?')[0]) ||
+            url.toLowerCase().includes(p.url.toLowerCase().split('?')[0])
+          )
+          
+          setAddProductStatus('success')
+          twa.haptic.notification('success')
+          toast.success('Product is in your watchlist!')
+          
+          if (existing) {
+            setSelectedProduct(productToTrackedProduct(existing))
+            setActiveScreen('product-detail')
+          } else {
+            setActiveScreen('watchlist')
+          }
+        } catch (e) {
+          console.log('[handleAddProduct] Error loading products:', e)
           setActiveScreen('watchlist')
-        } catch (refreshError) {
-          console.error('Failed to refresh products:', refreshError)
         }
-        return
+      } else {
+        // Real error
+        console.log('[handleAddProduct] Real error - showing toast')
+        setAddProductStatus('error')
+        twa.haptic.notification('error')
+        toast.error(errorMsg || 'Failed to add product')
       }
-      
-      // Extract error message with multiple fallbacks
-      let errorMessage = 'Failed to add product'
-      
-      if (error?.message && typeof error.message === 'string') {
-        errorMessage = error.message
-      } else if (error?.response?.data?.detail) {
-        const detail = error.response.data.detail
-        if (typeof detail === 'string') {
-          errorMessage = detail
-        } else if (detail?.message) {
-          errorMessage = detail.message
-        } else if (typeof detail === 'object') {
-          errorMessage = JSON.stringify(detail)
-        }
-      } else if (typeof error === 'string') {
-        errorMessage = error
-      } else if (error?.toString && typeof error.toString === 'function') {
-        const str = error.toString()
-        if (str !== '[object Object]') {
-          errorMessage = str
-        }
-      }
-      
-      toast.error(errorMessage)
+    } finally {
+      isAddingProductRef.current = false
+      setTimeout(() => setAddProductStatus('idle'), 1000)
     }
   }
 
@@ -373,21 +371,22 @@ function App() {
     try {
       twa.haptic.selection()
       setIsLoadingProductDetail(true)
-      
-      // Set screen after loading state to avoid flash
-      setTimeout(() => setActiveScreen('product-detail'), 0)
+      // Don't change screen yet - wait until product is loaded to avoid hook order issues
       
       // Load full product details with price history
       const priceHistory = await productService.getPriceHistory(product.id)
       const fullProduct = await productService.getProduct(product.id)
       const trackedProduct = productToTrackedProduct(fullProduct, priceHistory)
       
+      // Set product first, then change screen - this ensures component renders with product data
       setSelectedProduct(trackedProduct)
+      setActiveScreen('product-detail')
     } catch (error: any) {
       console.error('Failed to load product details:', error)
       twa.haptic.notification('error')
       toast.error(error.message || 'Failed to load product details')
       setActiveScreen('watchlist')
+      setSelectedProduct(null)
     } finally {
       setIsLoadingProductDetail(false)
     }
@@ -453,21 +452,19 @@ function App() {
     }
   }
 
-  const handleUpdateTargetPrice = async (id: string, price?: number) => {
+  const handleUpdateTargetPrice = useCallback(async (id: string, price?: number) => {
     try {
       twa.haptic.impact('light')
       await productService.updateDesiredPrice(id, price)
       
-      // Update local state
-      setProducts(
-        products.map(p =>
+      // Update local state using functional updates to avoid stale closure issues
+      setProducts(prevProducts =>
+        prevProducts.map(p =>
           p.id === id ? { ...p, targetPrice: price } : p
         )
       )
       
-      if (selectedProduct?.id === id) {
-        setSelectedProduct({ ...selectedProduct, targetPrice: price })
-      }
+      setSelectedProduct(prev => prev?.id === id ? { ...prev, targetPrice: price } : prev)
       
       twa.haptic.notification('success')
       toast.success(price ? 'Target price updated' : 'Target price removed')
@@ -476,9 +473,9 @@ function App() {
       twa.haptic.notification('error')
       toast.error(error.message || 'Failed to update target price')
     }
-  }
+  }, [twa])
 
-  const handleUpdateAlert = async (
+  const handleUpdateAlert = useCallback(async (
     id: string,
     alertType?: string,
     targetPrice?: number,
@@ -488,8 +485,8 @@ function App() {
       twa.haptic.impact('light')
       await productService.updateAlert(id, alertType, targetPrice, percentage)
       
-      // Update local state
-      setProducts(products.map(p => 
+      // Update local state using functional updates to avoid stale closure issues
+      setProducts(prevProducts => prevProducts.map(p => 
         p.id === id ? { 
           ...p, 
           targetPrice: alertType === 'price_below' ? targetPrice : undefined 
@@ -497,12 +494,10 @@ function App() {
       ))
       
       // Update selected product if it's the one being edited
-      if (selectedProduct && selectedProduct.id === id) {
-        setSelectedProduct({ 
-          ...selectedProduct, 
-          targetPrice: alertType === 'price_below' ? targetPrice : undefined 
-        })
-      }
+      setSelectedProduct(prev => prev && prev.id === id ? { 
+        ...prev, 
+        targetPrice: alertType === 'price_below' ? targetPrice : undefined 
+      } : prev)
       
       twa.haptic.notification('success')
       toast.success('Alert settings updated')
@@ -511,7 +506,7 @@ function App() {
       twa.haptic.notification('error')
       toast.error(error.message || 'Failed to update alert')
     }
-  }
+  }, [twa])
 
   const handleUpdateSettings = async (newSettings: UserSettings) => {
     setSettings(newSettings)
@@ -533,11 +528,28 @@ function App() {
     setActiveScreen(screen)
   }
 
-  const handleNotificationClick = (productId: string) => {
+  const handleNotificationClick = async (productId: string) => {
     const product = products.find(p => p.id === productId)
     if (product) {
-      setSelectedProduct(product)
-      setActiveScreen('product-detail')
+      try {
+        setIsLoadingProductDetail(true)
+        setSelectedProduct(null)
+        setActiveScreen('product-detail')
+        
+        // Load full product details with price history
+        const priceHistory = await productService.getPriceHistory(product.id)
+        const fullProduct = await productService.getProduct(product.id)
+        const trackedProduct = productToTrackedProduct(fullProduct, priceHistory)
+        
+        setSelectedProduct(trackedProduct)
+      } catch (error: any) {
+        console.error('Failed to load product details:', error)
+        toast.error(error.message || 'Failed to load product details')
+        setActiveScreen('watchlist')
+        setSelectedProduct(null)
+      } finally {
+        setIsLoadingProductDetail(false)
+      }
     } else {
       toast.error('Product not found')
     }
@@ -717,19 +729,38 @@ function App() {
             onBack={() => setActiveScreen('watchlist')}
             onAdd={handleAddProduct}
             prefillUrl={prefillUrl}
+            status={addProductStatus}
+            theme={settings.theme}
           />
         )
       
       case 'product-detail':
+        // CRITICAL: Only render ProductDetailScreen when we have a product
+        // This prevents React error #310 by ensuring component always renders with consistent data
+        // Never pass null product - always show loading state instead
+        if (!selectedProduct) {
+          // Show loading skeleton while product is being loaded
+          return (
+            <div className="min-h-twa-viewport flex items-center justify-center">
+              <div className="text-center space-y-4">
+                <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-muted-foreground">Loading product details...</p>
+              </div>
+            </div>
+          )
+        }
+        // selectedProduct is guaranteed to be non-null here
+        // Use product ID as key to ensure React treats it as same component type when switching products
         return (
           <ProductDetailScreen
+            key={selectedProduct.id}
             product={selectedProduct}
             onBack={() => setActiveScreen('watchlist')}
             onToggleActive={handleToggleActive}
             onDelete={handleDeleteProduct}
             onUpdateTargetPrice={handleUpdateTargetPrice}
             onUpdateAlert={handleUpdateAlert}
-            isLoading={isLoadingProductDetail}
+            isLoading={false}
           />
         )
       
