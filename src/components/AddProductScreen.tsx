@@ -184,6 +184,25 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl, status = 'idle', t
     // Set color based on app theme
     const isDark = theme === 'dark'
     const buttonColor = isDark ? '#8774e1' : '#3b82f6' // Purple for dark, blue for light
+    const bottomBarColor = isDark ? '#1a1a2e' : '#ffffff' // Dark background for dark theme
+    
+    // Helper to post events to Telegram
+    const postTelegramEvent = (eventType: string, eventData: any) => {
+      try {
+        if ((window as any).TelegramWebviewProxy?.postEvent) {
+          (window as any).TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData))
+          console.log(`[Telegram] ${eventType}:`, eventData)
+        } else if (window.parent !== window) {
+          window.parent.postMessage(JSON.stringify({ eventType, eventData }), '*')
+          console.log(`[Telegram] ${eventType} (postMessage):`, eventData)
+        }
+      } catch (e) {
+        console.log(`[Telegram] ${eventType} failed:`, e)
+      }
+    }
+    
+    // Set bottom bar color to match app theme
+    postTelegramEvent('web_app_set_bottom_bar_color', { color: bottomBarColor })
     
     // Use native postEvent for maximum compatibility with all parameters
     const setupMainButton = (params: {
@@ -195,23 +214,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl, status = 'idle', t
       text_color?: string
       has_shine_effect?: boolean
     }) => {
-      try {
-        // Try TelegramWebviewProxy first (mobile/desktop)
-        if ((window as any).TelegramWebviewProxy?.postEvent) {
-          (window as any).TelegramWebviewProxy.postEvent('web_app_setup_main_button', JSON.stringify(params))
-          console.log('[MainButton] Used TelegramWebviewProxy.postEvent with:', params)
-        } 
-        // Fall back to window.parent.postMessage (web)
-        else if (window.parent !== window) {
-          window.parent.postMessage(JSON.stringify({
-            eventType: 'web_app_setup_main_button',
-            eventData: params
-          }), '*')
-          console.log('[MainButton] Used postMessage with:', params)
-        }
-      } catch (e) {
-        console.log('[MainButton] postEvent failed:', e)
-      }
+      postTelegramEvent('web_app_setup_main_button', params)
     }
     
     // Setup main button with all parameters including shine effect
