@@ -181,9 +181,9 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl, status = 'idle', t
     }
     globalAddProductHandler = onMainButtonClick
     
-    // Set color based on app theme
+    // Set color based on app theme - using theme's primary blue color
     const isDark = theme === 'dark'
-    const buttonColor = isDark ? '#8774e1' : '#3b82f6' // Purple for dark, blue for light
+    const buttonColor = '#3b82f6' // Theme primary blue (consistent for both themes)
     const bottomBarColor = isDark ? '#1a1a2e' : '#ffffff' // Dark background for dark theme
     
     // Helper to post events to Telegram
@@ -245,7 +245,7 @@ export function AddProductScreen({ onBack, onAdd, prefillUrl, status = 'idle', t
   // Update loading state using native postEvent
   useEffect(() => {
     const isDark = theme === 'dark'
-    const buttonColor = isDark ? '#8774e1' : '#3b82f6'
+    const buttonColor = '#3b82f6' // Theme primary blue
     const buttonText = getButtonText()
     
     const updateMainButton = (params: {
